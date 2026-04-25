@@ -558,7 +558,7 @@ export const StoreProvider = ({ children }) => {
       currentOperator, setCurrentOperator,
       shiftStart, setShiftStart,
       showQRModal, setShowQRModal,
-      getLosses, getReconciliations
+      getLosses, getReconciliations, getShifts
     }}>
       {children}
     </StoreContext.Provider>
