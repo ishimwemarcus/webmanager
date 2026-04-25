@@ -30,15 +30,15 @@ export default function Sidebar({ className }) {
 
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'Performance' },
-    { to: '/commander', icon: Cpu, label: 'Commander' },
-    { to: '/stock', icon: Package, label: 'Inventory' },
+    { to: '/commander', icon: Cpu, label: 'Prendre Commande' },
+    { to: '/stock', icon: Package, label: 'Inventaire' },
     { to: '/sales', icon: ShoppingCart, label: 'Transactions' },
-    { to: '/wait', icon: Clock, label: 'Credits' },
-    { to: '/reports', icon: BarChart2, label: 'Reports' },
-    { to: '/clients', icon: Users, label: 'Clients VIP' },
-    { to: '/shifts', icon: Clock, label: 'Shifts' },
-    { to: '/spoilage', icon: AlertTriangle, label: 'Pertes' },
-    { to: '/cloture', icon: Calculator, label: 'Caisse' }
+    { to: '/wait', icon: Clock, label: 'Crédits Clients' },
+    { to: '/reports', icon: BarChart2, label: 'Intelligence' },
+    { to: '/clients', icon: Users, label: 'Base Clients' },
+    { to: '/shifts', icon: Clock, label: 'Journal des Postes' },
+    { to: '/spoilage', icon: AlertTriangle, label: 'Pertes (Avaries)' },
+    { to: '/cloture', icon: Calculator, label: 'Clôture Caisse' }
   ];
 
   const initials = currentUser?.name

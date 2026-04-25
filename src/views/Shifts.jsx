@@ -7,13 +7,15 @@ export default function Shifts() {
   const store = useStore();
   const { t } = useLanguage();
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
+  const [showAll, setShowAll] = useState(false);
   
   const allShifts = store.getShifts();
   const allSales = store.getSales();
 
   const filteredShifts = useMemo(() => {
+    if (showAll) return allShifts;
     return allShifts.filter(s => s.end && s.end.startsWith(filterDate));
-  }, [allShifts, filterDate]);
+  }, [allShifts, filterDate, showAll]);
 
   const stats = useMemo(() => {
     const totalRevenue = filteredShifts.reduce((acc, curr) => acc + (parseFloat(curr.revenue) || 0), 0);
@@ -29,14 +31,22 @@ export default function Shifts() {
           <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">Suivi des Performances Employés</h2>
         </div>
         
-        <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-navy-100 shadow-xl">
-            <Calendar className="w-5 h-5 text-blue-gray" />
-            <input 
-              type="date" 
-              value={filterDate}
-              onChange={e => setFilterDate(e.target.value)}
-              className="bg-transparent font-black text-navy-950 outline-none text-sm cursor-pointer"
-            />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-navy-100 shadow-xl">
+              <Calendar className="w-5 h-5 text-blue-gray" />
+              <input 
+                type="date" 
+                value={filterDate}
+                onChange={e => { setFilterDate(e.target.value); setShowAll(false); }}
+                className="bg-transparent font-black text-navy-950 outline-none text-sm cursor-pointer"
+              />
+          </div>
+          <button 
+            onClick={() => setShowAll(!showAll)}
+            className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all shadow-xl ${showAll ? 'bg-navy-950 text-white border-navy-950' : 'bg-white text-navy-950 border-navy-100 hover:border-navy-brand'}`}
+          >
+            {showAll ? 'Voir par Date' : 'Voir Tout Historique'}
+          </button>
         </div>
       </div>
 
