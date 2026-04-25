@@ -590,7 +590,19 @@ export default function Sales() {
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h3 className="text-2xl font-black text-navy-brand uppercase tracking-tighter mb-2">Vente Réussie</h3>
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-10">La transaction a été cryptée et archivée</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-6">La transaction a été cryptée et archivée</p>
+            
+            <div className="bg-navy-50 p-6 rounded-[32px] border border-navy-100 mb-8 space-y-4">
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Suivi Client (QR Link)</p>
+              <div className="w-40 h-40 bg-white p-3 rounded-2xl mx-auto shadow-md">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`https://ishimwemarcus.github.io/webmanager/#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${lastSaleRecord?.phone || 'none'}`)}`}
+                  alt="Client Portal"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <p className="text-[10px] text-blue-gray leading-tight italic font-bold">Le client peut scanner ce code pour suivre ses transactions et son crédit en temps réel.</p>
+            </div>
 
             <div className="space-y-3">
               <button

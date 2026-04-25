@@ -52,10 +52,10 @@ function App() {
   return (
     <>
     {!appBooted && <BootScreen onComplete={() => setAppBooted(true)} />}
-    {appBooted && !store.currentOperator && <ShiftGateway />}
+    {appBooted && !store.currentOperator && !window.location.hash.includes('/portal/') && <ShiftGateway />}
     <QRModal />
 
-    <div className={`flex h-[100dvh] bg-transparent relative overflow-hidden transition-all duration-1000 ${appBooted && store.currentOperator ? 'opacity-100 scale-100' : 'opacity-0 scale-105 absolute inset-0 pointer-events-none'}`}>
+    <div className={`flex h-[100dvh] bg-transparent relative overflow-hidden transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 scale-100' : 'opacity-0 scale-105 absolute inset-0 pointer-events-none'}`}>
       <GlobalAlerts />
       <ToastNotification />
       <FloatingCalculator />
@@ -76,14 +76,18 @@ function App() {
       )}
 
       {/* Slide-over / Fixed Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar className="h-full shadow-2xl lg:shadow-none" />
-      </div>
+      {!window.location.hash.includes('/portal/') && (
+        <div className={`fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <Sidebar className="h-full shadow-2xl lg:shadow-none" />
+        </div>
+      )}
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden w-full relative">
-        <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        {!window.location.hash.includes('/portal/') && (
+          <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        )}
 
-        <main className="flex-1 overflow-auto p-3 lg:p-6 scrollbar-thin pb-safe">
+        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-3 lg:p-6'}`}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/stock" element={<Stock />} />

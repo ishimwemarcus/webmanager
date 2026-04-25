@@ -102,6 +102,14 @@ export default function Clients() {
                     <p className={`text-xs font-black ${c.currentDebt > 0 ? 'text-red-500' : 'text-success-pro'}`}>{c.currentDebt > 0 ? store.formatCurrency(c.currentDebt) : 'Cleared'}</p>
                   </div>
                 </div>
+                <a 
+                   href={`#/portal/${encodeURIComponent(c.name)}/none`} 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   className="mt-3 block w-full py-2 text-center bg-navy-brand text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-md"
+                >
+                   Ouvrir Portail Client
+                </a>
               </div>
             );
           }) : (
@@ -119,6 +127,7 @@ export default function Clients() {
                 <th className="p-6 text-right">Dépenses Totales</th>
                 <th className="p-6 text-right">Dette Active</th>
                 <th className="p-6 text-center">Statut (I.A)</th>
+                <th className="p-6 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -139,6 +148,16 @@ export default function Clients() {
                          ) : (
                            <span className="text-white/40 border border-white/10 px-4 py-2 rounded-full">Standard</span>
                          )}
+                      </td>
+                      <td className="p-6 text-center">
+                         <a 
+                           href={`#/portal/${encodeURIComponent(c.name)}/none`} 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className="px-4 py-2 bg-navy-brand/20 text-navy-brand border border-navy-brand/30 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-navy-brand hover:text-white transition-all"
+                         >
+                           Portal
+                         </a>
                       </td>
                     </tr>
                  );
