@@ -7,18 +7,33 @@ export default function ShiftGateway() {
   const store = useStore();
   const { t } = useLanguage();
   const [operator, setOperator] = useState('');
+  const [selectedCurrency, setSelectedCurrency] = useState(store.currency || 'RWF');
 
   const handleStartShift = (e) => {
     e.preventDefault();
     if (operator.trim().length > 0) {
       const name = operator.trim().toUpperCase();
       const shiftId = new Date().toISOString();
+      
       store.setCurrentOperator(name);
+      store.setCurrency(selectedCurrency);
+      
       if (store.setShiftStart) store.setShiftStart(shiftId);
+      
       localStorage.setItem('biztrack_operator', name);
       localStorage.setItem('biztrack_shift_start', shiftId);
+      localStorage.setItem('biztrack_currency', selectedCurrency);
     }
   };
+
+  const currencies = [
+    { code: 'RWF', symbol: 'RWF', label: 'Franc Rwandais' },
+    { code: 'USD', symbol: '$', label: 'US Dollar' },
+    { code: 'EUR', symbol: '€', label: 'Euro' },
+    { code: 'GBP', symbol: '£', label: 'British Pound' },
+    { code: 'TZS', symbol: 'TZS', label: 'Tanzanian Shilling' },
+    { code: 'UGX', symbol: 'UGX', label: 'Ugandan Shilling' }
+  ];
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-navy-950/40 backdrop-blur-2xl p-4 overflow-hidden animate-fade-in">
@@ -38,11 +53,11 @@ export default function ShiftGateway() {
             </div>
         </div>
 
-        <form onSubmit={handleStartShift} className="p-12 pt-4 space-y-10">
+        <form onSubmit={handleStartShift} className="p-12 pt-4 space-y-8">
             <div className="space-y-4">
                 <div className="flex justify-between items-center px-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">{t('identityIdentity')}</label>
-                  <span className="text-xs font-bold text-navy-brand opacity-50">Session v2.4</span>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">Identification Employé</label>
+                  <span className="text-xs font-bold text-navy-brand opacity-50">Session v4.0</span>
                 </div>
                 <div className="relative group">
                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-gray group-focus-within:text-navy-brand transition-colors"><User className="w-6 h-6" /></span>
@@ -51,21 +66,37 @@ export default function ShiftGateway() {
                         required
                         value={operator}
                         onChange={(e) => setOperator(e.target.value)}
-                        placeholder="ENTREZ VOTRE NOM..."
-                        className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100"
+                        placeholder="VOTRE NOM ICI..."
+                        className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100 shadow-inner"
                         autoFocus
                     />
                 </div>
             </div>
 
+            <div className="space-y-4">
+                <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray px-2">Devise de Travail (Currency)</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {currencies.map(c => (
+                    <button
+                      key={c.code}
+                      type="button"
+                      onClick={() => setSelectedCurrency(c.symbol)}
+                      className={`py-4 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all ${selectedCurrency === c.symbol ? 'bg-navy-950 text-white border-navy-950 shadow-xl' : 'bg-navy-50 text-blue-gray border-navy-100 hover:border-navy-brand'}`}
+                    >
+                      {c.code}
+                    </button>
+                  ))}
+                </div>
+            </div>
+
             <button type="submit" className="w-full py-6 rounded-[24px] bg-navy-brand text-white text-sm font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-2xl hover:bg-navy-900 active:scale-95 transition-all group overflow-hidden relative">
-                <span className="relative z-10">{t('initializeSession')}</span>
+                <span className="relative z-10">Démarrer Vacation</span>
                 <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
 
-            <p className="text-center text-xs text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
-              Protocole de sécurité actif. Les données de session seront cryptées et synchronisées avec le grand livre mondial.
+            <p className="text-center text-[10px] text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
+              Protocole de sécurité MARC actif. Devise sélectionnée: <span className="text-navy-brand">{selectedCurrency}</span>
             </p>
         </form>
       </div>
