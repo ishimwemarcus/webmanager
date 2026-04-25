@@ -14,7 +14,7 @@ export default function Reports() {
   const allShifts = store.getShifts() || [];
   const [activeSectors, setActiveSectors] = useState(['sales', 'ledger', 'stock', 'losses', 'shifts']);
 
-  const { dailySales, dailyLedger, dailyLosses, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected } = useMemo(() => {
+  const { dailySales, dailyLedger, dailyLosses, dailyShifts, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected } = useMemo(() => {
     const sales = allSales.filter(s => s.date && s.date.startsWith(reportDate));
     const ledger = allLedger.filter(l => l.date && l.date.startsWith(reportDate));
     const losses = allLosses.filter(l => l.date && l.date.startsWith(reportDate));
