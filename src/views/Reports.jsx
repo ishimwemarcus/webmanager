@@ -11,12 +11,14 @@ export default function Reports() {
   const allLedger = store.getLedgerManual() || [];
   const allLosses = store.getLosses() || [];
   const allProducts = store.getProducts() || [];
-  const [activeSectors, setActiveSectors] = useState(['sales', 'ledger', 'stock', 'losses']);
+  const allShifts = store.getShifts() || [];
+  const [activeSectors, setActiveSectors] = useState(['sales', 'ledger', 'stock', 'losses', 'shifts']);
 
   const { dailySales, dailyLedger, dailyLosses, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected } = useMemo(() => {
     const sales = allSales.filter(s => s.date && s.date.startsWith(reportDate));
     const ledger = allLedger.filter(l => l.date && l.date.startsWith(reportDate));
     const losses = allLosses.filter(l => l.date && l.date.startsWith(reportDate));
+    const shifts = allShifts.filter(s => s.end && s.end.startsWith(reportDate));
 
     const rev = sales.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
     const cash = sales.reduce((sum, s) => sum + (parseFloat(s.paid) || 0), 0);
@@ -28,6 +30,7 @@ export default function Reports() {
       dailySales: sales,
       dailyLedger: ledger,
       dailyLosses: losses,
+      dailyShifts: shifts,
       totalSalesRev: rev,
       totalSalesCash: cash,
       totalSalesDebt: rev - cash,
@@ -154,6 +157,26 @@ export default function Reports() {
       content.push({ text: `Total Inventory Asset Valuation: ${store.formatCurrency(totalStockValue)}`, style: 'total', alignment: 'right', margin: [0, 10, 0, 0] });
     }
 
+    if (activeSectors.includes('shifts')) {
+      content.push({ text: 'EMPLOYEE SHIFT PERFORMANCE', style: 'sectionTitle', margin: [0, 30, 0, 10] });
+      content.push({
+        table: {
+          headerRows: 1,
+          widths: ['*', 'auto', 'auto', 'auto'],
+          body: [
+            [{ text: 'Operator', style: 'th' }, { text: 'Shift Period', style: 'th' }, { text: 'Transactions', style: 'th', alignment: 'right' }, { text: 'Revenue', style: 'th', alignment: 'right' }],
+            ...dailyShifts.map(sh => [
+              sh.operator.toUpperCase(),
+              `${new Date(sh.start).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${new Date(sh.end).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`,
+              { text: sh.transactions + ' Tx', alignment: 'right' },
+              { text: store.formatCurrency(sh.revenue), alignment: 'right', bold: true }
+            ])
+          ]
+        },
+        layout: 'lightHorizontalLines'
+      });
+    }
+
     const docDefinition = {
       pageSize: 'A4',
       pageMargins: [40, 60, 40, 60],
@@ -197,7 +220,8 @@ export default function Reports() {
                 { id: 'sales', label: 'Ventes' },
                 { id: 'ledger', label: 'Grand Livre' },
                 { id: 'stock', label: 'Stock' },
-                { id: 'losses', label: 'Pertes' }
+                { id: 'losses', label: 'Pertes' },
+                { id: 'shifts', label: 'Postes' }
               ].map(s => (
                 <button
                   key={s.id}
@@ -340,6 +364,44 @@ export default function Reports() {
                       <td className="p-6 text-right text-xs font-black text-rose-600">-{store.formatCurrency(l.valuation)}</td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {activeSectors.includes('shifts') && (
+          <div className="glass-card rounded-[24px] overflow-hidden border border-navy-50 bg-white shadow-2xl">
+            <div className="p-8 border-b border-navy-50 flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center"><Activity className="w-5 h-5" /></div>
+              <h3 className="text-sm font-black uppercase tracking-widest text-orange-500">Rapport de Vacation (Postes)</h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="bg-navy-50/50 text-xs md:text-sm font-black uppercase text-blue-gray">
+                    <th className="p-6">Employé</th>
+                    <th className="p-6">Horaires</th>
+                    <th className="p-6 text-right">Transactions</th>
+                    <th className="p-6 text-right">Recette Totale</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {dailyShifts.map((sh, idx) => (
+                    <tr key={`shift-${idx}`}>
+                      <td className="p-6 font-black uppercase text-navy-950">{sh.operator}</td>
+                      <td className="p-6 text-xs font-bold text-blue-gray">
+                        {new Date(sh.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(sh.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </td>
+                      <td className="p-6 text-right text-xs font-black text-navy-950">{sh.transactions} Tx</td>
+                      <td className="p-6 text-right text-xs font-black text-emerald-600">{store.formatCurrency(sh.revenue)}</td>
+                    </tr>
+                  ))}
+                  {dailyShifts.length === 0 && (
+                    <tr>
+                      <td colSpan="4" className="p-20 text-center text-blue-gray font-black uppercase tracking-widest opacity-20 italic">Aucune vacation enregistrée</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
