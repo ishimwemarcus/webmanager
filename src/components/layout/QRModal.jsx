@@ -31,20 +31,20 @@ export default function QRModal() {
         <div className="relative bg-white p-4 rounded-[32px] shadow-[0_0_60px_rgba(59,130,246,0.4)] border-8 border-white/10 hover:scale-105 transition-transform duration-500 group">
           <div className="absolute inset-0 bg-gradient-to-t from-accent-500/0 via-accent-500/20 to-accent-500/0 h-1 sm:h-2 top-0 animate-[scan_3s_ease-in-out_infinite] z-10"></div>
           <img 
-            src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fguardian-company.surge.sh" 
-            alt="Guardian Global QR Code"
+            src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https%3A%2F%2Fishimwemarcus.github.io%2Fwebmanager%2F" 
+            alt="MARC Global QR Code"
             className="w-56 h-56 md:w-64 md:h-64 rounded-xl object-contain bg-white relative z-0"
           />
         </div>
 
         
         <a 
-          href="https://guardian-company.surge.sh" 
+          href="https://ishimwemarcus.github.io/webmanager/" 
           target="_blank" 
           rel="noreferrer"
           className="mt-6 text-xs md:text-sm md:text-xs text-accent-500 font-bold tracking-widest hover:text-white hover:underline uppercase text-center break-all px-4"
         >
-          guardian-company.surge.sh
+          ishimwemarcus.github.io/webmanager
         </a>
 
         {/* Manual Master Override Sync Button */}

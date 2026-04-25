@@ -91,7 +91,7 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="group relative">
             <div className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl border border-white/10 p-1 shadow-lg hover:scale-110 hover:bg-gold/20 hover:border-gold/50 transition-all duration-700 cursor-pointer overflow-hidden opacity-10 hover:opacity-100 backdrop-blur-sm hover:backdrop-blur-none group">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=BEF264&bgcolor=050A09&data=${encodeURIComponent('https://guardian-business.surge.sh')}`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=BEF264&bgcolor=050A09&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/')}`}
                 alt="System Link"
                 className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700"
               />
@@ -101,7 +101,7 @@ export default function TopBar({ onToggleSidebar }) {
               <p className="text-xs font-black uppercase tracking-widest text-white mb-2 italic">Global Network Link</p>
               <div className="w-full aspect-square bg-white rounded-lg p-2 mb-2">
                 <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://guardian-business.surge.sh')}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/')}`}
                   alt="System Link"
                   className="w-full h-full object-contain"
                 />
