@@ -52,9 +52,21 @@
     background-color: #F0FDF4 !important; /* Luminous Clean Mint Baseline */
     color: #0F172A !important; /* Midnight Navy Visibility */
     background-attachment: fixed !important;
-    transition: background 0.5s ease;
+    transition: background 0.5s ease, filter 0.5s ease;
     overscroll-behavior: none;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Photophobia / Eye Sickness Comfort Mode */
+  html.eye-care-mode {
+    filter: invert(0.9) hue-rotate(180deg) brightness(1.1) contrast(0.85);
+    background-color: #111 !important;
+  }
+
+  html.eye-care-mode img,
+  html.eye-care-mode video,
+  html.eye-care-mode canvas {
+    filter: invert(1) hue-rotate(180deg);
   }
 
   h1, h2, h3, h4, .font-display {

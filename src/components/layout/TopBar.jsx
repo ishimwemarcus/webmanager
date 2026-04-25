@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Bell, Search, Settings, LogOut, Globe, QrCode, X } from 'lucide-react';
+import { Menu, Bell, Search, Settings, LogOut, Globe, QrCode, X, Eye } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
 
@@ -8,6 +8,17 @@ export default function TopBar({ onToggleSidebar }) {
   const { lang, toggleLang, t } = useLanguage();
   const { currency, setCurrency, currentOperator } = store;
   const [showQR, setShowQR] = useState(false);
+  const [eyeCare, setEyeCare] = useState(() => localStorage.getItem('biztrack_eyecare') === 'true');
+
+  React.useEffect(() => {
+    if (eyeCare) {
+      document.documentElement.classList.add('eye-care-mode');
+      localStorage.setItem('biztrack_eyecare', 'true');
+    } else {
+      document.documentElement.classList.remove('eye-care-mode');
+      localStorage.setItem('biztrack_eyecare', 'false');
+    }
+  }, [eyeCare]);
 
   const today = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', {
     weekday: 'long',
@@ -73,6 +84,15 @@ export default function TopBar({ onToggleSidebar }) {
           >
             <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform text-[#F59E0B]" />
             <span>{lang === 'en' ? 'EN' : 'FR'}</span>
+          </button>
+
+          {/* Eye Care Toggle */}
+          <button
+            onClick={() => setEyeCare(!eyeCare)}
+            title="Toggle Eye Care Mode"
+            className={`flex items-center gap-2 px-3 py-2 border rounded-2xl transition-all font-black group ${eyeCare ? 'bg-[#BEF264]/20 border-[#BEF264] text-[#BEF264]' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
+          >
+            <Eye className="w-4 h-4" />
           </button>
 
           {/* Currency Input Modifier */}
