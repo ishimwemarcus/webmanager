@@ -64,6 +64,16 @@
     text-transform: uppercase;
   }
 
+  /* Hide number input spin buttons globally */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type=number] {
+    -moz-appearance: textfield;
+  }
+
   h1 { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 0.9; }
   h2 { font-size: clamp(1.5rem, 5vw, 2.5rem); line-height: 1; }
 

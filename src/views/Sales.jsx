@@ -439,7 +439,7 @@ export default function Sales() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 md:gap-4">
-                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
+                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
                     <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Quantity</label>
                     <input
                       value={newSale.quantity}
@@ -451,7 +451,7 @@ export default function Sales() {
                       className="w-full bg-transparent text-xl md:text-2xl font-black text-charcoal focus:outline-none text-center"
                     />
                   </div>
-                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
+                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
                     <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Settlement</label>
                     <input
                       value={newSale.paid}
@@ -463,7 +463,7 @@ export default function Sales() {
                       className="w-full bg-transparent text-xl md:text-2xl font-black text-success-pro focus:outline-none text-center"
                     />
                   </div>
-                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
+                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
                     <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">{t('protocol')}</label>
                     <select
                       value={newSale.paymentMethod}
