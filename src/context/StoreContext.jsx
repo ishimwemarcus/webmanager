@@ -47,6 +47,7 @@ export const StoreProvider = ({ children }) => {
   const [reportArchive, setReportArchive] = useState(() => load('biztrack_reports', 'report', []));
   const [losses, setLosses] = useState(() => load('biztrack_losses', 'loss', []));
   const [reconciliations, setReconciliations] = useState(() => load('biztrack_reconciliations', 'reconciliation', []));
+  const [shifts, setShifts] = useState(() => load('biztrack_shifts', 'shift', []));
   const [clearanceGrants, setClearanceGrants] = useState(() => {
     try {
       const saved = localStorage.getItem('biztrack_clearance');
@@ -111,6 +112,7 @@ export const StoreProvider = ({ children }) => {
   useEffect(() => localStorage.setItem('biztrack_reports', JSON.stringify(reportArchive)), [reportArchive]);
   useEffect(() => localStorage.setItem('biztrack_losses', JSON.stringify(losses)), [losses]);
   useEffect(() => localStorage.setItem('biztrack_reconciliations', JSON.stringify(reconciliations)), [reconciliations]);
+  useEffect(() => localStorage.setItem('biztrack_shifts', JSON.stringify(shifts)), [shifts]);
   useEffect(() => localStorage.setItem('biztrack_currency', currency), [currency]);
   useEffect(() => localStorage.setItem('biztrack_operator', currentOperator), [currentOperator]);
   useEffect(() => localStorage.setItem('biztrack_shift_start', shiftStart), [shiftStart]);
@@ -151,6 +153,7 @@ export const StoreProvider = ({ children }) => {
   const getWaitCredits = () => [...waitCredits].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getLosses = () => [...losses].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getReconciliations = () => [...reconciliations].sort((a,b) => new Date(b.date) - new Date(a.date));
+  const getShifts = () => [...shifts].sort((a,b) => new Date(b.end) - new Date(a.end));
   // Get total wait credit for a specific client name
   const getReportArchive = () => [...reportArchive].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -256,6 +259,7 @@ export const StoreProvider = ({ children }) => {
     if (record.record_type === 'loss') setLosses(prev => [...prev, record]);
     if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
     if (record.record_type === 'category') setCategories(prev => [...prev, record]);
+    if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
   };
 
   const updateRecord = (record) => {
@@ -324,6 +328,7 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'reconciliation') setReconciliations(del);
     else if (record.record_type === 'report') setReportArchive(del);
     else if (record.record_type === 'category') setCategories(del);
+    else if (record.record_type === 'shift') { setShifts(del); apiDelete('biztrack_shifts'); }
   };
 
   const formatCurrency = (value) => {

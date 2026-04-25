@@ -36,6 +36,7 @@ export default function Sidebar({ className }) {
     { to: '/wait', icon: Clock, label: 'Credits' },
     { to: '/reports', icon: BarChart2, label: 'Reports' },
     { to: '/clients', icon: Users, label: 'Clients VIP' },
+    { to: '/shifts', icon: Clock, label: 'Shifts' },
     { to: '/spoilage', icon: AlertTriangle, label: 'Pertes' },
     { to: '/cloture', icon: Calculator, label: 'Caisse' }
   ];
@@ -126,10 +127,26 @@ export default function Sidebar({ className }) {
       <div className="p-4 mt-auto space-y-3">
         <div 
           onClick={() => {
-            store.showConfirm(`END SHIFT: Are you sure you want to change the operator?`, () => {
+            store.showConfirm(`END SHIFT: Are you sure you want to end your session?`, () => {
+              const endTime = new Date().toISOString();
+              const allSales = store.getSales();
+              const shiftSales = allSales.filter(s => s.shiftId === store.shiftStart || s.operator === store.currentOperator);
+              const revenue = shiftSales.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
+              
+              store.addRecord({
+                record_type: 'shift',
+                operator: store.currentOperator,
+                start: store.shiftStart,
+                end: endTime,
+                revenue: revenue,
+                transactions: shiftSales.length
+              });
+
+              store.setShiftStart('');
               store.setCurrentOperator('');
               localStorage.removeItem('biztrack_operator');
               localStorage.removeItem('biztrack_shift_start');
+              window.location.reload();
             });
           }}
           className="flex items-center gap-3 px-6 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 font-black text-xs md:text-sm uppercase tracking-[0.3em] cursor-pointer hover:bg-red-500/20 transition-all group"

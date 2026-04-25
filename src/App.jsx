@@ -13,6 +13,7 @@ import Spoilage from './views/Spoilage';
 import Cloture from './views/Cloture';
 import Commander from './views/Commander';
 import ClientPortal from './views/ClientPortal';
+import Shifts from './views/Shifts';
 import GlobalAlerts from './components/layout/GlobalAlerts';
 import ConfirmModal from './components/common/ConfirmModal';
 import ToastNotification from './components/layout/ToastNotification';
@@ -99,6 +100,7 @@ function App() {
             <Route path="/spoilage" element={<Spoilage />} />
             <Route path="/cloture" element={<Cloture />} />
             <Route path="/commander" element={<Commander />} />
+            <Route path="/shifts" element={<Shifts />} />
             <Route path="/portal/:clientName/:phone?" element={<ClientPortal />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
