@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Users, Award, AlertTriangle, TrendingUp, Star } from 'lucide-react';
+import { Users, Award, AlertTriangle, TrendingUp, Star, QrCode } from 'lucide-react';
 
 export default function Clients() {
   const store = useStore();
