@@ -408,7 +408,7 @@ export default function Sales() {
                     type="text"
                     required
                     placeholder="ENTREZ VOTRE NOM..."
-                    className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100"
+                    className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] px-6 py-5 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-lg md:text-xl uppercase placeholder:text-navy-100"
                     autoFocus
                   />
                 </div>
@@ -438,9 +438,9 @@ export default function Sales() {
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Quantity</label>
+                <div className="grid grid-cols-3 gap-2 md:gap-4">
+                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
+                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Quantity</label>
                     <input
                       value={newSale.quantity}
                       onChange={e => setNewSale({ ...newSale, quantity: parseFloat(e.target.value) || '' })}
@@ -448,11 +448,11 @@ export default function Sales() {
                       min="0.01"
                       step="any"
                       required
-                      className="w-full bg-transparent text-2xl font-black text-charcoal focus:outline-none text-center"
+                      className="w-full bg-transparent text-xl md:text-2xl font-black text-charcoal focus:outline-none text-center"
                     />
                   </div>
-                  <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Settlement</label>
+                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
+                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Settlement</label>
                     <input
                       value={newSale.paid}
                       onChange={e => setNewSale({ ...newSale, paid: parseFloat(e.target.value) })}
@@ -460,15 +460,15 @@ export default function Sales() {
                       min="0"
                       step="0.01"
                       required
-                      className="w-full bg-transparent text-2xl font-black text-success-pro focus:outline-none text-center"
+                      className="w-full bg-transparent text-xl md:text-2xl font-black text-success-pro focus:outline-none text-center"
                     />
                   </div>
-                  <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
-                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{t('protocol')}</label>
+                  <div className="bg-navy-50 p-2 md:p-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
+                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">{t('protocol')}</label>
                     <select
                       value={newSale.paymentMethod}
                       onChange={e => setNewSale({ ...newSale, paymentMethod: e.target.value })}
-                      className="w-full bg-transparent text-sm font-black text-charcoal focus:outline-none text-center uppercase tracking-widest appearance-none"
+                      className="w-full bg-transparent text-xs md:text-sm font-black text-charcoal focus:outline-none text-center uppercase appearance-none"
                     >
                       <option value="Cash">Cash</option>
                       <option value="Check">Check</option>
