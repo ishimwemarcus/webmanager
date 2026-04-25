@@ -23,6 +23,7 @@ import { Lock } from 'lucide-react';
 import BootScreen from './components/layout/BootScreen';
 import ShiftGateway from './components/layout/ShiftGateway';
 import QRModal from './components/layout/QRModal';
+import ShiftEndModal from './components/layout/ShiftEndModal';
 import FloatingCalculator from './components/layout/FloatingCalculator';
 
 
@@ -55,6 +56,10 @@ function App() {
     {!appBooted && <BootScreen onComplete={() => setAppBooted(true)} />}
     {appBooted && !store.currentOperator && !window.location.hash.includes('/portal/') && <ShiftGateway />}
     <QRModal />
+    <ShiftEndModal 
+      isOpen={store.isShiftEndModalOpen} 
+      onClose={() => store.setIsShiftEndModalOpen(false)} 
+    />
 
     <div className={`flex h-[100dvh] bg-transparent relative overflow-hidden transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 scale-100' : 'opacity-0 scale-105 absolute inset-0 pointer-events-none'}`}>
       <GlobalAlerts />

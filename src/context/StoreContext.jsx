@@ -60,6 +60,7 @@ export const StoreProvider = ({ children }) => {
   const [currentOperator, setCurrentOperator] = useState(() => localStorage.getItem('biztrack_operator') || '');
   const [shiftStart, setShiftStart] = useState(() => localStorage.getItem('biztrack_shift_start') || '');
   const [showQRModal, setShowQRModal] = useState(false);
+  const [isShiftEndModalOpen, setIsShiftEndModalOpen] = useState(false);
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
@@ -154,6 +155,7 @@ export const StoreProvider = ({ children }) => {
   const getLosses = () => [...losses].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getReconciliations = () => [...reconciliations].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getShifts = () => [...shifts].sort((a,b) => new Date(b.end) - new Date(a.end));
+  const getShiftTransactions = (shiftId) => sales.filter(s => s.shiftId === shiftId);
   // Get total wait credit for a specific client name
   const getReportArchive = () => [...reportArchive].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -558,7 +560,8 @@ export const StoreProvider = ({ children }) => {
       currentOperator, setCurrentOperator,
       shiftStart, setShiftStart,
       showQRModal, setShowQRModal,
-      getLosses, getReconciliations, getShifts
+      isShiftEndModalOpen, setIsShiftEndModalOpen,
+      getLosses, getReconciliations, getShifts, getShiftTransactions
     }}>
       {children}
     </StoreContext.Provider>

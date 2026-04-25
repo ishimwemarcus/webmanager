@@ -58,29 +58,7 @@ export default function TopBar({ onToggleSidebar }) {
           {/* Operator Badge */}
           {currentOperator && (
             <div
-              onClick={() => {
-                store.showConfirm(`END SHIFT: Are you sure you want to close this session for ${currentOperator}?`, () => {
-                  const endTime = new Date().toISOString();
-                  const allSales = store.getSales();
-                  const shiftSales = allSales.filter(s => s.shiftId === store.shiftStart || s.operator === currentOperator);
-                  const revenue = shiftSales.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
-                  
-                  store.addRecord({
-                    record_type: 'shift',
-                    operator: currentOperator,
-                    start: store.shiftStart,
-                    end: endTime,
-                    revenue: revenue,
-                    transactions: shiftSales.length
-                  });
-
-                  store.setShiftStart('');
-                  store.setCurrentOperator('');
-                  localStorage.removeItem('biztrack_operator');
-                  localStorage.removeItem('biztrack_shift_start');
-                  window.location.reload();
-                });
-              }}
+              onClick={() => store.setIsShiftEndModalOpen(true)}
               className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all"
               title="Click to End Shift"
             >
