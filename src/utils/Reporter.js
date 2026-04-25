@@ -148,7 +148,7 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
         <div class="center" style="font-size: 10px; margin-top: 4px;">SYSTEME MARC VER 4.0</div>
         
         <div class="center" style="margin-top: 15px;">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(window.location.origin + '/#/portal/' + encodeURIComponent(sale.client) + '/' + encodeURIComponent(sale.phone || 'none'))}" style="width: 35mm; height: 35mm;" />
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent((window.location.origin + window.location.pathname).replace(/\/$/, '') + '/#/portal/' + encodeURIComponent(sale.client) + '/' + encodeURIComponent(sale.phone || 'none'))}" style="width: 35mm; height: 35mm;" />
           <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">SCANNEZ POUR VOTRE HISTORIQUE & DETTES</p>
         </div>
 
@@ -246,7 +246,7 @@ export const shareReceipt = (sale, operator, formatCurrency) => {
 💵 *Réglé:* ${formatCurrency(sale.paid)}
 ${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
 ---------------------------------------
-🔗 *Votre Portail Client:* ${window.location.origin}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
+🔗 *Votre Portail Client:* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
 ---------------------------------------
 ⚖️ *Statut:* ${status}
 🙏 _Merci de votre confiance !_
