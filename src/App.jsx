@@ -106,6 +106,7 @@ function App() {
             <Route path="/cloture" element={<Cloture />} />
             <Route path="/commander" element={<Commander />} />
             <Route path="/shifts" element={<Shifts />} />
+            <Route path="/portal" element={<ClientPortal />} />
             <Route path="/portal/:clientName/:phone?" element={<ClientPortal />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

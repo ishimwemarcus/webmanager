@@ -49,9 +49,70 @@ export default function ClientPortal() {
     };
   }, [allSales, allWait, decodedName]);
 
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchPhone, setSearchPhone] = React.useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchTerm) return;
+    window.location.hash = `#/portal/${encodeURIComponent(searchTerm)}/${encodeURIComponent(searchPhone || 'none')}`;
+  };
+
   if (!decodedName) return (
-    <div className="min-h-[calc(100vh-6rem)] bg-navy-950 flex items-center justify-center p-6 text-center">
-      <p className="text-white/40 font-black uppercase tracking-widest">Identité Client Invalide</p>
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-navy-brand/10 blur-[120px] rounded-full animate-pulse-gentle"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/10 blur-[100px] rounded-full animate-pulse-gentle delay-700"></div>
+
+      <div className="max-w-md w-full glass-card bg-white/80 backdrop-blur-3xl border border-white p-10 md:p-12 rounded-[56px] shadow-[0_32px_80px_rgba(0,0,0,0.1)] relative z-10 scale-in">
+        <div className="flex flex-col items-center text-center space-y-6 mb-10">
+           <div className="w-24 h-24 bg-navy-brand rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl shadow-navy-brand/40 animate-bounce-gentle">
+              <ShieldCheck className="w-12 h-12" />
+           </div>
+           <div>
+              <h1 className="text-3xl md:text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">Espace Client</h1>
+              <p className="text-xs font-black text-blue-gray uppercase tracking-[0.3em] mt-2 italic">Sécurisé par MARC Systems</p>
+           </div>
+           <p className="text-sm font-bold text-navy-950/60 leading-relaxed">
+             Entrez votre identité pour consulter vos transactions, soldes et crédits en temps réel.
+           </p>
+        </div>
+
+        <form onSubmit={handleSearch} className="space-y-6">
+           <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Votre Nom Complet</label>
+              <input 
+                type="text" 
+                placeholder="Ex: Marcus Ishimwe"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="w-full bg-navy-50/50 border border-navy-100 rounded-[24px] px-6 py-4 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-sm"
+              />
+           </div>
+           <div className="space-y-2">
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Numéro de Téléphone (Optionnel)</label>
+              <input 
+                type="text" 
+                placeholder="Ex: 078XXXXXXX"
+                value={searchPhone}
+                onChange={e => setSearchPhone(e.target.value)}
+                className="w-full bg-navy-50/50 border border-navy-100 rounded-[24px] px-6 py-4 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-sm"
+              />
+           </div>
+           <button 
+             type="submit"
+             className="w-full py-5 bg-navy-brand text-white font-black rounded-[24px] shadow-2xl shadow-navy-brand/30 hover:bg-navy-950 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95"
+           >
+             Accéder à mon compte <CheckCircle2 className="w-5 h-5" />
+           </button>
+        </form>
+
+        <div className="mt-12 pt-8 border-t border-navy-50 text-center">
+           <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest opacity-40">
+             © 2026 MARC Business Management • Cloud Protocol v4
+           </p>
+        </div>
+      </div>
     </div>
   );
 

@@ -6,6 +6,7 @@ import { Users, Award, AlertTriangle, TrendingUp, Star } from 'lucide-react';
 export default function Clients() {
   const store = useStore();
   const { t } = useLanguage();
+  const [showPortalQR, setShowPortalQR] = React.useState(false);
   
   const sales = store.getSales ? store.getSales() : [];
   
@@ -44,6 +45,8 @@ export default function Clients() {
   const vipCount = clientData.filter(c => c.totalSpent > 1000 && c.transactions > 2).length;
   const riskCount = clientData.filter(c => c.currentDebt > c.totalSpent * 0.3).length;
 
+  const portalUrl = `${window.location.origin}${window.location.pathname}#/portal`;
+
   return (
     <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
@@ -51,7 +54,44 @@ export default function Clients() {
           <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">{t('clientsDatabase')}</h1>
           <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">{t('loyaltyProgram')}</h2>
         </div>
+        <button 
+          onClick={() => setShowPortalQR(true)}
+          className="px-8 py-4 bg-navy-950 text-white rounded-3xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-navy-brand transition-all shadow-2xl shadow-navy-950/20 active:scale-95"
+        >
+          <QrCode className="w-5 h-5" /> Générer QR Portail Client
+        </button>
       </div>
+
+      {showPortalQR && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/60 backdrop-blur-3xl p-4 no-print animate-fade-in" onClick={() => setShowPortalQR(false)}>
+           <div className="bg-white p-12 rounded-[56px] shadow-[0_40px_100px_rgba(0,0,0,0.3)] max-w-sm w-full text-center space-y-8 scale-in" onClick={e => e.stopPropagation()}>
+              <div className="space-y-2">
+                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter">Affiche Boutique</h3>
+                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest">Espace de Consultation Client</p>
+              </div>
+              
+              <div className="bg-navy-50 p-6 rounded-[40px] border-4 border-navy-100 shadow-inner">
+                 <img 
+                   src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(portalUrl)}`} 
+                   alt="Portal QR"
+                   className="w-full aspect-square rounded-[32px] mix-blend-multiply"
+                 />
+              </div>
+
+              <div className="space-y-4">
+                 <p className="text-xs font-bold text-navy-950/60 leading-relaxed px-4 italic">
+                   "Affichez ce code en boutique pour permettre à vos clients de consulter leurs transactions en un scan."
+                 </p>
+                 <button 
+                   onClick={() => window.print()}
+                   className="w-full py-4 bg-navy-brand text-white font-black rounded-2xl shadow-xl hover:bg-navy-900 transition-all uppercase tracking-widest text-[10px]"
+                 >
+                   Imprimer l'Affiche
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
         <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover:border-navy-brand transition-all">
