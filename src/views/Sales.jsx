@@ -40,6 +40,7 @@ export default function Sales() {
     amount: 0,
     paid: 0,
     paymentMethod: 'Cash',
+    phone: '',
     useCredit: true,
     overpayType: null
   });
@@ -125,6 +126,7 @@ export default function Sales() {
       quantity: parseFloat(newSale.quantity),
       amount,
       paid: totalPayment,
+      phone: newSale.phone,
       paymentMethod: newSale.paymentMethod,
       tip: 0,
       useCredit: newSale.useCredit
@@ -142,7 +144,7 @@ export default function Sales() {
   const closeAll = () => {
     setShowModal(false);
     setShowConfirmPop(false);
-    setNewSale({ product_id: '', client: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null });
+    setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null });
   };
 
   const handlePopConfirm = (isCorrect) => {
@@ -155,7 +157,7 @@ export default function Sales() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
@@ -179,7 +181,7 @@ export default function Sales() {
             <TrendingUp className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Today's Revenue</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Today's Revenue</p>
             <p className="text-3xl font-black text-navy-950">{store.formatCurrency(sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0))}</p>
           </div>
         </div>
@@ -188,7 +190,7 @@ export default function Sales() {
             <Calculator className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Total Transactions</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Total Transactions</p>
             <p className="text-3xl font-black text-navy-950">{sales.length} <span className="text-xs text-blue-gray opacity-40">Records</span></p>
           </div>
         </div>
@@ -209,7 +211,7 @@ export default function Sales() {
         <div className="flex items-center gap-4 bg-white p-1.5 rounded-2xl border border-navy-100 shadow-xl">
           <button
             onClick={() => setFilterShift(!filterShift)}
-            className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${filterShift ? 'bg-navy-brand text-white shadow-lg' : 'text-blue-gray hover:text-navy-brand'}`}
+            className={`px-6 py-2.5 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex items-center gap-2 ${filterShift ? 'bg-navy-brand text-white shadow-lg' : 'text-blue-gray hover:text-navy-brand'}`}
           >
             <Clock className="w-3.5 h-3.5" />
             {filterShift ? 'Current Shift' : 'All Shifts'}
@@ -222,7 +224,7 @@ export default function Sales() {
               <button
                 key={time}
                 onClick={() => setFilterDate(time)}
-                className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-[#F59E0B] text-black shadow-md' : 'text-blue-gray hover:text-navy-brand'}`}
+                className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-[#F59E0B] text-black shadow-md' : 'text-blue-gray hover:text-navy-brand'}`}
               >
                 {time}
               </button>
@@ -246,17 +248,21 @@ export default function Sales() {
                   {s.status}
                 </span>
               </div>
+              <div className="flex items-center justify-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                <p className="text-xs md:text-sm text-blue-gray uppercase tracking-[0.4em] font-black">{t('loginGateway')}</p>
+              </div>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Volume</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Volume</p>
                   <p className="text-xs font-black text-navy-900">{getFormattedQuantity(products.find(p => p.product_id === s.product_id))}</p>
                 </div>
                 <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Total</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Total</p>
                   <p className="text-xs font-black text-navy-900">{store.formatCurrency(s.amount)}</p>
                 </div>
                 <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Method</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Method</p>
                   <p className="text-xs font-black text-blue-gray">{s.paymentMethod || 'Cash'}</p>
                 </div>
               </div>
@@ -280,7 +286,7 @@ export default function Sales() {
             </div>
           ))
         ) : (
-          <div className="bg-white rounded-2xl border border-navy-50 p-12 text-center">
+          <div className="bg-white rounded-2xl border border-navy-50 p-6 md:p-12 text-center">
             <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-navy-200" />
             <p className="text-sm font-black uppercase tracking-widest text-blue-gray">No transactions found</p>
           </div>
@@ -293,32 +299,33 @@ export default function Sales() {
           <table className="premium-table w-full">
             <thead>
               <tr className="text-left bg-navy-50/50 border-b border-navy-100">
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand">{t('exchangeDate')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand">{t('assetDetail')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand">{t('entityInfo')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('transactionVal')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('settledAmount')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand text-center">Type</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('status')}</th>
-                <th className="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('action')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('exchangeDate')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('assetDetail')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('entityInfo')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('transactionVal')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('settledAmount')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">Type</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('status')}</th>
+                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-navy-50">
               {filteredSales.length > 0 ? (
                 filteredSales.map((s, idx) => (
                   <tr key={s.id || idx} className="group hover:bg-navy-50 transition-colors">
-                    <td className="px-6 py-5 text-[11px] text-blue-gray font-bold">{store.formatDate(s.date)}</td>
-                    <td className="px-6 py-5">
-                      <div className="text-xs font-black text-navy-950 uppercase tracking-tight">{s.name}</div>
+                    <td className="p-6 text-xs text-blue-gray font-bold">{s.date ? new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
+                    <td className="p-6">
+                      <p className="text-xs font-black uppercase text-navy-brand">{s.client}</p>
+                      <p className="text-xs font-bold text-blue-gray opacity-50">{s.phone || 'Pas de Contact'}</p>
                     </td>
-                    <td className="px-6 py-5 text-xs font-black text-navy-brand">{s.client}</td>
+                    <td className="p-6 text-xs font-bold text-navy-950/70">{s.name}</td>
                     <td className="px-6 py-5 text-right text-xs font-bold text-navy-950">{store.formatCurrency(s.amount)}</td>
                     <td className="px-6 py-5 text-right text-xs text-emerald-600 font-black">{store.formatCurrency(s.paid)}</td>
-                    <td className="px-6 py-5 text-center text-[10px] font-black uppercase text-blue-gray tracking-widest">{s.paymentMethod || 'Cash'}</td>
+                    <td className="px-6 py-5 text-center text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest">{s.paymentMethod || 'Cash'}</td>
                     <td className="px-6 py-4 text-center">
                       <button
                         onClick={() => { if (s.status === 'partial') window.location.hash = '#/ledger'; }}
-                        className={`px-3 py-1 rounded-full text-[9px] font-black uppercase border transition-all
+                        className={`px-3 py-1 rounded-full text-xs font-black uppercase border transition-all
                           ${s.status.includes('paid') ? 'bg-success-pro/5 text-success-pro border-success-pro/20' : 'bg-danger-pro/5 text-danger-pro border-danger-pro/20 hover:scale-110 active:scale-95 cursor-pointer'}`}>
                         {s.status}
                       </button>
@@ -332,7 +339,14 @@ export default function Sales() {
                         className="p-2.5 rounded-xl text-pure-black bg-success-pro/10 hover:bg-success-pro/20 transition-all no-print inline-flex items-center gap-2 shadow-sm border border-success-pro/10">
                         <ShoppingCart className="w-3.5 h-3.5 text-success-pro" />
                       </button>
-                      <button onClick={() => { const msg = new SpeechSynthesisUtterance(`${s.client} a acheté ${s.name} pour ${s.amount} ${store.currency}.`); msg.lang = 'fr-FR'; window.speechSynthesis.speak(msg); }}
+                      <button onClick={() => { 
+                        window.speechSynthesis.cancel();
+                        const msg = new SpeechSynthesisUtterance(`${s.client} a acheté ${s.name} pour ${s.amount} ${store.currency === '€' ? 'Euros' : store.currency}.`); 
+                        msg.lang = 'fr-FR'; 
+                        msg.pitch = 1.0;
+                        msg.rate = 1.0;
+                        window.speechSynthesis.speak(msg); 
+                      }}
                         className="p-3 rounded-2xl text-blue-gray hover:text-navy-brand hover:bg-navy-50 transition-all no-print">
                         <Volume2 className="w-4 h-4" />
                       </button>
@@ -360,8 +374,8 @@ export default function Sales() {
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
           <div className="glass-card rounded-[48px] shadow-2xl w-full max-w-xl relative overflow-hidden bg-white border border-navy-50 scale-in">
             <div className="p-10 bg-navy-brand text-white">
-              <h3 className="text-3xl font-black uppercase tracking-tighter">Process Transaction</h3>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1">Sale Registration Portal</p>
+              <h3 className="text-3xl font-black uppercase tracking-tighter">{t('transactionPortal')}</h3>
+              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/60 mt-1">{t('commandGateway')}</p>
               <button onClick={closeAll} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all">
                 <X className="w-6 h-6" />
               </button>
@@ -370,14 +384,14 @@ export default function Sales() {
             <form onSubmit={handleSalePreSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto">
               <div className="space-y-6">
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('assetIdentity')}</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('assetIdentity')}</label>
                   <select
                     value={newSale.product_id}
                     onChange={e => setNewSale({ ...newSale, product_id: e.target.value })}
                     required
                     className="w-full bg-navy-50 border border-navy-100 rounded-3xl px-6 py-5 text-charcoal font-bold focus:border-navy-brand outline-none transition-all appearance-none"
                   >
-                    <option value="">Select Item</option>
+                    <option value="">Sélectionner un Article</option>
                     {products.map(p => (
                       <option key={p.id} value={p.product_id} disabled={p.quantity === 0}>
                         {p.name} — ({p.quantity} Units) — {store.formatCurrency(p.price)}
@@ -387,22 +401,37 @@ export default function Sales() {
                 </div>
 
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('entityInfo')}</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('entityInfo')}</label>
                   <input
                     value={newSale.client}
                     onChange={e => setNewSale({ ...newSale, client: e.target.value })}
                     type="text"
                     required
-                    className="w-full bg-navy-50 border border-navy-100 rounded-3xl px-6 py-5 text-charcoal font-bold focus:border-navy-brand outline-none transition-all"
-                    placeholder="Customer Name"
+                    placeholder="ENTREZ VOTRE NOM..."
+                    className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100"
+                    autoFocus
                   />
+                </div>
+
+                <div>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">Numéro de Téléphone</label>
+                  <input
+                    value={newSale.phone}
+                    onChange={e => setNewSale({ ...newSale, phone: e.target.value })}
+                    type="tel"
+                    className="w-full bg-navy-50 border border-navy-100 rounded-3xl px-6 py-5 text-charcoal font-bold focus:border-navy-brand outline-none transition-all"
+                    placeholder="+250 ..."
+                  />
+                </div>
+
+                <div>
                   {clientDebt > 0 && newSale.client.length > 1 && (
                     <div className="mt-3 bg-danger-pro/10 border-l-4 border-danger-pro p-4 rounded-r-2xl flex items-center gap-3 animate-fade-in shadow-sm">
                       <AlertCircle className="w-5 h-5 text-danger-pro flex-shrink-0" />
                       <div>
-                        <p className="text-[10px] uppercase font-black tracking-widest text-danger-pro">Outstanding Debt Detected</p>
+                        <p className="text-xs md:text-sm uppercase font-black tracking-widest text-danger-pro">{t('riskStatus')}</p>
                         <p className="text-sm font-black text-danger-pro">
-                          This entity currently owes the business <span className="text-xl px-1">{store.formatCurrency(clientDebt)}</span>
+                          Cette entité doit à l'entreprise <span className="text-xl px-1">{store.formatCurrency(clientDebt)}</span>
                         </p>
                       </div>
                     </div>
@@ -411,7 +440,7 @@ export default function Sales() {
 
                 <div className="grid grid-cols-3 gap-4">
                   <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Quantity</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Quantity</label>
                     <input
                       value={newSale.quantity}
                       onChange={e => setNewSale({ ...newSale, quantity: parseFloat(e.target.value) || '' })}
@@ -423,7 +452,7 @@ export default function Sales() {
                     />
                   </div>
                   <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Settlement</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Settlement</label>
                     <input
                       value={newSale.paid}
                       onChange={e => setNewSale({ ...newSale, paid: parseFloat(e.target.value) })}
@@ -435,7 +464,7 @@ export default function Sales() {
                     />
                   </div>
                   <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Method</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{t('protocol')}</label>
                     <select
                       value={newSale.paymentMethod}
                       onChange={e => setNewSale({ ...newSale, paymentMethod: e.target.value })}
@@ -451,14 +480,18 @@ export default function Sales() {
                 </div>
 
                 <div className="p-8 rounded-[32px] bg-navy-50 border border-navy-100 space-y-4">
+                  <div className="flex justify-between items-center px-2">
+                    <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">{t('identityIdentity')}</label>
+                    <span className="text-xs font-bold text-navy-brand opacity-50">Session v2.4</span>
+                  </div>
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Total Valuation</p>
+                      <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Total Valuation</p>
                       <p className="text-3xl font-black text-navy-brand">{store.formatCurrency(newSale.amount)}</p>
                     </div>
                     {availableCredit > 0 && newSale.useCredit && (
                       <div className="text-right">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-success-pro">Credit Applied</p>
+                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-success-pro">Credit Applied</p>
                         <p className="text-xl font-bold text-success-pro">-{store.formatCurrency(Math.min(availableCredit, newSale.amount))}</p>
                       </div>
                     )}
@@ -471,7 +504,7 @@ export default function Sales() {
                       <Wallet className="w-6 h-6 text-navy-brand" />
                       <div>
                         <p className="text-xs font-black uppercase tracking-widest text-charcoal">Use Credit</p>
-                        <p className="text-[10px] text-blue-gray font-bold">Balance: {store.formatCurrency(availableCredit)}</p>
+                        <p className="text-xs md:text-sm text-blue-gray font-bold">Balance: {store.formatCurrency(availableCredit)}</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -492,23 +525,22 @@ export default function Sales() {
 
       {showConfirmPop && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-900/40 backdrop-blur-md p-4 animate-fade-in">
-          <div className="glass-card rounded-[48px] p-12 max-w-md w-full text-center space-y-8 bg-white shadow-2xl border border-navy-50 scale-in">
+          <div className="glass-card rounded-[48px] p-6 md:p-12 max-w-md w-full text-center space-y-8 bg-white shadow-2xl border border-navy-50 scale-in">
             <div className="w-20 h-20 bg-navy-50 rounded-full flex items-center justify-center mx-auto border border-navy-100">
               <AlertCircle className="w-10 h-10 text-navy-brand" />
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-2xl font-black uppercase tracking-tighter text-navy-brand">Confirm Transaction</h4>
+              <h4 className="text-2xl font-black uppercase tracking-tighter text-navy-brand">{t('confirmAction')}</h4>
 
               {parseFloat(newSale.paid) + (newSale.useCredit ? availableCredit : 0) > newSale.amount ? (
                 <div className="bg-navy-50 p-6 rounded-[32px] border border-navy-100 text-left space-y-6">
                   <div>
-                    <p className="text-[10px] text-success-pro font-black uppercase tracking-widest mb-1">Store Credit Auto-Applied</p>
+                    <p className="text-xs md:text-sm text-success-pro font-black uppercase tracking-widest mb-1">Store Credit Auto-Applied</p>
                     <p className="text-2xl font-black text-success-pro">
-
                       {store.formatCurrency((parseFloat(newSale.paid) || 0) + (newSale.useCredit ? availableCredit : 0) - newSale.amount)}
                     </p>
-                    <p className="text-[9px] text-blue-gray font-bold mt-2">This amount will be usable on their next purchase.</p>
+                    <p className="text-xs text-blue-gray font-bold mt-2">Ce montant sera utilisable lors de son prochain achat.</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
@@ -519,7 +551,7 @@ export default function Sales() {
                         ${newSale.overpayType === 'wait' ? 'border-navy-brand bg-white text-navy-brand shadow-lg scale-105' : 'border-navy-100 bg-white text-blue-gray'}`}
                     >
                       <Clock className="w-6 h-6" />
-                      <span className="text-[9px] font-black uppercase">To Balance</span>
+                      <span className="text-xs font-black uppercase">To Balance</span>
                     </button>
                     <button
                       type="button"
@@ -528,13 +560,13 @@ export default function Sales() {
                         ${newSale.overpayType === 'tip' ? 'border-navy-brand bg-white text-navy-brand shadow-lg scale-105' : 'border-navy-100 bg-white text-blue-gray'}`}
                     >
                       <Gift className="w-6 h-6" />
-                      <span className="text-[9px] font-black uppercase">To Tip</span>
+                      <span className="text-xs font-black uppercase">To Tip</span>
                     </button>
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
-                  Validate payment of {store.formatCurrency(newSale.paid)} for {newSale.client}?
+                <p className="text-center text-xs text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
+                  Protocole de sécurité actif. Les données de session seront cryptées et synchronisées avec le grand livre mondial.
                 </p>
               )}
             </div>
@@ -558,7 +590,7 @@ export default function Sales() {
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h3 className="text-2xl font-black text-navy-brand uppercase tracking-tighter mb-2">Vente Réussie</h3>
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-10">La transaction a été cryptée et archivée</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-10">La transaction a été cryptée et archivée</p>
 
             <div className="space-y-3">
               <button
@@ -581,7 +613,7 @@ export default function Sales() {
               </button>
               <button
                 onClick={() => setShowSuccess(false)}
-                className="w-full bg-navy-50 text-blue-gray font-black py-4 rounded-3xl uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all"
+                className="w-full bg-navy-50 text-blue-gray font-black py-4 rounded-3xl uppercase text-xs md:text-sm tracking-widest hover:bg-navy-100 transition-all"
               >
                 Continuer sans Ticket
               </button>

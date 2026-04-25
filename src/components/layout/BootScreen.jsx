@@ -50,7 +50,7 @@ export default function BootScreen({ onComplete }) {
           <div className="h-2 w-full bg-navy-900 rounded-full overflow-hidden border border-white/10 relative">
             <div className={`absolute top-0 left-0 h-full bg-gradient-to-r from-transparent via-[#2563eb] to-white transition-all duration-[3000ms] ease-out ${phase >= 1 ? 'w-full' : 'w-0'}`}></div>
           </div>
-          <div className="flex justify-between mt-3 text-[10px] font-black uppercase tracking-widest text-white/50">
+          <div className="flex justify-between mt-3 text-xs md:text-sm font-black uppercase tracking-widest text-white/50">
             <span className={`${phase >= 3 ? 'text-[#2563eb]' : ''} transition-colors duration-300`}>Sys. Boot</span>
             <span className={`${phase >= 3 ? 'text-white' : ''} transition-colors duration-300`}>{phase >= 3 ? 'COMPLETE' : 'INITIALIZING'}</span>
           </div>
@@ -62,19 +62,19 @@ export default function BootScreen({ onComplete }) {
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse">
               <Database className="w-5 h-5" />
             </div>
-            <span className="text-[9px] uppercase tracking-widest text-white/60 font-black">Ledger Linked</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Ledger Linked</span>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse delay-75">
               <LayoutGrid className="w-5 h-5" />
             </div>
-            <span className="text-[9px] uppercase tracking-widest text-white/60 font-black">Stock Mounted</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Stock Mounted</span>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse delay-150">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <span className="text-[9px] uppercase tracking-widest text-white/60 font-black">Secured</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Secured</span>
           </div>
         </div>
       </div>

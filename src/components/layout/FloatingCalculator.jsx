@@ -54,7 +54,7 @@ export default function FloatingCalculator() {
       <div className="p-4 bg-navy-brand text-white flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Calculator className="w-4 h-4" />
-          <span className="text-[10px] font-black uppercase tracking-widest">Asset Calculator</span>
+          <span className="text-xs md:text-sm font-black uppercase tracking-widest">Asset Calculator</span>
         </div>
         <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/20 rounded-lg transition-all">
           <X className="w-4 h-4" />
@@ -64,7 +64,7 @@ export default function FloatingCalculator() {
       <div className="p-6 space-y-4">
         {/* Screen */}
         <div className="bg-navy-50/50 rounded-2xl p-4 text-right border border-navy-50 shadow-inner">
-          <p className="text-[9px] font-bold text-blue-gray h-4 mb-1 uppercase tracking-widest">{equation}</p>
+          <p className="text-xs font-bold text-blue-gray h-4 mb-1 uppercase tracking-widest">{equation}</p>
           <p className="text-3xl font-black text-navy-brand truncate">{display}</p>
         </div>
 
@@ -98,12 +98,12 @@ export default function FloatingCalculator() {
         {history.length > 0 && (
           <div className="pt-4 border-t border-navy-50">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[8px] font-black uppercase text-blue-gray tracking-[0.2em]">Computation History</span>
+              <span className="text-xs md:text-sm md:text-xs font-black uppercase text-blue-gray tracking-[0.2em]">Computation History</span>
               <button onClick={() => setHistory([])} className="p-1 hover:bg-navy-50 rounded-md"><RotateCcw className="w-3 h-3 text-blue-gray" /></button>
             </div>
             <div className="space-y-1">
               {history.map((h, i) => (
-                <p key={i} className="text-[9px] font-bold text-blue-gray opacity-60 hover:opacity-100 transition-opacity cursor-pointer truncate" onClick={() => setDisplay(h.split('=')[1].trim())}>{h}</p>
+                <p key={i} className="text-xs font-bold text-blue-gray opacity-60 hover:opacity-100 transition-opacity cursor-pointer truncate" onClick={() => setDisplay(h.split('=')[1].trim())}>{h}</p>
               ))}
             </div>
           </div>

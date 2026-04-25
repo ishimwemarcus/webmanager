@@ -34,10 +34,10 @@ export default function TopBar({ onToggleSidebar }) {
             </h2>
             <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
               <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse"></div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-white">{t('liveSync')}</span>
+              <span className="text-xs font-black uppercase tracking-widest text-white">{t('liveSync')}</span>
             </div>
           </div>
-          <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.25em] mt-1 italic">{today}</p>
+          <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-[0.25em] mt-1 italic">{today}</p>
         </div>
       </div>
 
@@ -59,17 +59,17 @@ export default function TopBar({ onToggleSidebar }) {
               className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all"
               title="Click to End Shift"
             >
-              <div className="w-6 h-6 rounded-full bg-[#F59E0B] text-black flex items-center justify-center font-black text-[10px]">
+              <div className="w-6 h-6 rounded-full bg-[#F59E0B] text-black flex items-center justify-center font-black text-xs md:text-sm">
                 {currentOperator.charAt(0).toUpperCase()}
               </div>
-              <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
+              <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
             </div>
           )}
 
           {/* Language Toggle */}
           <button
             onClick={toggleLang}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl text-white transition-all font-black text-[10px] uppercase tracking-widest group hover:bg-white/10"
+            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl text-white transition-all font-black text-xs md:text-sm uppercase tracking-widest group hover:bg-white/10"
           >
             <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform text-[#F59E0B]" />
             <span>{lang === 'en' ? 'EN' : 'FR'}</span>
@@ -77,7 +77,7 @@ export default function TopBar({ onToggleSidebar }) {
 
           {/* Currency Input Modifier */}
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
-            <span className="text-[10px] font-black uppercase text-white/40" title="Currency Profile">CUR</span>
+            <span className="text-xs md:text-sm font-black uppercase text-white/40" title="Currency Profile">CUR</span>
             <input
               type="text"
               value={currency}
@@ -98,7 +98,7 @@ export default function TopBar({ onToggleSidebar }) {
             </div>
             {/* Tooltip/Hover Effect */}
             <div className="absolute top-full right-0 mt-4 w-48 bg-navy-950/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 transition-all duration-500 z-[110] shadow-2xl">
-              <p className="text-[9px] font-black uppercase tracking-widest text-white mb-2 italic">Global Network Link</p>
+              <p className="text-xs font-black uppercase tracking-widest text-white mb-2 italic">Global Network Link</p>
               <div className="w-full aspect-square bg-white rounded-lg p-2 mb-2">
                 <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://guardian-business.surge.sh')}`}
@@ -106,7 +106,7 @@ export default function TopBar({ onToggleSidebar }) {
                   className="w-full h-full object-contain"
                 />
             </div>
-              <p className="text-[8px] text-white/50 font-bold uppercase tracking-tight leading-relaxed">Scan to access the platform across distributed nodes.</p>
+              <p className="text-xs md:text-sm md:text-xs text-white/50 font-bold uppercase tracking-tight leading-relaxed">Scan to access the platform across distributed nodes.</p>
             </div>
           </div>
         </div>

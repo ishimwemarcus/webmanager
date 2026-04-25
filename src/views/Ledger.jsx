@@ -133,11 +133,11 @@ export default function Ledger() {
   };
 
   return (
-    <div className="max-w-full mx-auto min-h-screen bg-[#064E3B] rounded-[24px] p-4 md:p-8 space-y-4 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5 fade-in-up">
+    <div className="max-w-full mx-auto min-h-[calc(100vh-6rem)] bg-[#064E3B] rounded-[24px] p-4 md:p-8 space-y-4 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5 fade-in-up">
       <div className="border-b border-navy-50 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black uppercase tracking-tighter text-white leading-none">
-            Financial {t('ledger')}
+            {t('ledger')} Financier
           </h1>
           <h2 className="text-sm font-bold text-[#F59E0B] tracking-[0.2em] uppercase">
             {t('masterSettlement')}
@@ -164,14 +164,14 @@ export default function Ledger() {
                   });
                 }
               });
-              store.showAlert("All Client Accounts Reconciled!");
+              store.showAlert("Tous les comptes clients ont été réconciliés !");
             }}
-            className="flex-1 md:flex-none px-6 py-4 rounded-2xl bg-success-pro text-white font-black uppercase text-[10px] tracking-widest shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2"
+            className="flex-1 md:flex-none px-6 py-4 rounded-2xl bg-success-pro text-white font-black uppercase text-xs md:text-sm tracking-widest shadow-lg hover:scale-105 transition-all flex items-center justify-center gap-2"
           >
-            <ShieldCheck className="w-5 h-5" /> Global Reconcile
+            <ShieldCheck className="w-5 h-5" /> Réconciliation Globale
           </button>
           <button onClick={() => setShowModal(true)} className="flex-1 md:flex-none bg-[#BEF264] text-black font-black px-8 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:bg-white transition-all uppercase tracking-widest text-xs">
-            <Plus className="w-5 h-5" /> Manual Entry
+            <Plus className="w-5 h-5" /> Entrée Manuelle
           </button>
         </div>
 
@@ -179,20 +179,20 @@ export default function Ledger() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 no-print">
         <div className="glass-card p-6 rounded-[24px] border-l-4 border-red-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Debit</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Débit (Dépenses)</p>
           <p className="text-2xl font-black text-white">{store.formatCurrency(metrics.totalExpensed)}</p>
         </div>
         <div className="glass-card p-6 rounded-[24px] border-l-4 border-green-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Stored Credit</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Crédit Stocké</p>
           <p className="text-2xl font-black text-green-400">{store.formatCurrency(metrics.totalClientCredits)}</p>
         </div>
 
         <div className="glass-card p-6 rounded-[24px] border-l-4 border-blue-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Outstanding</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Créances Clients</p>
           <p className="text-2xl font-black text-blue-400">{store.formatCurrency(metrics.totalOutstanding)}</p>
         </div>
         <div className="glass-card p-6 rounded-[24px] border-l-4 border-purple-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2">Tips</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Pourboires</p>
           <p className="text-2xl font-black text-purple-400">{store.formatCurrency(metrics.totalTips)}</p>
         </div>
       </div>
@@ -203,9 +203,9 @@ export default function Ledger() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-8 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-navy-brand text-white shadow-lg' : 'text-blue-gray hover:text-navy-brand'}`}
+              className={`px-8 py-2.5 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-navy-brand text-white shadow-lg' : 'text-blue-gray hover:text-navy-brand'}`}
             >
-              {tab === 'general' ? 'Overview' : tab}
+              {tab === 'general' ? 'Vue d\'ensemble' : tab === 'expense' ? 'Dépenses' : 'Créances'}
             </button>
           ))}
         </div>
@@ -215,9 +215,9 @@ export default function Ledger() {
             <button
               key={time}
               onClick={() => setFilterDate(time)}
-              className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-white text-navy-brand shadow-sm border border-navy-100' : 'text-blue-gray hover:text-navy-brand'}`}
+              className={`px-4 py-2 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-white text-navy-brand shadow-sm border border-navy-100' : 'text-blue-gray hover:text-navy-brand'}`}
             >
-              {time}
+              {time === 'all' ? 'Tout' : time === 'today' ? 'Aujourd\'hui' : 'Ce Mois'}
             </button>
           ))}
         </div>
@@ -233,36 +233,36 @@ export default function Ledger() {
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex-1 min-w-0 pr-2">
                     <div className="flex items-center gap-1.5 mb-0.5">
-                      <span className={`px-1.5 py-0.5 rounded text-[8px] uppercase font-black flex-shrink-0 ${d.type === 'expense' ? 'bg-danger-pro/5 text-danger-pro' : 'bg-success-pro/5 text-success-pro'
+                      <span className={`px-1.5 py-0.5 rounded text-xs md:text-sm md:text-xs uppercase font-black flex-shrink-0 ${d.type === 'expense' ? 'bg-danger-pro/5 text-danger-pro' : 'bg-success-pro/5 text-success-pro'
                         }`}>{d.type}</span>
                       <p className="font-black text-navy-900 uppercase tracking-tight text-sm truncate">{d.name}</p>
                     </div>
-                    <p className="text-[9px] text-navy-brand font-bold">{d.client || 'INTERNAL'}</p>
-                    <p className="text-[9px] text-blue-gray italic">{d.description}</p>
+                    <p className="text-xs text-navy-brand font-bold">{d.client || 'INTERNAL'}</p>
+                    <p className="text-xs text-blue-gray italic">{d.description}</p>
                   </div>
                   <div className={`w-2 h-2 rounded-full flex-shrink-0 mt-1.5 ${d.status === 'paid' ? 'bg-success-pro' : 'bg-danger-pro'}`}></div>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-3">
                   <div className="bg-navy-50 rounded-xl p-2 text-center">
-                    <p className="text-[8px] text-blue-gray uppercase font-black">Amount</p>
+                    <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black">Montant</p>
                     <p className="text-xs font-black text-navy-900">{store.formatCurrency(d.amount)}</p>
                   </div>
                   <div className="bg-navy-50 rounded-xl p-2 text-center">
-                    <p className="text-[8px] text-blue-gray uppercase font-black">Settled</p>
+                    <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black">Payé</p>
                     <p className="text-xs font-black text-success-pro">{store.formatCurrency(d.paid)}</p>
                   </div>
                   <div className="bg-navy-50 rounded-xl p-2 text-center">
-                    <p className="text-[8px] text-blue-gray uppercase font-black">Owed</p>
+                    <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black">Reste</p>
                     <p className="text-xs font-black text-danger-pro">{store.formatCurrency(Math.max(0, (parseFloat(d.amount) || 0) - (parseFloat(d.paid) || 0)))}</p>
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-[9px] text-blue-gray font-bold">{store.formatDate(d.date)}</p>
+                  <p className="text-xs text-blue-gray font-bold">{store.formatDate(d.date)}</p>
                   <div className="flex gap-2">
                     {d.status !== 'paid' && (parseFloat(d.amount) || 0) > (parseFloat(d.paid) || 0) && (
                       <button onClick={() => setShowPayModal(d)}
-                        className="px-3 py-1.5 bg-navy-brand text-white text-[9px] font-black uppercase rounded-full">
-                        Settle
+                        className="px-3 py-1.5 bg-navy-brand text-white text-xs font-black uppercase rounded-full">
+                        Régler
                       </button>
                     )}
                     <button onClick={() => store.deleteRecord(d)}
@@ -274,9 +274,9 @@ export default function Ledger() {
               </div>
             ))
           ) : (
-            <div className="p-12 text-center">
+            <div className="p-6 md:p-12 text-center">
               <BookOpen className="w-12 h-12 mx-auto mb-4 text-navy-200" />
-              <p className="text-sm font-black uppercase tracking-widest text-blue-gray">No ledger entries detected</p>
+              <p className="text-sm font-black uppercase tracking-widest text-blue-gray">Aucune entrée détectée</p>
             </div>
           )}
         </div>
@@ -286,13 +286,13 @@ export default function Ledger() {
           <table className="premium-table w-full">
             <thead>
               <tr className="text-left bg-white/5">
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50">Flow / Date</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50">Classification</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50">Entity</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50 text-right">Valuation</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50 text-right">Settled</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-[#BEF264] text-right">Obligation</th>
-                <th className="p-6 text-[9px] font-black uppercase tracking-[0.2em] text-white/50 text-center">Action</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50">Flux / Date</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50">Classification</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50">Entité</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50 text-right">Évaluation</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50 text-right">Réglé</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-[#BEF264] text-right">Obligation</th>
+                <th className="p-6 text-xs font-black uppercase tracking-[0.2em] text-white/50 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -310,12 +310,12 @@ export default function Ledger() {
                     </td>
                     <td className="p-6">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className={`px-2 py-0.5 rounded text-[8px] uppercase font-black ${d.type === 'expense' ? 'bg-red-400/10 text-red-400' : 'bg-green-400/10 text-green-400'}`}>
+                        <span className={`px-2 py-0.5 rounded text-xs md:text-sm md:text-xs uppercase font-black ${d.type === 'expense' ? 'bg-red-400/10 text-red-400' : 'bg-green-400/10 text-green-400'}`}>
                           {d.type}
                         </span>
                         <div className="font-bold text-white uppercase tracking-tight">{d.name}</div>
                       </div>
-                      <div className="text-[10px] text-white/30 font-medium italic">{d.description}</div>
+                      <div className="text-xs md:text-sm text-white/30 font-medium italic">{d.description}</div>
                     </td>
                     <td className="p-6 font-bold text-white">{d.client || 'INTERNAL'}</td>
                     <td className="p-6 text-right font-bold text-white">{store.formatCurrency(d.amount)}</td>
@@ -324,8 +324,8 @@ export default function Ledger() {
                     <td className="p-6 text-center">
                       <div className="flex items-center justify-center gap-2">
                         {d.status !== 'paid' && (parseFloat(d.amount) || 0) > (parseFloat(d.paid) || 0) && (
-                          <button onClick={() => setShowPayModal(d)} className="bg-navy-brand text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-md no-print">
-                            Settle
+                          <button onClick={() => setShowPayModal(d)} className="bg-navy-brand text-white px-4 py-1.5 rounded-full text-xs md:text-sm font-black uppercase tracking-widest hover:scale-105 transition-all shadow-md no-print">
+                            Régler
                           </button>
                         )}
                         <button
@@ -350,7 +350,7 @@ export default function Ledger() {
                 <tr>
                   <td colSpan="7" className="p-32 text-center text-blue-gray">
                     <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-10" />
-                    <p className="text-sm font-black uppercase tracking-widest">No ledger entries detected</p>
+                    <p className="text-sm font-black uppercase tracking-widest">Aucune entrée détectée dans le grand livre</p>
                   </td>
                 </tr>
               )}
@@ -363,8 +363,8 @@ export default function Ledger() {
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
           <div className="glass-card rounded-[48px] shadow-2xl w-full max-w-xl relative overflow-hidden bg-white border border-navy-50 scale-in">
             <div className="p-10 bg-navy-brand text-white">
-              <h3 className="text-3xl font-black uppercase tracking-tighter">Manual Entry</h3>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1">Financial Data Injection</p>
+              <h3 className="text-3xl font-black uppercase tracking-tighter">Entrée Manuelle</h3>
+              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/60 mt-1">Injection de Données Financières</p>
               <button onClick={() => setShowModal(false)} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all"><X className="w-6 h-6" /></button>
             </div>
 
@@ -376,7 +376,7 @@ export default function Ledger() {
                   className={`flex-1 flex flex-col items-center gap-2 p-5 rounded-[24px] border-2 transition-all ${entry.type === 'expense' ? 'border-danger-pro bg-danger-pro/5 text-danger-pro shadow-lg' : 'border-navy-50 text-blue-gray'}`}
                 >
                   <TrendingDown className="w-6 h-6" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Debit</span>
+                  <span className="text-xs md:text-sm font-black uppercase tracking-widest">Debit</span>
                 </button>
                 <button
                   type="button"
@@ -384,33 +384,33 @@ export default function Ledger() {
                   className={`flex-1 flex flex-col items-center gap-2 p-5 rounded-[24px] border-2 transition-all ${entry.type === 'receivable' ? 'border-success-pro bg-success-pro/5 text-success-pro shadow-lg' : 'border-navy-50 text-blue-gray'}`}
                 >
                   <TrendingUp className="w-6 h-6" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Credit</span>
+                  <span className="text-xs md:text-sm font-black uppercase tracking-widest">Credit</span>
                 </button>
               </div>
 
               <div className="space-y-6">
                 <div className="relative group">
                   <span className="absolute left-6 top-1/2 -translate-y-1/2 text-navy-brand"><CreditCard className="w-5 h-5" /></span>
-                  <input value={entry.name} onChange={e => setEntry({ ...entry, name: e.target.value })} type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-3xl pl-16 pr-6 py-5 text-charcoal font-bold focus:border-navy-brand transition-all outline-none" placeholder="Label / Purpose" />
+                  <input value={entry.name} onChange={e => setEntry({ ...entry, name: e.target.value })} type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-3xl pl-16 pr-6 py-5 text-charcoal font-bold focus:border-navy-brand transition-all outline-none" placeholder="Libellé / Objet" />
                 </div>
                 <div className="relative group">
                   <span className="absolute left-6 top-1/2 -translate-y-1/2 text-navy-brand"><User className="w-5 h-5" /></span>
-                  <input value={entry.client} onChange={e => setEntry({ ...entry, client: e.target.value })} type="text" className="w-full bg-navy-50 border border-navy-100 rounded-3xl pl-16 pr-6 py-5 text-charcoal font-bold focus:border-navy-brand transition-all outline-none" placeholder="Entity Identity" />
+                  <input value={entry.client} onChange={e => setEntry({ ...entry, client: e.target.value })} type="text" className="w-full bg-navy-50 border border-navy-100 rounded-3xl pl-16 pr-6 py-5 text-charcoal font-bold focus:border-navy-brand transition-all outline-none" placeholder="Identité de l'Entité" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Value</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Valeur</label>
                     <input value={entry.amount} onChange={e => setEntry({ ...entry, amount: e.target.value })} type="number" required className="w-full bg-transparent text-2xl font-black text-charcoal focus:outline-none text-center" />
                   </div>
                   <div className="bg-navy-50 p-5 rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Settled</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">Payé</label>
                     <input value={entry.paid} onChange={e => setEntry({ ...entry, paid: e.target.value })} type="number" required className="w-full bg-transparent text-2xl font-black text-success-pro focus:outline-none text-center" />
                   </div>
                 </div>
               </div>
 
               <button type="submit" className="btn-premium w-full !py-6">
-                Authorize Entry <ArrowRight className="w-5 h-5 ml-4" />
+                Autoriser l'Entrée <ArrowRight className="w-5 h-5 ml-4" />
               </button>
             </form>
           </div>
@@ -422,20 +422,20 @@ export default function Ledger() {
           <div className="glass-card rounded-[48px] shadow-2xl w-full max-w-md relative overflow-hidden bg-white border border-navy-50 scale-in">
             <div className="p-10 bg-navy-brand text-white flex justify-between items-center">
               <div>
-                <h3 className="text-2xl font-black uppercase tracking-tight">Debt Clearance</h3>
-                <p className="text-[10px] font-black uppercase tracking-widest text-white/60 mt-1">Settle Obligation</p>
+                <h3 className="text-2xl font-black uppercase tracking-tight">Règlement de Dette</h3>
+                <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/60 mt-1">Solder l'Obligation</p>
               </div>
               <button onClick={() => { setShowPayModal(null); setPayAmount(''); }} className="p-3 rounded-full hover:bg-white/10 text-white transition-all"><X className="w-6 h-6" /></button>
             </div>
 
             <form onSubmit={handleMarkPaid} className="p-10 space-y-8">
               <div className="bg-danger-pro/5 border border-danger-pro/20 p-8 rounded-[32px] text-center">
-                <p className="text-[10px] font-black uppercase tracking-widest text-danger-pro/80 mb-2">To be cleared</p>
+                <p className="text-xs md:text-sm font-black uppercase tracking-widest text-danger-pro/80 mb-2">À régler</p>
                 <p className="text-4xl font-black text-danger-pro">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray text-center block">Injection Amount</label>
+                <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray text-center block">Montant de l'Injection</label>
                 <div className="relative">
                   <Wallet className="absolute left-6 top-1/2 -translate-y-1/2 w-7 h-7 text-navy-brand" />
                   <input
@@ -454,7 +454,7 @@ export default function Ledger() {
               </div>
 
               <button type="submit" className="btn-premium w-full !py-6">
-                Confirm Settle <CheckCircle2 className="w-5 h-5 ml-4" />
+                Confirmer le Règlement <CheckCircle2 className="w-5 h-5 ml-4" />
               </button>
             </form>
           </div>

@@ -15,10 +15,14 @@ export default function Wait() {
   const store = useStore();
   const { t } = useLanguage();
   const waitCredits = store.getWaitCredits();
+  const sales = store.getSales();
 
   const clientMap = waitCredits.reduce((acc, w) => {
     const key = w.client?.toLowerCase() || 'unknown';
-    if (!acc[key]) acc[key] = { client: w.client, records: [], total: 0 };
+    if (!acc[key]) {
+      const lastSale = sales.find(s => s.client?.toLowerCase() === key);
+      acc[key] = { client: w.client, records: [], total: 0, phone: lastSale?.phone || '' };
+    }
     acc[key].records.push(w);
     acc[key].total += parseFloat(w.balance) || 0;
     return acc;
@@ -32,16 +36,16 @@ export default function Wait() {
   };
 
   const confirmDelete = (record) => {
-    store.showConfirm("DELETE RECORD? This will permanently remove this balance entry.", () => {
+    store.showConfirm(t('confirmAction'), () => {
       store.deleteRecord(record);
     });
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 no-print">
         <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-          Credit Management
+          {t('waitSystem')}
         </h1>
         <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase">
           {t('creditRetention')}
@@ -54,7 +58,7 @@ export default function Wait() {
             <Wallet className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Global Balance</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Solde Global</p>
             <p className="text-3xl font-black text-navy-950">{store.formatCurrency(grandTotal)}</p>
           </div>
         </div>
@@ -63,8 +67,8 @@ export default function Wait() {
             <Users className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Active Debtors</p>
-            <p className="text-3xl font-black text-navy-950">{clients.filter(c => c.total > 0).length} <span className="text-xs text-blue-gray opacity-40">Accounts</span></p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Débiteurs Actifs</p>
+            <p className="text-3xl font-black text-navy-950">{clients.filter(c => c.total > 0).length} <span className="text-xs text-blue-gray opacity-40">Comptes</span></p>
           </div>
         </div>
       </div>
@@ -82,14 +86,14 @@ export default function Wait() {
                     <p className="text-xl font-black text-navy-950 uppercase tracking-tight">{c.client}</p>
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-2 h-2 rounded-full bg-success-pro animate-pulse"></div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">
-                        {c.records.length} Active Nodes
+                      <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">
+                        {c.phone || 'Aucun Contact'}
                       </p>
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1">Total Assets</p>
+                  <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-1">Valeur Totale</p>
                   <p className={`text-2xl font-black tracking-tighter ${c.total > 0 ? 'text-navy-brand' : 'text-blue-gray/20'}`}>
                     {store.formatCurrency(c.total)}
                   </p>
@@ -103,16 +107,16 @@ export default function Wait() {
                       <div className={`w-3 h-3 rounded-full flex-shrink-0 ${(parseFloat(r.balance)||0) > 0 ? 'bg-success-pro shadow-lg' : 'bg-navy-100'}`}></div>
                       <div>
                         <p className="font-bold text-navy-950 uppercase tracking-tight">{r.note || 'Retention Protocol'}</p>
-                        <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest mt-1 italic">{store.formatDate(r.date)}</p>
+                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-1 italic">{store.formatDate(r.date)}</p>
                       </div>
                     </div>
                     <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 ml-7 sm:ml-0">
                       <div>
-                        <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest">Inception</p>
+                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest">Inception</p>
                         <p className="text-sm font-bold text-navy-950">{store.formatCurrency(r.amount)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest">Reserve</p>
+                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest">Reserve</p>
                         <p className={`text-lg font-black ${(parseFloat(r.balance)||0) > 0 ? 'text-success-pro' : 'text-blue-gray/20 line-through'}`}>
                           {store.formatCurrency(r.balance || 0)}
                         </p>
@@ -153,7 +157,7 @@ export default function Wait() {
           <div className="p-4 bg-navy-50 rounded-2xl text-navy-brand">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <div className="text-[10px] text-blue-gray font-black uppercase tracking-widest leading-relaxed">
+          <div className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest leading-relaxed">
             <p className="text-navy-brand mb-1">Operational Protocol: Retention</p>
             <p>Monitors stored client value for future transaction linkage. Assets remain active until manually cleared or used during sales checkout.</p>
           </div>

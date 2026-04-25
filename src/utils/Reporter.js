@@ -146,6 +146,12 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
         <div class="divider"></div>
         <div class="center" style="margin-top: 15px;">Merci de votre confiance !</div>
         <div class="center" style="font-size: 10px; margin-top: 4px;">SYSTEME MARC VER 4.0</div>
+        
+        <div class="center" style="margin-top: 15px;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(window.location.origin + '/#/portal/' + encodeURIComponent(sale.client) + '/' + encodeURIComponent(sale.phone || 'none'))}" style="width: 35mm; height: 35mm;" />
+          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">SCANNEZ POUR VOTRE HISTORIQUE & DETTES</p>
+        </div>
+
         <script>
           window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }
         </script>
@@ -240,10 +246,13 @@ export const shareReceipt = (sale, operator, formatCurrency) => {
 💵 *Réglé:* ${formatCurrency(sale.paid)}
 ${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
 ---------------------------------------
+🔗 *Votre Portail Client:* ${window.location.origin}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
+---------------------------------------
 ⚖️ *Statut:* ${status}
 🙏 _Merci de votre confiance !_
   `.trim();
 
-  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const phone = sale.phone ? sale.phone.replace(/\D/g, '') : '';
+  const url = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
 };

@@ -43,34 +43,44 @@ export default function Cloture() {
       });
    };
 
-   const handleReconcile = (e) => {
-      e.preventDefault();
-      
-      if (editingRecord) {
-         store.updateRecord({
-            ...editingRecord,
-            actual: parseFloat(actualCash),
-            discrepancy,
-            note
-         });
-         store.showAlert("Clôture mise à jour avec succès!");
-         setEditingRecord(null);
-      } else {
-         store.addRecord({
-            record_type: 'reconciliation',
-            date: new Date().toISOString(),
-            expected: stats.expected,
-            actual: parseFloat(actualCash),
-            discrepancy,
-            note,
-            operator: store.currentOperator
-         });
-         store.showAlert("Clôture de caisse enregistrée avec succès!");
-      }
-      
-      setActualCash('');
-      setNote('');
-   };
+    const handleReconcile = (e) => {
+       e.preventDefault();
+       
+       if (editingRecord) {
+          store.updateRecord({
+             ...editingRecord,
+             actual: parseFloat(actualCash),
+             discrepancy,
+             note
+          });
+          store.showAlert("Clôture mise à jour avec succès!");
+          setEditingRecord(null);
+       } else {
+          store.addRecord({
+             record_type: 'reconciliation',
+             date: new Date().toISOString(),
+             expected: stats.expected,
+             actual: parseFloat(actualCash),
+             discrepancy,
+             note,
+             operator: store.currentOperator
+          });
+          
+          store.showAlert("Fin de poste enregistrée. Déconnexion en cours...", "success");
+          
+          // Formal Handover: Clear session and logout
+          setTimeout(() => {
+             store.setShiftStart('');
+             store.setCurrentOperator('');
+             localStorage.removeItem('biztrack_operator');
+             localStorage.removeItem('biztrack_shift_start');
+             window.location.reload();
+          }, 2000);
+       }
+       
+       setActualCash('');
+       setNote('');
+    };
 
    const cancelEdit = () => {
       setEditingRecord(null);
@@ -79,7 +89,7 @@ export default function Cloture() {
    };
 
    return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
          <div className="border-b border-navy-100 pb-8">
             <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">{t('closeRegister')}</h1>
             <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">Audit Journalier du Tiroir-Caisse</h2>
@@ -95,19 +105,19 @@ export default function Cloture() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                      <div className="p-6 bg-navy-50 rounded-[24px] border border-navy-100">
-                        <p className="text-[10px] font-black uppercase text-blue-gray mb-1">Ventes Espèces</p>
+                        <p className="text-xs md:text-sm font-black uppercase text-blue-gray mb-1">Ventes Espèces</p>
                         <p className="font-black text-navy-950">{store.formatCurrency(stats.salesCash)}</p>
                      </div>
                      <div className="p-6 bg-navy-50 rounded-[24px] border border-navy-100">
-                        <p className="text-[10px] font-black uppercase text-blue-gray mb-1">Entrées Ledger</p>
+                        <p className="text-xs md:text-sm font-black uppercase text-blue-gray mb-1">Entrées Ledger</p>
                         <p className="font-black text-emerald-600">{store.formatCurrency(stats.ledgerIncome)}</p>
                      </div>
                      <div className="p-6 bg-navy-50 rounded-[24px] border border-navy-100">
-                        <p className="text-[10px] font-black uppercase text-blue-gray mb-1">Dépenses Sorties</p>
+                        <p className="text-xs md:text-sm font-black uppercase text-blue-gray mb-1">Dépenses Sorties</p>
                         <p className="font-black text-rose-600">-{store.formatCurrency(stats.ledgerExpense)}</p>
                      </div>
                      <div className="p-6 bg-navy-900 rounded-[24px] border border-navy-800 shadow-lg">
-                        <p className="text-[10px] font-black uppercase text-white/60 mb-1">Solde Attendu</p>
+                        <p className="text-xs md:text-sm font-black uppercase text-white/60 mb-1">Solde Attendu</p>
                         <p className="text-xl font-black text-white">{store.formatCurrency(stats.expected)}</p>
                      </div>
                   </div>
@@ -142,7 +152,7 @@ export default function Cloture() {
                         <div className="flex items-center gap-4">
                            {discrepancy === 0 ? <CheckCircle2 className="w-8 h-8" /> : <AlertTriangle className="w-8 h-8" />}
                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest">Différence de Caisse</p>
+                              <p className="text-xs md:text-sm font-black uppercase tracking-widest">Différence de Caisse</p>
                               <p className="text-xl font-black">{store.formatCurrency(discrepancy)}</p>
                            </div>
                         </div>
@@ -151,7 +161,7 @@ export default function Cloture() {
                   )}
 
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-navy-400 ml-2">Note / Commentaire</label>
+                     <label className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400 ml-2">Note / Commentaire</label>
                      <textarea
                         rows="2"
                         value={note}
@@ -179,12 +189,12 @@ export default function Cloture() {
                      <div key={i} className="bg-white p-8 rounded-[24px] border border-navy-100 shadow-xl flex items-center justify-between group hover:border-navy-brand/20 transition-all">
                         <div className="space-y-1">
                            <p className="text-xs font-black text-navy-950 uppercase tracking-tighter">{new Date(r.date).toLocaleDateString()} - <span className="text-blue-gray">{new Date(r.date).toLocaleTimeString()}</span></p>
-                           <p className="text-[9px] font-black uppercase tracking-widest text-navy-brand">{r.operator || 'Admin'}</p>
-                           {r.note && <p className="text-[10px] text-blue-gray italic font-bold mt-2">"{r.note}"</p>}
+                           <p className="text-xs font-black uppercase tracking-widest text-navy-brand">{r.operator || 'Admin'}</p>
+                           {r.note && <p className="text-xs md:text-sm text-blue-gray italic font-bold mt-2">"{r.note}"</p>}
                         </div>
                          <div className="flex items-center gap-6">
                             <div className="text-right">
-                               <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1">Écart</p>
+                               <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1">Écart</p>
                                <p className={`text-xl font-black ${r.discrepancy === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                                   {r.discrepancy > 0 ? '+' : ''}{store.formatCurrency(r.discrepancy)}
                                </p>
@@ -196,7 +206,7 @@ export default function Cloture() {
                          </div>
                      </div>
                   ))}
-                  {history.length === 0 && <div className="p-20 text-center text-blue-gray font-black uppercase tracking-widest opacity-20 border-2 border-dashed border-navy-100 rounded-[40px]">Aucune archive</div>}
+                  {history.length === 0 && <div className="p-6 md:p-20 text-center text-blue-gray font-black uppercase tracking-widest opacity-20 border-2 border-dashed border-navy-100 rounded-[40px]">Aucune archive</div>}
                </div>
             </div>
          </div>

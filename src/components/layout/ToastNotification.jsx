@@ -22,7 +22,7 @@ export default function ToastNotification() {
           <Icon className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-gray/50 mb-0.5">System Message</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-blue-gray/50 mb-0.5">System Message</p>
           <p className="text-sm font-black text-navy-brand">{notification.message}</p>
         </div>
       </div>

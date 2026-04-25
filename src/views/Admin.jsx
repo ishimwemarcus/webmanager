@@ -68,7 +68,7 @@ export default function Admin() {
   const report = store.generateDailySummary ? store.generateDailySummary(sales, store.getExpenses(), store.getLedgerManual()) : { whatsappText: 'N/A' };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
@@ -89,7 +89,7 @@ export default function Admin() {
             <Users className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Provisioned Identities</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Provisioned Identities</p>
             <p className="text-3xl font-black text-navy-950">{users.length} <span className="text-xs text-blue-gray opacity-40">Accounts</span></p>
           </div>
         </div>
@@ -98,15 +98,15 @@ export default function Admin() {
             <Activity className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">System Integrity</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">System Integrity</p>
             <p className="text-3xl font-black text-navy-950">OPTIMAL <span className="text-xs text-emerald-500 italic">Live</span></p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 md:gap-12">
         <div className="space-y-3 no-print">
-          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-blue-gray mb-6 ml-4">Terminal Sectors</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] text-blue-gray mb-6 ml-4">Terminal Sectors</p>
           {[
             { id: 'accounts', label: 'Identities', icon: Users },
             { id: 'performance', label: 'Diagnostics', icon: Activity },
@@ -148,7 +148,7 @@ export default function Admin() {
                           {u.name}
                           {u.role === 'Master' && <Star className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" />}
                         </p>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mt-1">
+                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mt-1">
                           {u.role} Node • {u.status}
                         </p>
                       </div>
@@ -166,7 +166,7 @@ export default function Admin() {
                           >
                             <ShieldQuestion className="w-4 h-4" />
                           </button>
-                          <div className={`text-[10px] font-mono font-black border border-navy-100 px-4 py-3 rounded-xl bg-navy-50/50 transition-all ${visiblePass[u.id] ? 'opacity-100' : 'opacity-0 blur-sm select-none'}`}>
+                          <div className={`text-xs md:text-sm font-mono font-black border border-navy-100 px-4 py-3 rounded-xl bg-navy-50/50 transition-all ${visiblePass[u.id] ? 'opacity-100' : 'opacity-0 blur-sm select-none'}`}>
                             {u.password}
                           </div>
                           <button
@@ -194,11 +194,11 @@ export default function Admin() {
             <div className="space-y-8 fade-in">
               <div className="grid grid-cols-2 gap-8">
                 <div className="glass-card p-10 rounded-[24px] bg-white/5 border border-white/5 shadow-xl">
-                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-4">Trading Ratio</p>
+                  <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] text-white/40 mb-4">Trading Ratio</p>
                   <p className="text-[clamp(2rem,6vw,3rem)] font-black text-[#BEF264] tracking-tighter">{getTradingRatio()}</p>
                 </div>
                 <div className="glass-card p-10 rounded-[24px] bg-white/5 border border-white/5 shadow-xl">
-                  <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 mb-4">Active Operations</p>
+                  <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] text-white/40 mb-4">Active Operations</p>
                   <p className="text-[clamp(2rem,6vw,3rem)] font-black text-white tracking-tighter">{sales.length}</p>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function Admin() {
           )}
 
           {activeTab === 'security' && (
-            <div className="glass-card rounded-[48px] p-12 border border-navy-50 bg-white shadow-2xl text-center space-y-10 fade-in">
+            <div className="glass-card rounded-[48px] p-6 md:p-12 border border-navy-50 bg-white shadow-2xl text-center space-y-10 fade-in">
               <div className="w-20 h-20 bg-navy-50 rounded-full flex items-center justify-center mx-auto border border-navy-100">
                 <Lock className="w-10 h-10 text-navy-brand" />
               </div>
@@ -254,9 +254,9 @@ export default function Admin() {
                 </div>
                 <div>
                   <h4 className="text-xl font-black text-navy-brand uppercase tracking-tight">System Export</h4>
-                  <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest mt-2 h-8">Generate full structural backup.</p>
+                  <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-2 h-8">Generate full structural backup.</p>
                 </div>
-                <button onClick={store.exportData} className="w-full py-5 bg-navy-50 text-navy-brand border border-navy-100 rounded-[24px] text-[10px] font-black uppercase hover:bg-navy-brand hover:text-white transition-all">Download Payload</button>
+                <button onClick={store.exportData} className="w-full py-5 bg-navy-50 text-navy-brand border border-navy-100 rounded-[24px] text-xs md:text-sm font-black uppercase hover:bg-navy-brand hover:text-white transition-all">Download Payload</button>
               </div>
 
               <div className="glass-card p-10 rounded-[48px] bg-white border border-navy-50 shadow-xl space-y-6">
@@ -265,10 +265,10 @@ export default function Admin() {
                 </div>
                 <div>
                   <h4 className="text-xl font-black text-navy-brand uppercase tracking-tight">System Injection</h4>
-                  <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest mt-2 h-8">Restore from structural backup.</p>
+                  <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-2 h-8">Restore from structural backup.</p>
                 </div>
                 <label className="block">
-                  <span className="w-full py-5 bg-navy-brand text-white rounded-[24px] text-[10px] font-black uppercase flex items-center justify-center cursor-pointer shadow-lg">Inject Payload</span>
+                  <span className="w-full py-5 bg-navy-brand text-white rounded-[24px] text-xs md:text-sm font-black uppercase flex items-center justify-center cursor-pointer shadow-lg">Inject Payload</span>
                   <input type="file" accept=".json" onChange={handleImport} className="hidden" />
                 </label>
               </div>
@@ -278,10 +278,10 @@ export default function Admin() {
                   <Trash2 className="w-10 h-10 text-danger-pro" />
                   <div>
                     <h4 className="text-xl font-black text-navy-brand uppercase tracking-tight">Factory Purge</h4>
-                    <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest mt-1">Permanently wipe all system data.</p>
+                    <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-1">Permanently wipe all system data.</p>
                   </div>
                 </div>
-                <button onClick={() => store.showConfirm("Wipe all data?", store.clearAllData)} className="px-8 py-4 bg-danger-pro/5 text-danger-pro border border-danger-pro/10 rounded-2xl text-[10px] font-black uppercase hover:bg-danger-pro hover:text-white transition-all">Clear Systems</button>
+                <button onClick={() => store.showConfirm("Wipe all data?", store.clearAllData)} className="px-8 py-4 bg-danger-pro/5 text-danger-pro border border-danger-pro/10 rounded-2xl text-xs md:text-sm font-black uppercase hover:bg-danger-pro hover:text-white transition-all">Clear Systems</button>
               </div>
             </div>
           )}
@@ -291,9 +291,9 @@ export default function Admin() {
       {showInviteModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
           <div className="glass-card rounded-[56px] shadow-2xl w-full max-w-xl relative bg-white border border-navy-50 overflow-hidden scale-in">
-            <div className="p-12 text-center bg-navy-brand text-white">
+            <div className="p-6 md:p-12 text-center bg-navy-brand text-white">
               <h3 className="text-3xl font-black uppercase tracking-tighter">Provision Account</h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] mt-2 opacity-60">Identity Authorization</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] mt-2 opacity-60">Identity Authorization</p>
               <button onClick={() => setShowInviteModal(false)} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all"><X className="w-6 h-6" /></button>
             </div>
 
@@ -308,12 +308,12 @@ export default function Admin() {
                 status: 'active'
               });
               setShowInviteModal(false);
-            }} className="p-12 space-y-8">
+            }} className="p-6 md:p-12 space-y-8">
               <div className="space-y-6 text-center">
                 <input name="fullname" type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center italic" placeholder="Operator Name" />
                 <input name="username" type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center font-mono" placeholder="username_sector" />
                 <input name="password" type="password" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center tracking-widest" placeholder="••••••••" />
-                <select name="role" className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none appearance-none text-center uppercase text-[10px] tracking-widest">
+                <select name="role" className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none appearance-none text-center uppercase text-xs md:text-sm tracking-widest">
                   <option value="Operator">Operator Node</option>
                   <option value="Admin">Admin Node</option>
                   <option value="Master">Master Node</option>

@@ -99,7 +99,7 @@ export default function Spoilage() {
   };
 
   return (
-    <div className="max-w-full mx-auto min-h-screen bg-[#064E3B] rounded-[24px] p-4 md:p-8 space-y-4 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5 fade-in-up">
+    <div className="max-w-full mx-auto min-h-[calc(100vh-6rem)] bg-[#064E3B] rounded-[24px] p-4 md:p-8 space-y-4 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5 fade-in-up">
       <div className="border-b border-navy-50 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black uppercase tracking-tighter text-white leading-none">{t('spoilage')}</h1>
@@ -125,11 +125,11 @@ export default function Spoilage() {
               </div>
               <div className="grid grid-cols-2 gap-2 mb-2">
                 <div className="bg-navy-50 rounded-lg p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Value Lost</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Value Lost</p>
                   <p className="text-xs font-black text-navy-900">{store.formatCurrency(l.valuation || 0)}</p>
                 </div>
                 <div className="bg-navy-50 rounded-lg p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Operator</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Operator</p>
                   <p className="text-xs font-black text-blue-gray">{l.operator || 'Admin'}</p>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export default function Spoilage() {
               </div>
             </div>
           )) : (
-            <div className="p-12 text-center text-blue-gray/30 font-black uppercase tracking-widest text-sm">Aucune perte enregistrée</div>
+            <div className="p-6 md:p-12 text-center text-blue-gray/30 font-black uppercase tracking-widest text-sm">Aucune perte enregistrée</div>
           )}
         </div>
 
@@ -150,7 +150,7 @@ export default function Spoilage() {
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-white/5 text-[9px] font-black uppercase tracking-widest text-white/50">
+              <tr className="bg-white/5 text-xs font-black uppercase tracking-widest text-white/50">
                 <th className="p-6">Date / Heure</th>
                 <th className="p-6">Produit</th>
                 <th className="p-6 text-center">Quantité</th>
@@ -168,7 +168,7 @@ export default function Spoilage() {
                   <td className="p-6 text-center font-black text-red-400">{l.quantity}</td>
                   <td className="p-6 text-sm text-white/50 font-bold italic">{l.reason}</td>
                   <td className="p-6 text-right font-black text-white">{store.formatCurrency(l.valuation || 0)}</td>
-                  <td className="p-6 text-center text-[10px] font-black uppercase tracking-widest text-white/40">{l.operator || 'Admin'}</td>
+                  <td className="p-6 text-center text-xs md:text-sm font-black uppercase tracking-widest text-white/40">{l.operator || 'Admin'}</td>
                   <td className="p-6 text-center">
                     <button onClick={() => handleOpenModal(l)} className="p-3 bg-white border border-navy-100 rounded-xl text-blue-gray hover:text-navy-brand transition-all shadow-sm mr-2"><Edit2 className="w-4 h-4" /></button>
                     <button onClick={() => handleDelete(l)} className="p-3 bg-white border border-navy-100 rounded-xl text-red-400 hover:bg-red-600 hover:text-white transition-all shadow-sm"><Trash2 className="w-4 h-4" /></button>
@@ -176,7 +176,7 @@ export default function Spoilage() {
                 </tr>
               ))}
               {losses.length === 0 && (
-                <tr><td colSpan="7" className="p-20 text-center text-blue-gray font-black uppercase tracking-widest opacity-20">Aucune perte enregistrée</td></tr>
+                <tr><td colSpan="7" className="p-6 md:p-20 text-center text-blue-gray font-black uppercase tracking-widest opacity-20">Aucune perte enregistrée</td></tr>
               )}
             </tbody>
           </table>
@@ -192,7 +192,7 @@ export default function Spoilage() {
             </div>
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
               <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Produit</label>
+                <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Produit</label>
                 <select
                   required
                   disabled={!!editingLoss}
@@ -206,7 +206,7 @@ export default function Spoilage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Quantité Perdue</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Quantité Perdue</label>
                   <input
                     type="number"
                     required
@@ -216,7 +216,7 @@ export default function Spoilage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Raison</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Raison</label>
                   <input
                     type="text"
                     placeholder="Ex: Pourri, Cassé"

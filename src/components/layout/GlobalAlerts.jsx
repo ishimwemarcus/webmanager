@@ -66,13 +66,13 @@ export default function GlobalAlerts() {
           <h2 className="font-display text-2xl font-bold text-navy-950 mb-2">Access Request</h2>
           <p className="text-sm text-navy-500 mb-6 bg-amber-50/50 p-4 rounded-2xl border border-amber-100/50 w-full">
             <strong className="text-navy-900 block text-lg">{pendingUser.name}</strong>
-            <span className="text-[10px] font-black uppercase tracking-widest text-navy-400">System ID: {pendingUser.username}</span>
+            <span className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400">System ID: {pendingUser.username}</span>
             <br/><br/>
             This operator has just registered and requires Master clearance to enter the platform.
           </p>
 
           <div className="w-full mb-6 text-left">
-            <label className="text-[10px] font-black uppercase tracking-widest text-navy-400 mb-2 block ml-1">Grant Access Lifespan</label>
+            <label className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400 mb-2 block ml-1">Grant Access Lifespan</label>
             <select 
               value={lifespanDays}
               onChange={(e) => setLifespanDays(e.target.value)}

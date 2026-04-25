@@ -24,7 +24,7 @@ export default function QRModal() {
         </div>
         
         <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1 text-center mt-4 md:mt-0">Global Link</h2>
-        <p className="text-[9px] md:text-[10px] text-navy-400 text-center font-bold mb-4 md:mb-8 uppercase tracking-widest leading-relaxed max-w-[200px] md:max-w-none">
+        <p className="text-xs md:text-xs md:text-sm text-navy-400 text-center font-bold mb-4 md:mb-8 uppercase tracking-widest leading-relaxed max-w-[200px] md:max-w-none">
           Scan to join the live network.
         </p>
         
@@ -42,7 +42,7 @@ export default function QRModal() {
           href="https://guardian-company.surge.sh" 
           target="_blank" 
           rel="noreferrer"
-          className="mt-6 text-[10px] md:text-xs text-accent-500 font-bold tracking-widest hover:text-white hover:underline uppercase text-center break-all px-4"
+          className="mt-6 text-xs md:text-sm md:text-xs text-accent-500 font-bold tracking-widest hover:text-white hover:underline uppercase text-center break-all px-4"
         >
           guardian-company.surge.sh
         </a>
@@ -74,7 +74,7 @@ export default function QRModal() {
             }
           }}
           id="sync-btn-global"
-          className="mt-8 w-full md:w-auto px-6 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 rounded-2xl text-[9px] font-black uppercase tracking-[0.2em] transition-all disabled:opacity-50"
+          className="mt-8 w-full md:w-auto px-6 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all disabled:opacity-50"
         >
           Sync PC to Global Network
         </button>

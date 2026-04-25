@@ -182,7 +182,7 @@ export default function Reports() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 no-print">
         <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">Intelligence d'Affaires</h1>
         <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">Auditeur Multi-Secteurs</h2>
@@ -191,7 +191,7 @@ export default function Reports() {
       <div className="flex flex-col gap-6 no-print">
         <div className="flex flex-col gap-4 glass-card p-4 md:p-6 shadow-xl bg-white border border-navy-50">
           <div className="flex flex-wrap items-center gap-3">
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Secteurs:</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Secteurs:</p>
             <div className="flex flex-wrap gap-2">
               {[
                 { id: 'sales', label: 'Ventes' },
@@ -205,7 +205,7 @@ export default function Reports() {
                   className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all border ${activeSectors.includes(s.id) ? 'bg-navy-brand text-white border-navy-brand' : 'bg-white text-blue-gray border-navy-100'}`}
                 >
                   {activeSectors.includes(s.id) ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-                  <span className="text-[10px] font-black uppercase tracking-widest">{s.label}</span>
+                  <span className="text-xs md:text-sm font-black uppercase tracking-widest">{s.label}</span>
                 </button>
               ))}
             </div>
@@ -223,7 +223,7 @@ export default function Reports() {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <button onClick={handleDownloadPDF} className="bg-navy-950 text-white px-4 md:px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black transition-all">
+              <button onClick={handleDownloadPDF} className="bg-navy-950 text-white px-4 md:px-8 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black transition-all">
                 <Download className="w-4 h-4" /> PDF
               </button>
               <button
@@ -235,7 +235,7 @@ export default function Reports() {
                   netProfit: netCashCollected,
                   performance: netCashCollected > 0 ? 'STATUT: STABLE' : 'STATUT: DÉFICIT'
                 }, store.formatCurrency)}
-                className="bg-[#2563eb] text-white px-4 md:px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black transition-all"
+                className="bg-[#2563eb] text-white px-4 md:px-8 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-2 hover:bg-black transition-all"
               >
                 <Printer className="w-4 h-4" /> Imprimer
               </button>
@@ -246,19 +246,19 @@ export default function Reports() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 no-print">
         <div className="glass-card flex flex-col justify-center border-l-8 border-emerald-500 bg-white shadow-xl group hover:scale-[1.02] transition-all">
-          <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-emerald-500" /> Revenus des Ventes</p>
+          <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><TrendingUp className="w-4 h-4 text-emerald-500" /> Revenus des Ventes</p>
           <p className="text-3xl font-black text-navy-950">{store.formatCurrency(totalSalesRev)}</p>
         </div>
         <div className="glass-card flex flex-col justify-center border-l-8 border-navy-brand bg-white shadow-xl">
-          <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><TrendingDown className="w-4 h-4 text-navy-brand" /> Dettes Émises</p>
+          <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><TrendingDown className="w-4 h-4 text-navy-brand" /> Dettes Émises</p>
           <p className="text-3xl font-black text-navy-950">{store.formatCurrency(totalSalesDebt)}</p>
         </div>
         <div className="glass-card flex flex-col justify-center border-l-8 border-rose-500 bg-white shadow-xl">
-          <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><Trash2 className="w-4 h-4 text-rose-500" /> Pertes (Avaries)</p>
+          <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><Trash2 className="w-4 h-4 text-rose-500" /> Pertes (Avaries)</p>
           <p className="text-3xl font-black text-navy-950">{store.formatCurrency(totalLossValuation)}</p>
         </div>
         <div className={`glass-card flex flex-col justify-center border-l-8 bg-white shadow-xl ${netCashCollected >= 0 ? 'border-emerald-400' : 'border-rose-400'}`}>
-          <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><Activity className="w-4 h-4 text-blue-gray" /> MARGE NETTE</p>
+          <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1 flex items-center gap-2"><Activity className="w-4 h-4 text-blue-gray" /> MARGE NETTE</p>
           <p className={`text-3xl font-black ${netCashCollected >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{store.formatCurrency(netCashCollected)}</p>
         </div>
       </div>
@@ -273,7 +273,7 @@ export default function Reports() {
             <div className="hidden lg:block overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-navy-50/50 text-[10px] font-black uppercase text-blue-gray">
+                  <tr className="bg-navy-50/50 text-xs md:text-sm font-black uppercase text-blue-gray">
                     <th className="p-6">Heure</th>
                     <th className="p-6">Identité du Client</th>
                     <th className="p-6">Produit</th>
@@ -291,7 +291,7 @@ export default function Reports() {
                       <td className="p-6 text-right text-xs font-bold text-navy-950">{store.formatCurrency(s.amount)}</td>
                       <td className="p-6 text-right text-xs font-black text-emerald-600">{store.formatCurrency(s.paid)}</td>
                       <td className="p-6 text-center">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase border-2 ${s.paid >= s.amount ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase border-2 ${s.paid >= s.amount ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'}`}>
                           {s.paid >= s.amount ? 'PAYÉ' : 'CRÉDIT'}
                         </span>
                       </td>
@@ -312,7 +312,7 @@ export default function Reports() {
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-navy-50/50 text-[10px] font-black uppercase text-blue-gray">
+                  <tr className="bg-navy-50/50 text-xs md:text-sm font-black uppercase text-blue-gray">
                     <th className="p-6">Type</th>
                     <th className="p-6">Heure</th>
                     <th className="p-6">Description / Raison</th>
@@ -323,7 +323,7 @@ export default function Reports() {
                   {dailyLedger.map((l, idx) => (
                     <tr key={`ledger-${idx}`}>
                       <td className="p-6">
-                        <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase ${l.type === 'expense' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>{l.type === 'expense' ? 'DÉPENSE' : 'ENTRÉE'}</span>
+                        <span className={`px-3 py-1 rounded-full text-xs font-black uppercase ${l.type === 'expense' ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>{l.type === 'expense' ? 'DÉPENSE' : 'ENTRÉE'}</span>
                       </td>
                       <td className="p-6 text-xs font-bold text-blue-gray">{l.date ? new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
                       <td className="p-6 text-xs font-black text-navy-950 italic">{l.description}</td>
@@ -333,7 +333,7 @@ export default function Reports() {
                   {dailyLosses.map((l, idx) => (
                     <tr key={`loss-${idx}`}>
                       <td className="p-6">
-                        <span className="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-orange-50 text-orange-600">PERTE (AVARIE)</span>
+                        <span className="px-3 py-1 rounded-full text-xs font-black uppercase bg-orange-50 text-orange-600">PERTE (AVARIE)</span>
                       </td>
                       <td className="p-6 text-xs font-bold text-blue-gray">{l.date ? new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
                       <td className="p-6 text-xs font-black text-navy-950 italic">{l.name} - Raison: {l.reason}</td>

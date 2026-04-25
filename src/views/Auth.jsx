@@ -31,7 +31,7 @@ export default function Auth({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-[calc(100vh-6rem)] bg-transparent flex items-center justify-center p-6 relative overflow-hidden font-sans">
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-navy-brand/5 blur-[120px] rounded-full"></div>
 
       <div className="w-full max-w-[480px] relative z-10 fade-in-up">
@@ -58,7 +58,7 @@ export default function Auth({ onLogin }) {
           <h1 className="text-[clamp(2.5rem,8vw,3.75rem)] font-black text-navy-brand uppercase tracking-tighter leading-none italic">
             MARC
           </h1>
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-blue-gray mt-4 opacity-50">High-Security Governance</p>
+          <p className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-blue-gray mt-4 opacity-50">High-Security Governance</p>
         </div>
 
         {/* AUTH CARD */}
@@ -72,20 +72,20 @@ export default function Auth({ onLogin }) {
               <h2 className="text-2xl font-black text-charcoal uppercase tracking-tight italic">
                 Interface Entry
               </h2>
-              <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-2">
+              <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mt-2">
                 Initialize Operational Session
               </p>
             </div>
 
             {error && (
-              <div className="bg-navy-50 border-l-4 border-navy-brand px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest text-navy-brand animate-shake">
+              <div className="bg-navy-50 border-l-4 border-navy-brand px-6 py-4 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest text-navy-brand animate-shake">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2 block">Username Sector</label>
+                <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2 block">Username Sector</label>
                 <div className="relative">
                   <ShieldCheck className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-navy-200" />
                   <input value={formData.username} onChange={(e) => setFormData({ ...formData, username: e.target.value })} type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-bold text-charcoal focus:border-navy-brand outline-none transition-all font-mono" placeholder="username_id" />
@@ -93,14 +93,14 @@ export default function Auth({ onLogin }) {
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2 block">Security Protocol</label>
+                <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2 block">Security Protocol</label>
                 <div className="relative">
                   <Lock className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-navy-200" />
                   <input value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} type="password" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-bold text-charcoal focus:border-navy-brand outline-none transition-all tracking-[0.5em]" placeholder="••••" />
                 </div>
               </div>
 
-              <button type="submit" className="btn-premium w-full !py-6 !text-[11px] !rounded-[32px] mt-4">
+              <button type="submit" className="btn-premium w-full !py-6 !text-sm !rounded-[32px] mt-4">
                 Initialize System
                 <ArrowRight className="w-5 h-5 ml-4" />
               </button>

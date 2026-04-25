@@ -98,14 +98,14 @@ export default function Commander() {
   const criticalDebt = clients.filter(c => (parseFloat(c.balance) || 0) > 500);
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Enterprise Intelligence
+            Intelligence d'Entreprise
           </h1>
           <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">
-            {t('commanderInterface')} Center
+            Centre {t('commanderInterface')}
           </h2>
         </div>
         <div className="flex gap-4">
@@ -114,7 +114,7 @@ export default function Commander() {
               <Cpu className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Efficiency Index</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Indice d'Efficacité</p>
               <p className="text-xl font-black text-navy-brand italic">98.4% <span className="text-emerald-500">↑</span></p>
             </div>
           </div>
@@ -134,16 +134,16 @@ export default function Commander() {
               <h3 className="text-xl font-black uppercase tracking-tight text-navy-950 flex items-center gap-3">
                 <BarChart3 className="w-6 h-6 text-emerald-500" /> {t('forecasting')}
               </h3>
-              <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Quantum Projection Protocol v.4.0</p>
+              <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Protocole de Projection Quantique v.4.0</p>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span className="text-[8px] font-black text-blue-gray uppercase tracking-widest">Bullish</span>
+                <span className="text-xs md:text-sm md:text-xs font-black text-blue-gray uppercase tracking-widest">Haussier</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                <span className="text-[8px] font-black text-blue-gray uppercase tracking-widest">Bearish</span>
+                <span className="text-xs md:text-sm md:text-xs font-black text-blue-gray uppercase tracking-widest">Baissier</span>
               </div>
             </div>
           </div>
@@ -163,12 +163,12 @@ export default function Commander() {
                       const data = payload[0].payload;
                       return (
                         <div className="bg-white border border-navy-100 rounded-2xl p-4 shadow-2xl">
-                          <p className="text-[10px] font-black text-blue-gray uppercase mb-2">{data.name} Analysis</p>
+                          <p className="text-xs md:text-sm font-black text-blue-gray uppercase mb-2">Analyse du {data.name}</p>
                           <div className="space-y-1">
-                            <div className="flex justify-between gap-8"><span className="text-[9px] text-blue-gray">OPEN</span><span className="text-[10px] font-mono text-navy-950">{store.formatCurrency(data.open)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-[9px] text-blue-gray">HIGH</span><span className="text-[10px] font-mono text-emerald-600">{store.formatCurrency(data.high)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-[9px] text-blue-gray">LOW</span><span className="text-[10px] font-mono text-rose-600">{store.formatCurrency(data.low)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-[9px] text-blue-gray">CLOSE</span><span className={`text-[10px] font-mono ${data.isUp ? 'text-emerald-600' : 'text-rose-600'}`}>{store.formatCurrency(data.close)}</span></div>
+                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">OUVERTURE</span><span className="text-xs md:text-sm font-mono text-navy-950">{store.formatCurrency(data.open)}</span></div>
+                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">HAUT</span><span className="text-xs md:text-sm font-mono text-emerald-600">{store.formatCurrency(data.high)}</span></div>
+                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">BAS</span><span className="text-xs md:text-sm font-mono text-rose-600">{store.formatCurrency(data.low)}</span></div>
+                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">CLÔTURE</span><span className={`text-xs md:text-sm font-mono ${data.isUp ? 'text-emerald-600' : 'text-rose-600'}`}>{store.formatCurrency(data.close)}</span></div>
                           </div>
                         </div>
                       );
@@ -183,13 +183,12 @@ export default function Commander() {
 
           <div className="pt-6 border-t border-white/5 grid grid-cols-2 gap-10">
             <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 mb-1">{t('projectedRevenue')} (7D)</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-white/30 mb-1">{t('projectedRevenue')} (7D)</p>
               <p className="text-3xl font-black text-white">{store.formatCurrency(forecastData.reduce((s, f) => s + f.close, 0))}</p>
             </div>
             <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-success-pro mb-1">Stability Rating</p>
-              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400 mb-1">Stability Rating</p>
-              <p className="text-xl font-black text-white italic tracking-tighter">ULTRA-GRADE <Zap className="inline w-5 h-5 text-emerald-400 fill-emerald-400" /></p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-emerald-400 mb-1">Indice de Stabilité</p>
+              <p className="text-xl font-black text-white italic tracking-tighter">QUALITÉ SUPÉRIEURE <Zap className="inline w-5 h-5 text-emerald-400 fill-emerald-400" /></p>
             </div>
           </div>
         </div>
@@ -204,7 +203,7 @@ export default function Commander() {
             <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
               <BadgeAlert className="w-6 h-6 text-emerald-400" /> {t('leaderboard')}
             </h3>
-            <p className="text-[10px] font-bold text-emerald-400/50 mt-1 uppercase tracking-widest italic">Operational Performance Ranking</p>
+            <p className="text-xs md:text-sm font-bold text-emerald-400/50 mt-1 uppercase tracking-widest italic">Classement de Performance Opérationnelle</p>
           </div>
 
           <div className="space-y-4 relative z-10">
@@ -216,7 +215,7 @@ export default function Commander() {
                   </div>
                   <div>
                     <p className="text-sm font-black uppercase tracking-tighter">{op.name}</p>
-                    <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">{op.count} Operations</p>
+                    <p className="text-xs md:text-sm font-black text-white/30 uppercase tracking-widest">{op.count} Opérations</p>
                   </div>
                 </div>
                 <div className="text-right">
@@ -224,7 +223,7 @@ export default function Commander() {
                 </div>
               </div>
             ))}
-            {leaderboardData.length === 0 && <p className="p-10 text-center opacity-20 italic font-black uppercase tracking-widest text-xs">Awaiting Data Streams...</p>}
+            {leaderboardData.length === 0 && <p className="p-10 text-center opacity-20 italic font-black uppercase tracking-widest text-xs">En attente de flux de données...</p>}
           </div>
         </div>
 
@@ -237,10 +236,10 @@ export default function Commander() {
             <h3 className="text-xl font-black uppercase tracking-tight text-danger-pro flex items-center gap-3">
               <ShieldAlert className="w-6 h-6" /> {t('riskRoom')}
             </h3>
-            <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Active critical anomalies in the ecosystem</p>
+            <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Anomalies critiques actives dans l'écosystème</p>
           </div>
-          <span className="px-5 py-2 bg-red-50 text-red-600 rounded-full text-[10px] font-black uppercase tracking-widest animate-pulse border border-red-100 self-start sm:self-auto">
-            {criticalStock.length + criticalDebt.length} Anomalies detected
+          <span className="px-5 py-2 bg-red-50 text-red-600 rounded-full text-xs md:text-sm font-black uppercase tracking-widest animate-pulse border border-red-100 self-start sm:self-auto">
+            {criticalStock.length + criticalDebt.length} Anomalies détectées
           </span>
         </div>
 
@@ -259,21 +258,21 @@ export default function Commander() {
               </div>
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="bg-red-50 rounded-xl p-2 text-center">
-                  <p className="text-[10px] text-red-400 uppercase font-black">Gravité</p>
-                  <p className="text-[10px] font-black text-red-600">{entry.type === 'stock' ? 'Immédiat' : 'Défaut Risque'}</p>
+                  <p className="text-xs md:text-sm text-red-400 uppercase font-black">Gravité</p>
+                  <p className="text-xs md:text-sm font-black text-red-600">{entry.type === 'stock' ? 'Immédiat' : 'Défaut Risque'}</p>
                 </div>
                 <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-[10px] text-blue-gray uppercase font-black">Impact</p>
+                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Impact</p>
                   <p className="text-xs font-black text-navy-900">{entry.type === 'stock' ? store.formatCurrency((parseFloat(entry.item.price) || 0) * 10) : `-${store.formatCurrency(entry.item.balance)}`}</p>
                 </div>
               </div>
-              <button className={`w-full py-3 text-white text-[10px] font-black uppercase tracking-widest rounded-xl ${entry.type === 'stock' ? 'bg-navy-brand' : 'bg-red-600'}`}>
+              <button className={`w-full py-3 text-white text-xs md:text-sm font-black uppercase tracking-widest rounded-xl ${entry.type === 'stock' ? 'bg-navy-brand' : 'bg-red-600'}`}>
                 {entry.type === 'stock' ? 'Restocker' : 'Contacter Client'}
               </button>
             </div>
           ))}
           {criticalStock.length === 0 && criticalDebt.length === 0 && (
-            <div className="p-12 text-center text-blue-gray/30 font-black uppercase tracking-widest">No Critical Anomalies</div>
+            <div className="p-6 md:p-12 text-center text-blue-gray/30 font-black uppercase tracking-widest">Aucune Anomalie Critique</div>
           )}
         </div>
 
@@ -281,7 +280,7 @@ export default function Commander() {
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-navy-50/50 text-[10px] font-black uppercase tracking-widest text-blue-gray">
+              <tr className="bg-navy-50/50 text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">
                 <th className="p-8">Type d'Anomalie</th>
                 <th className="p-8">Node / Entité</th>
                 <th className="p-8 text-center">Gravité</th>
@@ -297,10 +296,10 @@ export default function Commander() {
                     <span className="text-xs font-black uppercase tracking-widest text-red-500">Rupture Critique</span>
                   </td>
                   <td className="p-8 font-black uppercase text-navy-brand">{p.name}</td>
-                  <td className="p-8 text-center text-[10px] font-black text-red-600 uppercase">Immédiat (0 Stock)</td>
+                  <td className="p-8 text-center text-xs md:text-sm font-black text-red-600 uppercase">Immédiat (0 Stock)</td>
                   <td className="p-8 text-right font-black text-navy-900">{store.formatCurrency((parseFloat(p.price) || 0) * 10)}</td>
                   <td className="p-8 text-center">
-                    <button className="px-6 py-3 bg-navy-brand text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg">Restocker</button>
+                    <button className="px-6 py-3 bg-navy-brand text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg">Restocker</button>
                   </td>
                 </tr>
               ))}
@@ -311,15 +310,15 @@ export default function Commander() {
                     <span className="text-xs font-black uppercase tracking-widest text-red-600">Dette Massive</span>
                   </td>
                   <td className="p-8 font-black uppercase text-navy-brand">{c.client}</td>
-                  <td className="p-8 text-center text-[10px] font-black text-red-600 uppercase">Risque de Défaut</td>
+                  <td className="p-8 text-center text-xs md:text-sm font-black text-red-600 uppercase">Risque de Défaut</td>
                   <td className="p-8 text-right font-black text-red-600">-{store.formatCurrency(c.balance)}</td>
                   <td className="p-8 text-center">
-                    <button className="px-6 py-3 bg-red-600 text-white text-[9px] font-black uppercase tracking-widest rounded-xl shadow-lg">Contacter Client</button>
+                    <button className="px-6 py-3 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg">Contacter Client</button>
                   </td>
                 </tr>
               ))}
               {criticalStock.length === 0 && criticalDebt.length === 0 && (
-                <tr><td colSpan="5" className="p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em]">No Critical Anomalies</td></tr>
+                <tr><td colSpan="5" className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em]">Aucune Anomalie Critique</td></tr>
               )}
             </tbody>
           </table>

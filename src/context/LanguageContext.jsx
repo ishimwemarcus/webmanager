@@ -27,6 +27,9 @@ const translations = {
     receivableDirect: 'Aller au Manifeste des Ventes',
     broadcastWhatsApp: 'Diffuser via WhatsApp',
     downloadPayload: 'Télécharger les Données',
+    addRecord: 'Enregistrer une Entrée',
+    back: 'Retour',
+    commanderInterface: 'Interface de Commande',
     
     // Auth
     loginGateway: 'Connexion Sécurisée',
@@ -107,6 +110,7 @@ const translations = {
     retention: 'Crédit Client',
     protocol: 'Gestion',
     creditRetention: 'Soldes Clients',
+    loyaltyProgram: 'Programme de Fidélité',
 
     // Admin / Recovery
     governance: 'Gestion du Personnel',
@@ -143,7 +147,6 @@ const translations = {
 
     // New Luxury Features
     clientsDatabase: 'Base Clients VIP',
-    loyaltyProgram: 'Programme de Fidélité',
     spoilage: 'Déclarer une Perte (Avarie)',
     thermalReceipt: 'Ticket Caisse (80mm)',
     closeRegister: 'Clôture de Caisse',
@@ -154,14 +157,37 @@ const translations = {
     cashDiscrepancy: 'Écart de Caisse',
     vipStatus: 'Client VIP',
     riskStatus: 'Risque Financier',
-    commanderCenter: 'Commander\'s Center',
+    commanderCenter: 'Centre de Commande',
     forecasting: 'Prévisions I.A',
     leaderboard: 'Palmarès de Performance',
     riskRoom: 'Zone de Risque Critique',
     projectedRevenue: 'Revenu Projeté (7j)',
     efficiencyIndex: 'Indice d\'Efficacité',
     topOperator: 'Meilleur Opérateur',
-    performanceDelta: 'Variation de Performance'
+    performanceDelta: 'Variation de Performance',
+    newSale: 'Nouvelle Vente',
+    todayRevenue: 'Chiffre d\'Affaires du Jour',
+    totalTransactions: 'Transactions Totales',
+    records: 'Enregistrements',
+    currentShift: 'Poste Actuel',
+    allShifts: 'Tous les Postes',
+    confirmSale: 'Confirmer la Vente',
+    confirm: 'Confirmer',
+    success: 'Succès',
+    transactionRecorded: 'Transaction enregistrée avec succès',
+    print: 'Imprimer',
+    share: 'Partager',
+    intelligence: 'Intelligence d\'Affaires',
+    auditor: 'Auditeur Multi-Secteurs',
+    sectors: 'Secteurs',
+    salesSec: 'Ventes',
+    ledgerSec: 'Grand Livre',
+    stockSec: 'Stock',
+    lossesSec: 'Pertes',
+    pdf: 'PDF',
+    revenue: 'Revenus des Ventes',
+    debtsIssued: 'Dettes Émises',
+    netMargin: 'MARGE NETTE'
   }
 };
 

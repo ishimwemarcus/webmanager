@@ -79,7 +79,7 @@ export default function Sidebar({ className }) {
       </div>
 
       <div className="px-4 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-4 italic">Management Sectors</p>
+        <p className="text-xs md:text-sm md:text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-4 italic">Management Sectors</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -119,7 +119,7 @@ export default function Sidebar({ className }) {
           `}
         >
           <BookOpen className="w-5 h-5" />
-          <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('cashRegister')}</span>
+          <span className="text-xs md:text-sm font-black uppercase tracking-[0.2em]">{t('cashRegister')}</span>
         </NavLink>
       </div>
 
@@ -132,7 +132,7 @@ export default function Sidebar({ className }) {
               localStorage.removeItem('biztrack_shift_start');
             });
           }}
-          className="flex items-center gap-3 px-6 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 font-black text-[10px] uppercase tracking-[0.3em] cursor-pointer hover:bg-red-500/20 transition-all group"
+          className="flex items-center gap-3 px-6 py-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-500 font-black text-xs md:text-sm uppercase tracking-[0.3em] cursor-pointer hover:bg-red-500/20 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>{t('logout') || 'End Shift'}</span>
@@ -144,11 +144,11 @@ export default function Sidebar({ className }) {
               {store.currentOperator?.charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-black text-white truncate uppercase tracking-tight italic">{store.currentOperator || 'Operator'}</p>
-              <p className="text-[8px] text-white/30 font-black uppercase tracking-widest">Active Shift</p>
+              <p className="text-xs md:text-sm font-black text-white truncate uppercase tracking-tight italic">{store.currentOperator || 'Operator'}</p>
+              <p className="text-xs md:text-sm md:text-xs text-white/30 font-black uppercase tracking-widest">Active Shift</p>
             </div>
           </div>
-          <div className="text-[8px] text-white/30 font-black bg-black/20 rounded-lg px-3 py-2 border border-white/5 flex justify-between items-center tracking-widest uppercase italic">
+          <div className="text-xs md:text-sm md:text-xs text-white/30 font-black bg-black/20 rounded-lg px-3 py-2 border border-white/5 flex justify-between items-center tracking-widest uppercase italic">
             <span>Standby</span>
             <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse shadow-[0_0_10px_rgba(245,158,11,0.4)]"></div>
           </div>

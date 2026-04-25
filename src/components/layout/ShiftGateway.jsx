@@ -34,15 +34,15 @@ export default function ShiftGateway() {
             <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter mb-2">MARC GATEWAY</h1>
             <div className="flex items-center justify-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <p className="text-[10px] text-blue-gray uppercase tracking-[0.4em] font-black">Authentication Required</p>
+              <p className="text-xs md:text-sm text-blue-gray uppercase tracking-[0.4em] font-black">{t('loginGateway')}</p>
             </div>
         </div>
 
         <form onSubmit={handleStartShift} className="p-12 pt-4 space-y-10">
             <div className="space-y-4">
                 <div className="flex justify-between items-center px-2">
-                  <label className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray">Identity Credentials</label>
-                  <span className="text-[9px] font-bold text-navy-brand opacity-50">Shift v2.4</span>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">{t('identityIdentity')}</label>
+                  <span className="text-xs font-bold text-navy-brand opacity-50">Session v2.4</span>
                 </div>
                 <div className="relative group">
                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-blue-gray group-focus-within:text-navy-brand transition-colors"><User className="w-6 h-6" /></span>
@@ -51,7 +51,7 @@ export default function ShiftGateway() {
                         required
                         value={operator}
                         onChange={(e) => setOperator(e.target.value)}
-                        placeholder="ENTER YOUR NAME..."
+                        placeholder="ENTREZ VOTRE NOM..."
                         className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100"
                         autoFocus
                     />
@@ -59,13 +59,13 @@ export default function ShiftGateway() {
             </div>
 
             <button type="submit" className="w-full py-6 rounded-[24px] bg-navy-brand text-white text-sm font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-2xl hover:bg-navy-900 active:scale-95 transition-all group overflow-hidden relative">
-                <span className="relative z-10">Initialize Shift</span>
+                <span className="relative z-10">{t('initializeSession')}</span>
                 <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
 
-            <p className="text-center text-[9px] text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
-              Security Protocol Active. Session data will be encrypted and synchronized with the global ledger.
+            <p className="text-center text-xs text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
+              Protocole de sécurité actif. Les données de session seront cryptées et synchronisées avec le grand livre mondial.
             </p>
         </form>
       </div>

@@ -96,13 +96,13 @@ export default function Stock() {
   };
 
   const handleBulkDelete = () => {
-    store.showConfirm(`PURGE ${selectedIds.length} ASSETS? This will permanently remove selected items from the registry.`, () => {
+    store.showConfirm(`PURGER ${selectedIds.length} ACTIFS? Cette action supprimera définitivement les éléments sélectionnés du registre.`, () => {
       selectedIds.forEach(id => {
         const prod = products.find(p => p.id === id);
         if (prod) store.deleteRecord(prod);
       });
       setSelectedIds([]);
-      store.showAlert(`${selectedIds.length} items purged successfully`, "success");
+      store.showAlert(`${selectedIds.length} éléments purgés avec succès`, "success");
     });
   };
 
@@ -136,13 +136,13 @@ export default function Stock() {
   };
 
   const confirmDelete = (product) => {
-    store.showConfirm(`DELETE ${product.name.toUpperCase()}? This action is irreversible.`, () => {
+    store.showConfirm(`SUPPRIMER ${product.name.toUpperCase()}? Cette action est irréversible.`, () => {
       store.deleteRecord(product);
     });
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-screen space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
@@ -159,7 +159,7 @@ export default function Stock() {
               onClick={handleBulkDelete}
               className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 flex items-center gap-2 hover:bg-red-700 transition-all"
             >
-              <Trash2 className="w-5 h-5" /> Delete {selectedIds.length} Items
+              <Trash2 className="w-5 h-5" /> Supprimer {selectedIds.length} Articles
             </button>
           )}
           <button onClick={() => setShowModal(true)} className="btn-premium">
@@ -174,7 +174,7 @@ export default function Stock() {
             <TrendingUp className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Total Valuation</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Évaluation Totale</p>
             <p className="text-3xl font-black text-navy-950">{store.formatCurrency(products.reduce((acc, p) => acc + ((parseFloat(p.price) || 0) * (parseFloat(p.quantity) || 0)), 0))}</p>
           </div>
         </div>
@@ -183,8 +183,8 @@ export default function Stock() {
             <Package className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Active Assets</p>
-            <p className="text-3xl font-black text-navy-950">{products.length} <span className="text-xs text-blue-gray opacity-40">SKUs</span></p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Actifs Opérationnels</p>
+            <p className="text-3xl font-black text-navy-950">{products.length} <span className="text-xs text-blue-gray opacity-40">Unités</span></p>
           </div>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function Stock() {
         {selectedCategory && (
           <button 
             onClick={() => setSelectedCategory(null)} 
-            className="px-8 py-4 bg-navy-brand text-white rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 shadow-lg hover:shadow-navy-brand/30 transition-all"
+            className="px-8 py-4 bg-navy-brand text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-3 shadow-lg hover:shadow-navy-brand/30 transition-all"
           >
             <ArrowRight className="w-4 h-4 rotate-180" /> {t('back')}
           </button>
@@ -227,8 +227,8 @@ export default function Stock() {
                     <Box className="w-8 h-8" />
                   </div>
                   <div>
-                    <h4 className="text-xl font-black uppercase tracking-tighter text-navy-950">{cat.name} Sector</h4>
-                    <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">{catCount} Assets Managed</p>
+                    <h4 className="text-xl font-black uppercase tracking-tighter text-navy-950">Secteur {cat.name}</h4>
+                    <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">{catCount} Actifs Gérés</p>
                   </div>
                 </div>
                 <ArrowRight className="w-6 h-6 text-navy-200 group-hover:text-emerald-500 transition-all" />
@@ -246,18 +246,18 @@ export default function Stock() {
               <div className="w-12 h-12 rounded-2xl bg-white shadow-inner flex items-center justify-center">
                 <Package className="w-6 h-6 text-navy-brand" />
               </div>
-              {selectedCategory ? `${selectedCategory} Sector Manifest` : 'Search Results'}
+              {selectedCategory ? `Manifeste du Secteur ${selectedCategory}` : 'Résultats de Recherche'}
             </h4>
             <div className="flex items-center gap-6">
               <button
                 onClick={toggleSelectAll}
-                className="text-[10px] font-black uppercase tracking-widest text-navy-brand flex items-center gap-2 hover:opacity-70 transition-all"
+                className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-brand flex items-center gap-2 hover:opacity-70 transition-all"
               >
                 {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-                {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? 'Unselect All' : 'Select All Area'}
+                {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? 'Tout désélectionner' : 'Tout sélectionner'}
               </button>
-              <span className="px-4 py-1.5 bg-navy-brand text-white rounded-full text-[10px] font-black uppercase tracking-widest">
-                {filteredProducts.length} Nodes Active
+              <span className="px-4 py-1.5 bg-navy-brand text-white rounded-full text-xs md:text-sm font-black uppercase tracking-widest">
+                {filteredProducts.length} Unités Actives
               </span>
             </div>
           </div>
@@ -268,7 +268,7 @@ export default function Stock() {
             Object.keys(groupedProducts).map(category => (
               <React.Fragment key={category}>
                 <div className="bg-navy-50/50 p-4 border-y border-navy-100/50">
-                  <span className="text-[9px] font-black uppercase tracking-[0.2em] text-navy-brand flex items-center gap-2">
+                  <span className="text-xs font-black uppercase tracking-[0.2em] text-navy-brand flex items-center gap-2">
                     <div className="w-1 h-1 rounded-full bg-navy-brand"></div>
                     {category}
                   </span>
@@ -284,19 +284,19 @@ export default function Stock() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1.5">
                           <p className="font-black text-charcoal uppercase tracking-tighter text-sm truncate cursor-pointer hover:text-navy-brand" onClick={() => setDetailProduct(p)}>{p.name}</p>
-                          <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase border flex-shrink-0 ${status.cls}`}>{status.text}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-xs md:text-sm md:text-xs font-black uppercase border flex-shrink-0 ${status.cls}`}>{status.text}</span>
                         </div>
-                        <p className="text-[10px] text-blue-gray font-black uppercase tracking-widest mb-3 italic opacity-60">
+                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mb-3 italic opacity-60">
                           {p.category || 'Standard'} · {p.packageType || 'Unit'}
                         </p>
                         <div className="grid grid-cols-3 gap-3">
                           <div className="bg-navy-50/50 rounded-xl p-2.5 border border-navy-50 text-center">
-                            <p className="text-[8px] text-blue-gray uppercase font-black mb-0.5">Stock</p>
+                            <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black mb-0.5">Stock</p>
                             <p className="text-sm font-black text-charcoal">{getFormattedQuantity(p)}</p>
                           </div>
                           <div className="bg-navy-50/50 rounded-xl p-2.5 border border-navy-50 text-center">
-                            <p className="text-[8px] text-blue-gray uppercase font-black mb-0.5">Value</p>
-                            <p className="text-[10px] font-black text-navy-brand">{store.formatCurrency(p.price)}</p>
+                            <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black mb-0.5">Valeur</p>
+                            <p className="text-xs md:text-sm font-black text-navy-brand">{store.formatCurrency(p.price)}</p>
                           </div>
                           <div className="flex flex-col gap-1">
                             <button onClick={() => setEditProduct(p)} className="flex-1 bg-white border border-navy-100 rounded-lg flex items-center justify-center text-blue-gray hover:text-navy-brand shadow-sm">
@@ -314,7 +314,7 @@ export default function Stock() {
               </React.Fragment>
             ))
           ) : (
-            <div className="p-20 text-center text-blue-gray/30 font-black uppercase tracking-widest text-sm italic">Registry is currently void</div>
+            <div className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-widest text-sm italic">Le registre est actuellement vide</div>
           )}
         </div>
 
@@ -322,15 +322,15 @@ export default function Stock() {
         <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-navy-50 text-[11px] font-black uppercase tracking-widest text-navy-950 border-b-2 border-navy-100">
+              <tr className="bg-navy-50 text-sm font-black uppercase tracking-widest text-navy-950 border-b-2 border-navy-100">
                 <th className="p-6 w-16"></th>
-                <th className="p-6">Asset Identity</th>
-                <th className="p-6">Sector / Unit</th>
-                <th className="p-6 text-right">Reserve</th>
-                <th className="p-6 text-right">Unit Rate</th>
-                <th className="p-6 text-right">Total Valuation</th>
-                <th className="p-6 text-center">Status</th>
-                <th className="p-6 text-center">Protocol</th>
+                <th className="p-6">Identité de l'Actif</th>
+                <th className="p-6">Secteur / Unité</th>
+                <th className="p-6 text-right">Réserve</th>
+                <th className="p-6 text-right">Taux Unitaire</th>
+                <th className="p-6 text-right">Évaluation Totale</th>
+                <th className="p-6 text-center">Statut</th>
+                <th className="p-6 text-center">Protocole</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-navy-50">
@@ -341,7 +341,7 @@ export default function Stock() {
                       <td colSpan="8" className="p-4 px-8">
                         <div className="flex items-center gap-3">
                           <div className="w-2 h-2 rounded-full bg-navy-brand shadow-sm"></div>
-                          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-navy-brand">{category}</span>
+                          <span className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-navy-brand">{category}</span>
                         </div>
                       </td>
                     </tr>
@@ -362,21 +362,21 @@ export default function Stock() {
                               </div>
                               <div className="min-w-0">
                                 <p className="font-black text-charcoal uppercase tracking-tighter text-sm truncate">{p.name}</p>
-                                <p className="text-[8px] text-blue-gray font-black tracking-[0.2em] uppercase opacity-40">Node: {p.product_id}</p>
+                                <p className="text-xs md:text-sm md:text-xs text-blue-gray font-black tracking-[0.2em] uppercase opacity-40">Node: {p.product_id}</p>
                               </div>
                             </div>
                           </td>
                           <td className="p-6">
                             <div className="flex flex-col">
-                              <span className="text-[10px] font-black uppercase text-navy-brand">{p.category || 'Standard'}</span>
-                              <span className="text-[9px] font-bold text-blue-gray italic uppercase tracking-wider">{p.packageType || 'Unit'}</span>
+                              <span className="text-xs md:text-sm font-black uppercase text-navy-brand">{p.category || 'Standard'}</span>
+                              <span className="text-xs font-bold text-blue-gray italic uppercase tracking-wider">{p.packageType || 'Unit'}</span>
                             </div>
                           </td>
                           <td className="p-6 text-right font-black text-lg text-charcoal tabular-nums">{getFormattedQuantity(p)}</td>
                           <td className="p-6 text-right text-blue-gray font-black tabular-nums">{store.formatCurrency(p.cost)}</td>
                           <td className="p-6 text-right text-navy-950 font-black tabular-nums">{store.formatCurrency(p.price)}</td>
                           <td className="p-6 text-center">
-                            <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase border shadow-sm ${status.cls}`}>{status.text}</span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase border shadow-sm ${status.cls}`}>{status.text}</span>
                           </td>
                           <td className="p-6">
                             <div className="flex items-center justify-center gap-2">
@@ -394,7 +394,7 @@ export default function Stock() {
                   </React.Fragment>
                 ))
               ) : (
-                <tr><td colSpan="8" className="p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em] italic">No active assets detected in this sector</td></tr>
+                <tr><td colSpan="8" className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em] italic">Aucun actif actif détecté dans ce secteur</td></tr>
               )}
             </tbody>
           </table>
@@ -413,7 +413,7 @@ export default function Stock() {
             <form onSubmit={handleAddProduct} className="p-10 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">{t('assetIdentity')}</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">{t('assetIdentity')}</label>
                   <input
                     required
                     value={newProduct.name}
@@ -422,19 +422,19 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">{t('sector')}</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">{t('sector')}</label>
                   <select
                     required
                     value={newProduct.category}
                     onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
                     className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-[#BEF264] transition-all appearance-none"
                   >
-                    <option value="" className="bg-[#064E3B]">Choose Sector...</option>
+                    <option value="" className="bg-[#064E3B]">Choisir un Secteur...</option>
                     {categories.map(c => <option key={c.id} value={c.name} className="bg-[#064E3B]">{c.name}</option>)}
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">Unité de Mesure</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Unité de Mesure</label>
                   <select
                     required
                     value={newProduct.packageType}
@@ -452,7 +452,7 @@ export default function Stock() {
                   </select>
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">Stock Total</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Stock Total</label>
                   <input
                     type="number"
                     step="any"
@@ -463,7 +463,7 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">Coût d'Achat</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Coût d'Achat</label>
                   <input
                     type="number"
                     step="0.01"
@@ -474,7 +474,7 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-white/50 ml-2">Prix de Vente</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Prix de Vente</label>
                   <input
                     type="number"
                     step="0.01"
@@ -498,13 +498,13 @@ export default function Stock() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 backdrop-blur-md p-4">
           <div className="glass-card max-w-2xl w-full rounded-[40px] bg-white shadow-2xl border border-white/10 overflow-hidden relative scale-in">
             <div className="p-10 border-b border-navy-50 flex justify-between items-center text-navy-brand">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">Modify Asset Registry</h3>
+              <h3 className="text-2xl font-black uppercase tracking-tighter">Modifier le Registre des Actifs</h3>
               <button onClick={() => setEditProduct(null)} className="p-3 hover:bg-navy-50 rounded-full transition-all"><X className="w-6 h-6" /></button>
             </div>
             <form onSubmit={handleEditProduct} className="p-10 space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="col-span-full space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Identifier</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Identifiant</label>
                   <input
                     disabled
                     value={editProduct.name}
@@ -512,7 +512,7 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Current Reserve</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Réserve Actuelle</label>
                   <input
                     type="number"
                     step="any"
@@ -523,7 +523,7 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Unit Cost</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Coût Unitaire</label>
                   <input
                     type="number"
                     step="0.01"
@@ -534,7 +534,7 @@ export default function Stock() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-2">Unit Selling Price</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Prix de Vente Unitaire</label>
                   <input
                     type="number"
                     step="0.01"
@@ -546,7 +546,7 @@ export default function Stock() {
                 </div>
               </div>
               <button type="submit" className="w-full bg-navy-brand text-white font-black py-5 rounded-[28px] shadow-2xl flex items-center justify-center gap-3 hover:bg-success-pro transition-all uppercase tracking-widest">
-                Confirm Modifications <ShieldCheck className="w-5 h-5" />
+                Confirmer les Modifications <ShieldCheck className="w-5 h-5" />
               </button>
             </form>
           </div>
@@ -559,7 +559,7 @@ export default function Stock() {
           <div className="creative-product-card scale-in shadow-[0_50px_100px_rgba(0,0,0,0.4)]" onClick={e => e.stopPropagation()}>
             <div className="banner-area relative">
               <div className="absolute top-6 left-6 flex items-center gap-2">
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-[8px] font-black uppercase tracking-widest text-white border border-white/10">
+                <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs md:text-sm md:text-xs font-black uppercase tracking-widest text-white border border-white/10">
                   {detailProduct.category || 'Standard'}
                 </span>
               </div>
@@ -571,15 +571,15 @@ export default function Stock() {
                  <Package className="w-12 h-12 text-white" />
               </div>
               <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{detailProduct.name}</h3>
-              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Asset Intelligence Node</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-white/50">Asset Intelligence Node</p>
             </div>
 
             <div className="reveal-content">
               <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray/40">Current Reserve</p>
+                <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray/40">Current Reserve</p>
                 <p className="text-4xl font-black text-charcoal">{getFormattedQuantity(detailProduct)}</p>
                 <div className="flex justify-center">
-                   <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase border mt-2 ${getStatusInfo(detailProduct.quantity).cls}`}>
+                   <span className={`px-3 py-1 rounded-full text-xs font-black uppercase border mt-2 ${getStatusInfo(detailProduct.quantity).cls}`}>
                      {getStatusInfo(detailProduct.quantity).text}
                    </span>
                 </div>
@@ -587,15 +587,15 @@ export default function Stock() {
 
               <div className="stats-grid grid grid-cols-2 gap-4">
                  <div className="bg-navy-50/50 p-4 rounded-3xl border border-navy-50">
-                    <p className="text-[8px] font-black uppercase text-blue-gray mb-1">Unit Cost</p>
+                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-blue-gray mb-1">Unit Cost</p>
                     <p className="text-sm font-black text-charcoal">{store.formatCurrency(detailProduct.cost)}</p>
                  </div>
                  <div className="bg-navy-50/50 p-4 rounded-3xl border border-navy-50">
-                    <p className="text-[8px] font-black uppercase text-blue-gray mb-1">Market Price</p>
+                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-blue-gray mb-1">Market Price</p>
                     <p className="text-sm font-black text-navy-brand">{store.formatCurrency(detailProduct.price)}</p>
                  </div>
                  <div className="col-span-2 bg-navy-brand/5 p-4 rounded-3xl border border-navy-brand/10">
-                    <p className="text-[8px] font-black uppercase text-navy-brand mb-1">Total Asset Value</p>
+                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-navy-brand mb-1">Total Asset Value</p>
                     <p className="text-lg font-black text-navy-brand">{store.formatCurrency(detailProduct.quantity * detailProduct.cost)}</p>
                  </div>
               </div>
