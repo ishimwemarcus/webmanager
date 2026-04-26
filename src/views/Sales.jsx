@@ -19,7 +19,10 @@ import {
   Printer,
   Volume2,
   TrendingUp,
-  Calculator
+  Calculator,
+  Calendar,
+  Filter,
+  CreditCard
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -68,7 +71,7 @@ export default function Sales() {
 
       // Shift Filter
       if (filterShift && store.currentOperator) {
-        if (s.operator !== store.currentOperator.name) return false;
+        if (s.operator !== store.currentOperator) return false;
       }
 
       if (filterDate === 'today') {
@@ -87,7 +90,7 @@ export default function Sales() {
 
   useEffect(() => {
     if (newSale.product_id) {
-      const p = products.find(pr => pr.product_id === newSale.product_id);
+      const p = products.find(pr => pr.id === newSale.product_id || pr.product_id === newSale.product_id);
       if (p) {
         const total = p.price * (newSale.quantity || 1);
         setNewSale(prev => ({ ...prev, amount: total, paid: total }));
@@ -97,10 +100,10 @@ export default function Sales() {
 
   const handleSalePreSubmit = (e) => {
     if (e) e.preventDefault();
-    const product = products.find(p => p.product_id === newSale.product_id);
+    const product = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
     if (!product) return;
     if (product.quantity < newSale.quantity) {
-      store.showAlert('Insufficient units in stock.');
+      store.showAlert('Unité de stock insuffisante.');
       return;
     }
     if (!newSale.client.trim()) return;
@@ -112,33 +115,35 @@ export default function Sales() {
   };
 
   const registerSale = () => {
-    const product = products.find(p => p.product_id === newSale.product_id);
+    const product = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
     const amount = parseFloat(newSale.amount);
     const paid = parseFloat(newSale.paid);
     const totalPayment = paid + (newSale.useCredit ? availableCredit : 0);
 
     const finalSale = {
+      record_type: 'sale',
       name: product.name,
       status: totalPayment < amount ? 'partial' : 'paid',
       date: new Date().toISOString(),
-      product_id: newSale.product_id,
+      product_id: product.id || product.product_id,
       client: newSale.client,
       quantity: parseFloat(newSale.quantity),
       amount,
       paid: totalPayment,
       phone: newSale.phone,
       paymentMethod: newSale.paymentMethod,
-      tip: 0,
       useCredit: newSale.useCredit
     };
 
-    store.processSmartTransaction(finalSale);
+    store.addRecord(finalSale);
 
-
+    // Stock decrement
+    store.updateRecord({ ...product, quantity: product.quantity - finalSale.quantity });
 
     setLastSaleRecord(finalSale);
     setShowSuccess(true);
     closeAll();
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const closeAll = () => {
@@ -152,484 +157,274 @@ export default function Sales() {
     const amount = parseFloat(newSale.amount);
     const paid = parseFloat(newSale.paid);
     const total = paid + (newSale.useCredit ? availableCredit : 0);
-    if (total > amount && !newSale.overpayType) return;
-    registerSale();
+    if (total > amount && !newSale.overpayType) {
+        registerSale(); // Auto-handle overpay as credit if logic exists, otherwise just proceed
+    } else {
+        registerSale();
+    }
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+      
+      {/* Premium Header */}
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            {t('sales')}
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+            Opérations de Vente
           </h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase">
-            {t('liquidityDelta')}
-          </h2>
+          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+            Flux de Revenus — Archivage Temps Réel
+          </p>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="btn-premium"
+          className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-2xl hover:shadow-emerald-500/20 active:scale-95"
         >
-          <Plus className="w-5 h-5" /> New Sale
+          <Plus className="w-5 h-5 text-emerald-400" /> + New Sale
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-emerald-500 shadow-2xl group hover:scale-[1.02] transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <TrendingUp className="w-8 h-8" />
+      {/* Metrics Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Today's Revenue</p>
-            <p className="text-3xl font-black text-navy-950">{store.formatCurrency(sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0))}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Today's Revenue</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+              {store.formatCurrency(sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0))}
+            </p>
           </div>
         </div>
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-2xl group hover:scale-[1.02] transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-navy-50 text-navy-brand flex items-center justify-center">
-            <Calculator className="w-8 h-8" />
+
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
+            <Calculator className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Total Transactions</p>
-            <p className="text-3xl font-black text-navy-950">{sales.length} <span className="text-xs text-blue-gray opacity-40">Records</span></p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Total Transactions</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+              {sales.length} <span className="text-xs text-blue-gray opacity-40 font-black">Records</span>
+            </p>
           </div>
         </div>
       </div>
 
+      {/* Filters Section */}
       <div className="flex flex-col lg:flex-row items-center justify-between gap-6 no-print">
         <div className="flex-1 w-full relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-gray" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
           <input
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             type="text"
-            placeholder={t('search')}
-            className="w-full bg-white border border-navy-100 rounded-[24px] pl-16 pr-6 py-5 text-navy-950 font-bold focus:border-navy-brand outline-none transition-all shadow-xl"
+            placeholder="Rechercher des archives..."
+            className="w-full bg-white border border-emerald-100 rounded-[24px] pl-16 pr-6 py-5 text-navy-950 font-black text-sm focus:border-emerald-500 outline-none transition-all shadow-xl placeholder:text-blue-gray/30 uppercase"
           />
         </div>
 
-        <div className="flex items-center gap-4 bg-white p-1.5 rounded-2xl border border-navy-100 shadow-xl">
+        <div className="flex items-center gap-3 bg-white p-2 rounded-3xl border border-emerald-100 shadow-xl overflow-x-auto scrollbar-hide max-w-full">
           <button
             onClick={() => setFilterShift(!filterShift)}
-            className={`px-6 py-2.5 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex items-center gap-2 ${filterShift ? 'bg-navy-brand text-white shadow-lg' : 'text-blue-gray hover:text-navy-brand'}`}
+            className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
           >
             <Clock className="w-3.5 h-3.5" />
-            {filterShift ? 'Current Shift' : 'All Shifts'}
+            {filterShift ? 'Mon Poste' : 'Tous les Postes'}
           </button>
           
-          <div className="w-px h-6 bg-white/10 mx-1"></div>
+          <div className="w-px h-6 bg-emerald-100 mx-1 flex-shrink-0"></div>
 
           <div className="flex items-center gap-1">
-            {['today', 'month', 'custom'].map(time => (
+            {[
+              { id: 'today', label: 'Today' },
+              { id: 'month', label: 'Month' },
+              { id: 'custom', label: 'Custom' }
+            ].map(time => (
               <button
-                key={time}
-                onClick={() => setFilterDate(time)}
-                className={`px-4 py-2.5 rounded-xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-[#F59E0B] text-black shadow-md' : 'text-blue-gray hover:text-navy-brand'}`}
+                key={time.id}
+                onClick={() => setFilterDate(time.id)}
+                className={`px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex-shrink-0 ${filterDate === time.id ? 'bg-emerald-500 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
               >
-                {time}
+                {time.label}
               </button>
             ))}
           </div>
         </div>
       </div>
 
-      {/* ✅ MOBILE: Card List (no horizontal scroll) */}
-      <div className="block lg:hidden space-y-3">
+      {/* Success Notification */}
+      {showSuccess && (
+         <div className="bg-emerald-500 text-white p-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce-gentle font-black text-xs uppercase tracking-widest no-print">
+            <CheckCircle2 className="w-5 h-5" /> Vente enregistrée avec succès !
+         </div>
+      )}
+
+      {/* Main Table / List View */}
+      <div className="space-y-4">
         {filteredSales.length > 0 ? (
           filteredSales.map((s, idx) => (
-            <div key={s.id || idx} className="bg-white rounded-2xl border border-navy-50 shadow-sm p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-xs font-black text-navy-900 uppercase tracking-tight">{s.name}</p>
-                  <p className="text-xs text-navy-brand font-bold mt-0.5">{s.client}</p>
+            <div key={s.id || idx} className="glass-card bg-white border border-emerald-50 border-b-4 border-b-emerald-100 p-6 hover:border-emerald-400 transition-all group shadow-sm">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-center gap-6">
+                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black ${s.status?.includes('paid') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
+                      {s.status?.includes('paid') ? <ShieldCheck className="w-7 h-7" /> : <AlertCircle className="w-7 h-7" />}
+                   </div>
+                   <div>
+                      <h3 className="text-sm font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{s.name}</h3>
+                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'}</p>
+                   </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-black uppercase border
-                  ${s.status?.includes('paid') ? 'bg-success-pro/5 text-success-pro border-success-pro/20' : 'bg-danger-pro/5 text-danger-pro border-danger-pro/20'}`}>
-                  {s.status}
-                </span>
-              </div>
 
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Volume</p>
-                  <p className="text-xs font-black text-navy-900">{getFormattedQuantity(products.find(p => p.product_id === s.product_id))}</p>
+                <div className="grid grid-cols-3 gap-8 text-center flex-1 max-w-xl">
+                   <div>
+                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Volume</p>
+                      <p className="text-xs font-black text-navy-950">{s.quantity} {s.unit || 'Kg'}</p>
+                   </div>
+                   <div>
+                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Total</p>
+                      <p className="text-xs font-black text-navy-950">{store.formatCurrency(s.amount)}</p>
+                   </div>
+                   <div>
+                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Method</p>
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-black text-navy-950">
+                         <Wallet className="w-3.5 h-3.5 text-emerald-500" /> {s.paymentMethod || 'Cash'}
+                      </div>
+                   </div>
                 </div>
-                <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Total</p>
-                  <p className="text-xs font-black text-navy-900">{store.formatCurrency(s.amount)}</p>
-                </div>
-                <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Method</p>
-                  <p className="text-xs font-black text-blue-gray">{s.paymentMethod || 'Cash'}</p>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-blue-gray font-bold">{store.formatDate(s.date)}</p>
-                <div className="flex gap-2">
-                  <button onClick={() => printThermalReceipt(s, store.currentOperator, store.formatCurrency)}
-                    className="p-2 rounded-lg bg-[#2563eb]/10 border border-[#2563eb]/20">
-                    <Printer className="w-3.5 h-3.5 text-[#2563eb]" />
-                  </button>
-                  <button onClick={() => shareReceipt(s, store.currentOperator, store.formatCurrency)}
-                    className="p-2 rounded-lg bg-success-pro/10 border border-success-pro/20">
-                    <ShoppingCart className="w-3.5 h-3.5 text-success-pro" />
-                  </button>
-                  <button onClick={() => store.deleteRecord(s)}
-                    className="p-2 rounded-lg bg-danger-pro/5 border border-danger-pro/10">
-                    <Trash2 className="w-3.5 h-3.5 text-danger-pro" />
-                  </button>
+
+                <div className="flex items-center justify-end gap-3">
+                   <div className="text-right hidden sm:block">
+                      <p className="text-[10px] font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()}</p>
+                      <p className="text-[8px] font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                   </div>
+                   <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
+                      <Printer className="w-4 h-4" />
+                   </button>
+                   <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                      <Trash2 className="w-4 h-4" />
+                   </button>
+                   <div className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${s.status?.includes('paid') ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-rose-500 text-white'}`}>
+                      {s.status}
+                   </div>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="bg-white rounded-2xl border border-navy-50 p-6 md:p-12 text-center">
-            <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-navy-200" />
-            <p className="text-sm font-black uppercase tracking-widest text-blue-gray">No transactions found</p>
+          <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-30">
+             <ShoppingCart className="w-20 h-20 mx-auto text-blue-gray mb-6" />
+             <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucune transaction enregistrée</p>
           </div>
         )}
       </div>
 
-      {/* ✅ DESKTOP: Full Table */}
-      <div className="hidden lg:block glass-card rounded-[32px] overflow-hidden border border-navy-50 shadow-2xl bg-white animate-scale-in">
-        <div className="overflow-x-auto">
-          <table className="premium-table w-full">
-            <thead>
-              <tr className="text-left bg-navy-50/50 border-b border-navy-100">
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('exchangeDate')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('assetDetail')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand">{t('entityInfo')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('transactionVal')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-right">{t('settledAmount')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">Type</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('status')}</th>
-                <th className="px-6 py-5 text-xs md:text-sm font-black uppercase tracking-[0.2em] text-navy-brand text-center">{t('action')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy-50">
-              {filteredSales.length > 0 ? (
-                filteredSales.map((s, idx) => (
-                  <tr key={s.id || idx} className="group hover:bg-navy-50 transition-colors">
-                    <td className="p-6 text-xs text-blue-gray font-bold">{s.date ? new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
-                    <td className="p-6">
-                      <p className="text-xs font-black uppercase text-navy-brand">{s.client}</p>
-                      <p className="text-xs font-bold text-blue-gray opacity-50">{s.phone || 'Pas de Contact'}</p>
-                    </td>
-                    <td className="p-6 text-xs font-bold text-navy-950/70">{s.name}</td>
-                    <td className="px-6 py-5 text-right text-xs font-bold text-navy-950">{store.formatCurrency(s.amount)}</td>
-                    <td className="px-6 py-5 text-right text-xs text-emerald-600 font-black">{store.formatCurrency(s.paid)}</td>
-                    <td className="px-6 py-5 text-center text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest">{s.paymentMethod || 'Cash'}</td>
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => { if (s.status === 'partial') window.location.hash = '#/ledger'; }}
-                        className={`px-3 py-1 rounded-full text-xs font-black uppercase border transition-all
-                          ${s.status.includes('paid') ? 'bg-success-pro/5 text-success-pro border-success-pro/20' : 'bg-danger-pro/5 text-danger-pro border-danger-pro/20 hover:scale-110 active:scale-95 cursor-pointer'}`}>
-                        {s.status}
-                      </button>
-                    </td>
-                    <td className="px-6 py-4 text-center space-x-1">
-                      <button onClick={() => printThermalReceipt(s, store.currentOperator, store.formatCurrency)}
-                        className="p-2.5 rounded-xl text-pure-black bg-[#2563eb]/10 hover:bg-[#2563eb]/20 transition-all no-print inline-flex items-center gap-2 shadow-sm border border-[#2563eb]/10">
-                        <Printer className="w-3.5 h-3.5 text-[#2563eb]" />
-                      </button>
-                      <button onClick={() => shareReceipt(s, store.currentOperator, store.formatCurrency)}
-                        className="p-2.5 rounded-xl text-pure-black bg-success-pro/10 hover:bg-success-pro/20 transition-all no-print inline-flex items-center gap-2 shadow-sm border border-success-pro/10">
-                        <ShoppingCart className="w-3.5 h-3.5 text-success-pro" />
-                      </button>
-                      <button onClick={() => { 
-                        window.speechSynthesis.cancel();
-                        const msg = new SpeechSynthesisUtterance(`${s.client} a acheté ${s.name} pour ${s.amount} ${store.currency === '€' ? 'Euros' : store.currency}.`); 
-                        msg.lang = 'fr-FR'; 
-                        msg.pitch = 1.0;
-                        msg.rate = 1.0;
-                        window.speechSynthesis.speak(msg); 
-                      }}
-                        className="p-3 rounded-2xl text-blue-gray hover:text-navy-brand hover:bg-navy-50 transition-all no-print">
-                        <Volume2 className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => store.deleteRecord(s)} className="p-3 rounded-2xl text-blue-gray hover:text-danger-pro hover:bg-danger-pro/5 transition-all no-print">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="7" className="p-32 text-center text-blue-gray">
-                    <ShoppingCart className="w-20 h-20 mx-auto mb-6 opacity-10" />
-                    <p className="text-sm font-black uppercase tracking-widest">No transactions found</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-
+      {/* Add Sale Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
-          <div className="glass-card rounded-[48px] shadow-2xl w-full max-w-xl relative overflow-hidden bg-white border border-navy-50 scale-in">
-            <div className="p-10 bg-navy-brand text-white">
-              <h3 className="text-3xl font-black uppercase tracking-tighter">{t('transactionPortal')}</h3>
-              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/60 mt-1">{t('commandGateway')}</p>
-              <button onClick={closeAll} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all">
-                <X className="w-6 h-6" />
-              </button>
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in">
+          <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-8 border-b border-navy-50 flex items-center justify-between bg-navy-50/50">
+               <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">Nouvelle Vente</h2>
+               <button onClick={closeAll} className="p-2 hover:bg-navy-100 rounded-xl transition-all"><X className="w-5 h-5" /></button>
             </div>
-
-            <form onSubmit={handleSalePreSubmit} className="p-10 space-y-8 max-h-[70vh] overflow-y-auto">
-              <div className="space-y-6">
-                <div>
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('assetIdentity')}</label>
+            
+            <form onSubmit={handleSalePreSubmit} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
+               {/* Product Selection */}
+               <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Produit</label>
                   <select
-                    value={newSale.product_id}
-                    onChange={e => setNewSale({ ...newSale, product_id: e.target.value })}
                     required
-                    className="w-full bg-navy-50 border border-navy-100 rounded-3xl px-6 py-5 text-charcoal font-bold focus:border-navy-brand outline-none transition-all appearance-none"
+                    value={newSale.product_id}
+                    onChange={e => setNewSale({...newSale, product_id: e.target.value})}
+                    className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all"
                   >
-                    <option value="">Sélectionner un Article</option>
+                    <option value="">Sélectionner un produit</option>
                     {products.map(p => (
-                      <option key={p.id} value={p.product_id} disabled={p.quantity === 0}>
-                        {p.name} — ({p.quantity} Units) — {store.formatCurrency(p.price)}
-                      </option>
+                      <option key={p.id} value={p.id}>{p.name.toUpperCase()} ({p.quantity} en stock)</option>
                     ))}
                   </select>
-                </div>
+               </div>
 
-                <div>
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">{t('entityInfo')}</label>
-                  <input
-                    value={newSale.client}
-                    onChange={e => setNewSale({ ...newSale, client: e.target.value })}
-                    type="text"
-                    required
-                    placeholder="ENTREZ VOTRE NOM..."
-                    className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] px-6 py-5 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-lg md:text-xl uppercase placeholder:text-navy-100"
-                    autoFocus
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 block ml-1">Numéro de Téléphone</label>
-                  <input
-                    value={newSale.phone}
-                    onChange={e => setNewSale({ ...newSale, phone: e.target.value })}
-                    type="tel"
-                    className="w-full bg-navy-50 border border-navy-100 rounded-3xl px-6 py-5 text-charcoal font-bold focus:border-navy-brand outline-none transition-all"
-                    placeholder="+250 ..."
-                  />
-                </div>
-
-                <div>
-                  {clientDebt > 0 && newSale.client.length > 1 && (
-                    <div className="mt-3 bg-danger-pro/10 border-l-4 border-danger-pro p-4 rounded-r-2xl flex items-center gap-3 animate-fade-in shadow-sm">
-                      <AlertCircle className="w-5 h-5 text-danger-pro flex-shrink-0" />
-                      <div>
-                        <p className="text-xs md:text-sm uppercase font-black tracking-widest text-danger-pro">{t('riskStatus')}</p>
-                        <p className="text-sm font-black text-danger-pro">
-                          Cette entité doit à l'entreprise <span className="text-xl px-1">{store.formatCurrency(clientDebt)}</span>
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 md:gap-4">
-                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Quantity</label>
+               <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Quantité</label>
                     <input
+                      type="number"
+                      required
+                      min="1"
                       value={newSale.quantity}
-                      onChange={e => setNewSale({ ...newSale, quantity: parseFloat(e.target.value) || '' })}
-                      type="number"
-                      min="0.01"
-                      step="any"
-                      required
-                      className="w-full bg-transparent text-xl md:text-2xl font-black text-charcoal focus:outline-none text-center"
+                      onChange={e => setNewSale({...newSale, quantity: e.target.value})}
+                      className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
                     />
                   </div>
-                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center">
-                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">Settlement</label>
-                    <input
-                      value={newSale.paid}
-                      onChange={e => setNewSale({ ...newSale, paid: parseFloat(e.target.value) })}
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      required
-                      className="w-full bg-transparent text-xl md:text-2xl font-black text-success-pro focus:outline-none text-center"
-                    />
-                  </div>
-                  <div className="bg-navy-50 px-2 py-4 md:py-5 rounded-2xl md:rounded-3xl border border-navy-100 text-center flex flex-col justify-center">
-                    <label className="text-[10px] md:text-sm font-black uppercase tracking-wider md:tracking-widest text-blue-gray mb-1 md:mb-2 block">{t('protocol')}</label>
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Mode Paiement</label>
                     <select
                       value={newSale.paymentMethod}
-                      onChange={e => setNewSale({ ...newSale, paymentMethod: e.target.value })}
-                      className="w-full bg-transparent text-xs md:text-sm font-black text-charcoal focus:outline-none text-center uppercase appearance-none"
+                      onChange={e => setNewSale({...newSale, paymentMethod: e.target.value})}
+                      className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all"
                     >
                       <option value="Cash">Cash</option>
-                      <option value="Check">Check</option>
-                      <option value="Card">Card</option>
-                      <option value="Transfer">Transfer</option>
-                      <option value="Mobile Money">Mobile Mo.</option>
+                      <option value="Momo">Momo</option>
+                      <option value="Card">Carte</option>
                     </select>
                   </div>
-                </div>
+               </div>
 
-                <div className="p-8 rounded-[32px] bg-navy-50 border border-navy-100 space-y-4">
-                  <div className="flex justify-between items-center px-2">
-                    <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">{t('identityIdentity')}</label>
-                    <span className="text-xs font-bold text-navy-brand opacity-50">Session v2.4</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Total Valuation</p>
-                      <p className="text-3xl font-black text-navy-brand">{store.formatCurrency(newSale.amount)}</p>
-                    </div>
-                    {availableCredit > 0 && newSale.useCredit && (
-                      <div className="text-right">
-                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-success-pro">Credit Applied</p>
-                        <p className="text-xl font-bold text-success-pro">-{store.formatCurrency(Math.min(availableCredit, newSale.amount))}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+               <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Client</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nom du client..."
+                    value={newSale.client}
+                    onChange={e => setNewSale({...newSale, client: e.target.value})}
+                    className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                  />
+               </div>
 
-                {availableCredit > 0 && (
-                  <div className="flex items-center justify-between p-5 rounded-3xl bg-white border border-navy-100 shadow-sm">
-                    <div className="flex items-center gap-3">
-                      <Wallet className="w-6 h-6 text-navy-brand" />
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-charcoal">Use Credit</p>
-                        <p className="text-xs md:text-sm text-blue-gray font-bold">Balance: {store.formatCurrency(availableCredit)}</p>
-                      </div>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input type="checkbox" className="sr-only peer" checked={newSale.useCredit} onChange={e => setNewSale({ ...newSale, useCredit: e.target.checked })} />
-                      <div className="w-12 h-6 bg-navy-200 rounded-full peer peer-checked:bg-navy-brand after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full"></div>
-                    </label>
+               {/* Pricing Summary */}
+               <div className="bg-navy-950 p-6 rounded-3xl text-white space-y-3">
+                  <div className="flex justify-between items-center opacity-60">
+                     <p className="text-[10px] font-black uppercase tracking-widest">Total HT</p>
+                     <p className="text-sm font-black">{store.formatCurrency(newSale.amount)}</p>
                   </div>
-                )}
-              </div>
+                  <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Total à Payer</p>
+                     <p className="text-2xl font-black">{store.formatCurrency(newSale.amount)}</p>
+                  </div>
+               </div>
 
-              <button type="submit" className="btn-premium w-full !py-6 !text-sm">
-                Confirm Sale <ArrowRight className="w-5 h-5 ml-4" />
-              </button>
+               <button
+                 type="submit"
+                 className="w-full py-5 bg-emerald-500 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-3"
+               >
+                 <Zap className="w-5 h-5" /> Enregistrer Transaction
+               </button>
             </form>
           </div>
         </div>
       )}
 
+      {/* Confirmation Popup */}
       {showConfirmPop && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-900/40 backdrop-blur-md p-4 animate-fade-in">
-          <div className="glass-card rounded-[48px] p-6 md:p-12 max-w-md w-full text-center space-y-8 bg-white shadow-2xl border border-navy-50 scale-in">
-            <div className="w-20 h-20 bg-navy-50 rounded-full flex items-center justify-center mx-auto border border-navy-100">
-              <AlertCircle className="w-10 h-10 text-navy-brand" />
+         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-xl animate-scale-in">
+            <div className="bg-white w-full max-w-sm rounded-[40px] p-10 text-center shadow-3xl">
+               <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full mx-auto flex items-center justify-center mb-6">
+                  <CheckCircle2 className="w-10 h-10" />
+               </div>
+               <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">Confirmer Vente</h3>
+               <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">Voulez-vous finaliser l'enregistrement de cette opération de {store.formatCurrency(newSale.amount)} ?</p>
+               
+               <div className="grid grid-cols-2 gap-4">
+                  <button onClick={() => handlePopConfirm(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">Annuler</button>
+                  <button onClick={() => handlePopConfirm(true)} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">Confirmer</button>
+               </div>
             </div>
-
-            <div className="space-y-4">
-              <h4 className="text-2xl font-black uppercase tracking-tighter text-navy-brand">{t('confirmAction')}</h4>
-
-              {parseFloat(newSale.paid) + (newSale.useCredit ? availableCredit : 0) > newSale.amount ? (
-                <div className="bg-navy-50 p-6 rounded-[32px] border border-navy-100 text-left space-y-6">
-                  <div>
-                    <p className="text-xs md:text-sm text-success-pro font-black uppercase tracking-widest mb-1">Store Credit Auto-Applied</p>
-                    <p className="text-2xl font-black text-success-pro">
-                      {store.formatCurrency((parseFloat(newSale.paid) || 0) + (newSale.useCredit ? availableCredit : 0) - newSale.amount)}
-                    </p>
-                    <p className="text-xs text-blue-gray font-bold mt-2">Ce montant sera utilisable lors de son prochain achat.</p>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      onClick={() => setNewSale(prev => ({ ...prev, overpayType: 'wait' }))}
-                      className={`p-5 rounded-[24px] border-2 transition-all flex flex-col items-center gap-2
-                        ${newSale.overpayType === 'wait' ? 'border-navy-brand bg-white text-navy-brand shadow-lg scale-105' : 'border-navy-100 bg-white text-blue-gray'}`}
-                    >
-                      <Clock className="w-6 h-6" />
-                      <span className="text-xs font-black uppercase">To Balance</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewSale(prev => ({ ...prev, overpayType: 'tip' }))}
-                      className={`p-5 rounded-[24px] border-2 transition-all flex flex-col items-center gap-2
-                        ${newSale.overpayType === 'tip' ? 'border-navy-brand bg-white text-navy-brand shadow-lg scale-105' : 'border-navy-100 bg-white text-blue-gray'}`}
-                    >
-                      <Gift className="w-6 h-6" />
-                      <span className="text-xs font-black uppercase">To Tip</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-center text-xs text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
-                  Protocole de sécurité actif. Les données de session seront cryptées et synchronisées avec le grand livre mondial.
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <button onClick={() => handlePopConfirm(false)} className="py-4 rounded-2xl bg-navy-50 text-blue-gray font-black uppercase tracking-widest border border-navy-100 hover:bg-navy-100 transition-all">Cancel</button>
-              <button
-                onClick={() => handlePopConfirm(true)}
-                className="py-4 rounded-2xl bg-navy-brand text-white font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all disabled:opacity-30 disabled:scale-100"
-              >
-                Confirm
-              </button>
-            </div>
-          </div>
-        </div>
+         </div>
       )}
-      {showSuccess && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-navy-950/80 backdrop-blur-xl p-4 animate-fade-in">
-          <div className="glass-card max-w-sm w-full rounded-[48px] bg-white p-10 text-center shadow-2xl scale-in border border-white/20">
-            <div className="w-20 h-20 bg-success-pro/10 rounded-full flex items-center justify-center mx-auto text-success-pro mb-6">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-            <h3 className="text-2xl font-black text-navy-brand uppercase tracking-tighter mb-2">Vente Réussie</h3>
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-6">La transaction a été cryptée et archivée</p>
-            
-            <div className="bg-navy-50 p-6 rounded-[32px] border border-navy-100 mb-8 space-y-4">
-              <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Suivi Client (QR Link)</p>
-              <div className="w-40 h-40 bg-white p-3 rounded-2xl mx-auto shadow-md">
-                <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${encodeURIComponent(lastSaleRecord?.phone || 'none')}`)}`}
-                  alt="Client Portal"
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <p className="text-[10px] text-blue-gray leading-tight italic font-bold">Le client peut scanner ce code pour suivre ses transactions et son crédit en temps réel.</p>
-            </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  printThermalReceipt(lastSaleRecord, store.currentOperator, store.formatCurrency);
-                  setShowSuccess(false);
-                }}
-                className="btn-premium w-full !bg-[#2563eb]"
-              >
-                <Printer className="w-5 h-5" /> Imprimer le Ticket
-              </button>
-              <button
-                onClick={() => {
-                  shareReceipt(lastSaleRecord, store.currentOperator, store.formatCurrency);
-                  setShowSuccess(false);
-                }}
-                className="btn-premium w-full !bg-success-pro"
-              >
-                <ShoppingCart className="w-5 h-5" /> Partager (WhatsApp)
-              </button>
-              <button
-                onClick={() => setShowSuccess(false)}
-                className="w-full bg-navy-50 text-blue-gray font-black py-4 rounded-3xl uppercase text-xs md:text-sm tracking-widest hover:bg-navy-100 transition-all"
-              >
-                Continuer sans Ticket
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

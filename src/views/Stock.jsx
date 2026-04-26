@@ -14,7 +14,11 @@ import {
   TrendingUp,
   Box,
   CheckSquare,
-  Square
+  Square,
+  AlertTriangle,
+  Layers,
+  Database,
+  Filter
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -53,8 +57,8 @@ export default function Stock() {
       setEditProduct(prev => ({ ...prev, quantity: weight * count }));
     }
   }, [editProduct?.packWeight, editProduct?.packCount]);
+
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [detailProduct, setDetailProduct] = useState(null);
 
   const products = store.getProducts();
   const categories = store.getCategories();
@@ -67,42 +71,19 @@ export default function Stock() {
     return matchesSearch && matchesCategory;
   });
 
-  const groupedProducts = useMemo(() => {
-    const groups = {};
-    filteredProducts.forEach(p => {
-      const cat = p.category || 'Uncategorized';
-      if (!groups[cat]) groups[cat] = [];
-      groups[cat].push(p);
-    });
-    return groups;
-  }, [filteredProducts]);
-
-  const getStatusInfo = (qty) => {
-    if (qty <= 0) return { cls: 'bg-danger-pro/5 text-danger-pro border-danger-pro/20', text: t('depleted') };
-    if (qty <= 5) return { cls: 'bg-warning-pro/5 text-warning-pro border-warning-pro/20', text: t('low') };
-    return { cls: 'bg-success-pro/5 text-success-pro border-success-pro/20', text: t('optimal') };
-  };
+  const totalValuation = products.reduce((acc, p) => acc + ((parseFloat(p.price) || 0) * (parseFloat(p.quantity) || 0)), 0);
 
   const toggleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
-  const toggleSelectAll = () => {
-    if (selectedIds.length === filteredProducts.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredProducts.map(p => p.id));
-    }
-  };
-
   const handleBulkDelete = () => {
-    store.showConfirm(`PURGER ${selectedIds.length} ACTIFS? Cette action supprimera définitivement les éléments sélectionnés du registre.`, () => {
+    store.showConfirm(`PURGER ${selectedIds.length} ACTIFS? Cette action supprimera définitivement les éléments du registre.`, () => {
       selectedIds.forEach(id => {
         const prod = products.find(p => p.id === id);
         if (prod) store.deleteRecord(prod);
       });
       setSelectedIds([]);
-      store.showAlert(`${selectedIds.length} éléments purgés avec succès`, "success");
     });
   };
 
@@ -110,15 +91,14 @@ export default function Stock() {
     e.preventDefault();
     store.addRecord({
       record_type: 'product',
-      product_id: 'p' + Date.now().toString(36),
-      status: 'active',
-      date: new Date().toISOString(),
+      name: newProduct.name,
+      category: newProduct.category,
+      packageType: newProduct.packageType,
       quantity: parseFloat(newProduct.quantity) || 0,
       cost: parseFloat(newProduct.cost) || 0,
       price: parseFloat(newProduct.price) || 0,
-      name: newProduct.name,
-      category: newProduct.category,
-      packageType: newProduct.packageType
+      status: 'active',
+      date: new Date().toISOString()
     });
     setNewProduct({ name: '', category: '', packageType: '', quantity: 0, cost: 0, price: 0 });
     setShowModal(false);
@@ -136,482 +116,272 @@ export default function Stock() {
   };
 
   const confirmDelete = (product) => {
-    store.showConfirm(`SUPPRIMER ${product.name.toUpperCase()}? Cette action est irréversible.`, () => {
+    store.showConfirm(`SUPPRIMER ${product.name.toUpperCase()}?`, () => {
       store.deleteRecord(product);
     });
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
+    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+      
+      {/* Premium Header */}
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            {t('stock')}
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+            Inventaire Stock
           </h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase">
-            {t('projectTracker')}
-          </h2>
+          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+            Gestion des Actifs — Registre Centralisé
+          </p>
         </div>
 
         <div className="flex items-center gap-4">
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="bg-red-600 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-red-500/20 flex items-center gap-2 hover:bg-red-700 transition-all"
+              className="bg-rose-500 text-white px-8 py-4 rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 flex items-center gap-2 hover:bg-rose-600 transition-all active:scale-95"
             >
               <Trash2 className="w-5 h-5" /> Supprimer {selectedIds.length} Articles
             </button>
           )}
-          <button onClick={() => setShowModal(true)} className="btn-premium">
-            <Plus className="w-5 h-5 mr-3" /> {t('addRecord')}
+          <button
+            onClick={() => setShowModal(true)}
+            className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
+          >
+            <Plus className="w-5 h-5 text-emerald-400" /> Ajouter un Actif
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-emerald-500 shadow-2xl group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <TrendingUp className="w-8 h-8" />
+      {/* Metrics Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Évaluation Totale</p>
-            <p className="text-3xl font-black text-navy-950">{store.formatCurrency(products.reduce((acc, p) => acc + ((parseFloat(p.price) || 0) * (parseFloat(p.quantity) || 0)), 0))}</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Évaluation Totale</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+              {store.formatCurrency(totalValuation)}
+            </p>
           </div>
         </div>
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-2xl group hover-elevate transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-navy-50 text-navy-brand flex items-center justify-center">
-            <Package className="w-8 h-8" />
+
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
+            <Layers className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Actifs Opérationnels</p>
-            <p className="text-3xl font-black text-navy-950">{products.length} <span className="text-xs text-blue-gray opacity-40">Unités</span></p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Actifs Opérationnels</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+              {products.length} <span className="text-xs text-blue-gray opacity-40 font-black">Lignes</span>
+            </p>
           </div>
         </div>
       </div>
 
+      {/* Search & Back Button */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-6 no-print">
-        <div className="relative flex-1 w-full md:max-w-md">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-blue-gray" />
+        <div className="relative flex-1 w-full group">
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
           <input
             type="text"
-            placeholder={t('searchPlaceholder')}
+            placeholder="Rechercher dans l'inventaire..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-white border border-navy-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/50 shadow-xl outline-none focus:border-navy-brand transition-all"
+            className="w-full bg-white border border-emerald-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
           />
         </div>
         {selectedCategory && (
           <button 
             onClick={() => setSelectedCategory(null)} 
-            className="px-8 py-4 bg-navy-brand text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest flex items-center gap-3 shadow-lg hover:shadow-navy-brand/30 transition-all"
+            className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
           >
-            <ArrowRight className="w-4 h-4 rotate-180" /> {t('back')}
+            <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> Retour aux Secteurs
           </button>
         )}
       </div>
 
-      {/* ✅ Premium Category Grid (Two Boxes) */}
+      {/* Categories Grid */}
       {!searchQuery && !selectedCategory && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print animate-scale-in">
-          
-          {categories.map((cat, idx) => {
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 no-print animate-scale-in">
+          {categories.map((cat) => {
             const catCount = products.filter(p => p.category === cat.name).length;
+            const catValue = products.filter(p => p.category === cat.name).reduce((s, p) => s + (p.price * p.quantity), 0);
             return (
               <div 
                 key={cat.id}
-                className="glass-card p-10 flex items-center justify-between group cursor-pointer hover-elevate hover:border-emerald-500 transition-all"
+                className="glass-card bg-white p-8 rounded-[40px] border-emerald-50 flex flex-col items-center text-center group cursor-pointer hover:border-emerald-500 transition-all shadow-sm relative overflow-hidden"
                 onClick={() => setSelectedCategory(cat.name)}
               >
-                <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 rounded-[24px] bg-emerald-500 text-white flex items-center justify-center shadow-2xl">
-                    <Box className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-xl font-black uppercase tracking-tighter text-navy-950">Secteur {cat.name}</h4>
-                    <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">{catCount} Actifs Gérés</p>
-                  </div>
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
+                   <Box className="w-24 h-24" />
                 </div>
-                <ArrowRight className="w-6 h-6 text-navy-200 group-hover:text-emerald-500 transition-all" />
+                <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
+                   <Box className="w-8 h-8" />
+                </div>
+                <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">Secteur {cat.name}</h4>
+                <p className="text-[10px] font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} Articles</p>
+                <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-navy-950">
+                   <span>Valeur Estimée</span>
+                   <span className="text-emerald-600">{store.formatCurrency(catValue)}</span>
+                </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {/* Registry Table: Revealed after interaction */}
+      {/* Registry Manifest (Table View) */}
       {(selectedCategory || searchQuery) && (
-        <div className="glass-card rounded-[40px] overflow-hidden border border-navy-100 shadow-2xl fade-in bg-white animate-scale-in">
-          <div className="p-8 border-b-2 border-navy-50 bg-gradient-to-r from-navy-50 to-white flex items-center justify-between">
-            <h4 className="text-lg font-black text-navy-brand uppercase tracking-widest flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-white shadow-inner flex items-center justify-center">
-                <Package className="w-6 h-6 text-navy-brand" />
-              </div>
-              {selectedCategory ? `Manifeste du Secteur ${selectedCategory}` : 'Résultats de Recherche'}
-            </h4>
-            <div className="flex items-center gap-6">
-              <button
-                onClick={toggleSelectAll}
-                className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-brand flex items-center gap-2 hover:opacity-70 transition-all"
-              >
-                {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? <CheckSquare className="w-4 h-4" /> : <Square className="w-4 h-4" />}
-                {selectedIds.length === filteredProducts.length && filteredProducts.length > 0 ? 'Tout désélectionner' : 'Tout sélectionner'}
-              </button>
-              <span className="px-4 py-1.5 bg-navy-brand text-white rounded-full text-xs md:text-sm font-black uppercase tracking-widest">
-                {filteredProducts.length} Unités Actives
-              </span>
-            </div>
-          </div>
+        <div className="space-y-4 animate-fade-in">
+           <div className="flex items-center gap-3 mb-6">
+              <Filter className="w-5 h-5 text-emerald-500" />
+              <h3 className="text-sm font-black text-navy-950 uppercase tracking-widest">
+                 {selectedCategory ? `Manifeste Secteur : ${selectedCategory}` : 'Résultats de Recherche'}
+              </h3>
+           </div>
 
-          {/* ✅ MOBILE: Compact Card List */}
-          <div className="block lg:hidden divide-y divide-navy-50">
-          {Object.keys(groupedProducts).length > 0 ? (
-            Object.keys(groupedProducts).map(category => (
-              <React.Fragment key={category}>
-                <div className="bg-navy-50/50 p-4 border-y border-navy-100/50">
-                  <span className="text-xs font-black uppercase tracking-[0.2em] text-navy-brand flex items-center gap-2">
-                    <div className="w-1 h-1 rounded-full bg-navy-brand"></div>
-                    {category}
-                  </span>
-                </div>
-                {groupedProducts[category].map((p, pIdx) => {
-                  const status = getStatusInfo(p.quantity);
-                  const isSelected = selectedIds.includes(p.id);
-                  return (
-                    <div key={p.id || pIdx} className={`p-5 flex items-start gap-4 ${isSelected ? 'bg-navy-50' : ''} hover:bg-navy-50 transition-colors`}>
-                      <button onClick={() => toggleSelect(p.id)} className="mt-1 text-navy-brand flex-shrink-0">
-                        {isSelected ? <CheckSquare className="w-5 h-5" /> : <Square className="w-5 h-5 opacity-30" />}
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <p className="font-black text-charcoal uppercase tracking-tighter text-sm truncate cursor-pointer hover:text-navy-brand" onClick={() => setDetailProduct(p)}>{p.name}</p>
-                          <span className={`px-2 py-0.5 rounded-full text-xs md:text-sm md:text-xs font-black uppercase border flex-shrink-0 ${status.cls}`}>{status.text}</span>
-                        </div>
-                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mb-3 italic opacity-60">
-                          {p.category || 'Standard'} · {p.packageType || 'Unit'}
-                        </p>
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="bg-navy-50/50 rounded-xl p-2.5 border border-navy-50 text-center">
-                            <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black mb-0.5">Stock</p>
-                            <p className="text-sm font-black text-charcoal">{getFormattedQuantity(p)}</p>
-                          </div>
-                          <div className="bg-navy-50/50 rounded-xl p-2.5 border border-navy-50 text-center">
-                            <p className="text-xs md:text-sm md:text-xs text-blue-gray uppercase font-black mb-0.5">Valeur</p>
-                            <p className="text-xs md:text-sm font-black text-navy-brand">{store.formatCurrency(p.price)}</p>
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <button onClick={() => setEditProduct(p)} className="flex-1 bg-white border border-navy-100 rounded-lg flex items-center justify-center text-blue-gray hover:text-navy-brand shadow-sm">
-                              <Pencil className="w-3 h-3" />
-                            </button>
-                            <button onClick={() => confirmDelete(p)} className="flex-1 bg-red-50 border border-red-100 rounded-lg flex items-center justify-center text-red-500 shadow-sm">
-                              <Trash2 className="w-3 h-3" />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+           <div className="space-y-3">
+              {filteredProducts.map((p) => (
+                 <div key={p.id} className={`glass-card bg-white p-5 rounded-3xl border transition-all flex flex-col md:flex-row md:items-center gap-4 hover:border-emerald-400 group ${selectedIds.includes(p.id) ? 'border-emerald-500 bg-emerald-50/10' : 'border-emerald-50'}`}>
+                    <div className="flex items-center gap-4">
+                       <button onClick={() => toggleSelect(p.id)} className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${selectedIds.includes(p.id) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-emerald-100 hover:border-emerald-500'}`}>
+                          {selectedIds.includes(p.id) && <CheckSquare className="w-4 h-4" />}
+                       </button>
+                       <div className="w-12 h-12 bg-navy-50 text-navy-950 rounded-xl flex items-center justify-center font-black">
+                          <Package className="w-6 h-6" />
+                       </div>
+                       <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{p.name}</h4>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || 'Général'}</p>
+                       </div>
                     </div>
-                  );
-                })}
-              </React.Fragment>
-            ))
-          ) : (
-            <div className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-widest text-sm italic">Le registre est actuellement vide</div>
-          )}
-        </div>
 
-        {/* ✅ DESKTOP: High-Visibility Manifest Table */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-navy-50 text-sm font-black uppercase tracking-widest text-navy-950 border-b-2 border-navy-100">
-                <th className="p-6 w-16"></th>
-                <th className="p-6">Identité de l'Actif</th>
-                <th className="p-6">Secteur / Unité</th>
-                <th className="p-6 text-right">Réserve</th>
-                <th className="p-6 text-right">Taux Unitaire</th>
-                <th className="p-6 text-right">Évaluation Totale</th>
-                <th className="p-6 text-center">Statut</th>
-                <th className="p-6 text-center">Protocole</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy-50">
-              {Object.keys(groupedProducts).length > 0 ? (
-                Object.keys(groupedProducts).map(category => (
-                  <React.Fragment key={category}>
-                    <tr className="bg-navy-50/30">
-                      <td colSpan="8" className="p-4 px-8">
-                        <div className="flex items-center gap-3">
-                          <div className="w-2 h-2 rounded-full bg-navy-brand shadow-sm"></div>
-                          <span className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-navy-brand">{category}</span>
-                        </div>
-                      </td>
-                    </tr>
-                    {groupedProducts[category].map((p, pIdx) => {
-                      const status = getStatusInfo(p.quantity);
-                      const isSelected = selectedIds.includes(p.id);
-                      return (
-                        <tr key={p.id || pIdx} className={`group hover:bg-navy-50 transition-all ${isSelected ? 'bg-navy-50/50' : ''}`}>
-                          <td className="p-6 text-center">
-                            <button onClick={() => toggleSelect(p.id)} className="text-navy-brand transition-all">
-                              {isSelected ? <CheckSquare className="w-5 h-5 shadow-sm" /> : <Square className="w-5 h-5 opacity-20 hover:opacity-100" />}
-                            </button>
-                          </td>
-                          <td className="p-6 cursor-pointer" onClick={() => setDetailProduct(p)}>
-                            <div className="flex items-center gap-4">
-                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${isSelected ? 'bg-navy-brand text-white' : 'bg-navy-50 text-navy-brand group-hover:bg-navy-brand group-hover:text-white group-hover:rotate-6'}`}>
-                                <Box className="w-5 h-5" />
-                              </div>
-                              <div className="min-w-0">
-                                <p className="font-black text-charcoal uppercase tracking-tighter text-sm truncate">{p.name}</p>
-                                <p className="text-xs md:text-sm md:text-xs text-blue-gray font-black tracking-[0.2em] uppercase opacity-40">Node: {p.product_id}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-6">
-                            <div className="flex flex-col">
-                              <span className="text-xs md:text-sm font-black uppercase text-navy-brand">{p.category || 'Standard'}</span>
-                              <span className="text-xs font-bold text-blue-gray italic uppercase tracking-wider">{p.packageType || 'Unit'}</span>
-                            </div>
-                          </td>
-                          <td className="p-6 text-right font-black text-lg text-charcoal tabular-nums">{getFormattedQuantity(p)}</td>
-                          <td className="p-6 text-right text-blue-gray font-black tabular-nums">{store.formatCurrency(p.cost)}</td>
-                          <td className="p-6 text-right text-navy-950 font-black tabular-nums">{store.formatCurrency(p.price)}</td>
-                          <td className="p-6 text-center">
-                            <span className={`px-3 py-1 rounded-full text-xs font-black uppercase border shadow-sm ${status.cls}`}>{status.text}</span>
-                          </td>
-                          <td className="p-6">
-                            <div className="flex items-center justify-center gap-2">
-                              <button onClick={() => setEditProduct(p)} className="p-2.5 bg-white border border-navy-100 rounded-lg text-blue-gray hover:text-navy-brand hover:border-navy-brand transition-all shadow-sm">
-                                <Pencil className="w-3.5 h-3.5" />
-                              </button>
-                              <button onClick={() => confirmDelete(p)} className="p-2.5 bg-red-50 border border-red-100 rounded-lg text-red-400 hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </React.Fragment>
-                ))
-              ) : (
-                <tr><td colSpan="8" className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em] italic">Aucun actif actif détecté dans ce secteur</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )}
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1 text-center md:text-left">
+                       <div>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Stock Disponible</p>
+                          <div className="flex items-center justify-center md:justify-start gap-2">
+                             <span className="text-xs font-black text-navy-950">{p.quantity}</span>
+                             <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
+                                {p.quantity <= 5 ? 'Bas' : 'Optimal'}
+                             </span>
+                          </div>
+                       </div>
+                       <div>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Prix Unitaire</p>
+                          <p className="text-xs font-black text-navy-950">{store.formatCurrency(p.price)}</p>
+                       </div>
+                       <div className="hidden md:block">
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Valeur Assets</p>
+                          <p className="text-xs font-black text-emerald-600">{store.formatCurrency(p.quantity * p.price)}</p>
+                       </div>
+                    </div>
 
-      {/* Product Add Modal */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
-          <div className="glass-card max-w-2xl w-full rounded-[40px] bg-[#064E3B] shadow-[0_50px_100px_rgba(0,0,0,0.5)] border border-white/10 overflow-hidden relative scale-in">
-            <div className="p-10 border-b border-white/5 flex justify-between items-center text-white">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">{t('addRecord')}</h3>
-              <button onClick={() => setShowModal(false)} className="p-3 hover:bg-white/10 rounded-full transition-all text-white"><X className="w-6 h-6" /></button>
-            </div>
-            <form onSubmit={handleAddProduct} className="p-10 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">{t('assetIdentity')}</label>
-                  <input
-                    required
-                    value={newProduct.name}
-                    onChange={e => setNewProduct({ ...newProduct, name: e.target.value })}
-                    className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-[#BEF264] transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">{t('sector')}</label>
-                  <select
-                    required
-                    value={newProduct.category}
-                    onChange={e => setNewProduct({ ...newProduct, category: e.target.value })}
-                    className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-[#BEF264] transition-all appearance-none"
-                  >
-                    <option value="" className="bg-[#064E3B]">Choisir un Secteur...</option>
-                    {categories.map(c => <option key={c.id} value={c.name} className="bg-[#064E3B]">{c.name}</option>)}
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Unité de Mesure</label>
-                  <select
-                    required
-                    value={newProduct.packageType}
-                    onChange={e => setNewProduct({ ...newProduct, packageType: e.target.value })}
-                    className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-[#BEF264] transition-all"
-                  >
-                    <option value="" className="bg-[#064E3B]">Sélectionner une unité...</option>
-                    <option value="Kg" className="bg-[#064E3B]">Kilogramme (Kg)</option>
-                    <option value="L" className="bg-[#064E3B]">Litre (L)</option>
-                    <option value="Bouteille" className="bg-[#064E3B]">Bouteille</option>
-                    <option value="Unité" className="bg-[#064E3B]">Unité</option>
-                    <option value="Boîte" className="bg-[#064E3B]">Boîte</option>
-                    <option value="Sac" className="bg-[#064E3B]">Sac</option>
-                    <option value="Carton" className="bg-[#064E3B]">Carton</option>
-                  </select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Stock Total</label>
-                  <input
-                    type="number"
-                    step="any"
-                    required
-                    value={newProduct.quantity}
-                    onChange={e => setNewProduct({ ...newProduct, quantity: e.target.value })}
-                    className="w-full bg-[#065F46] border border-[#BEF264]/30 rounded-2xl px-6 py-4 text-[#BEF264] font-black text-xl outline-none focus:border-[#BEF264] transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Coût d'Achat</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={newProduct.cost}
-                    onChange={e => setNewProduct({ ...newProduct, cost: e.target.value })}
-                    className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-white font-bold outline-none focus:border-[#BEF264] transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 ml-2">Prix de Vente</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={newProduct.price}
-                    onChange={e => setNewProduct({ ...newProduct, price: e.target.value })}
-                    className="w-full bg-[#065F46] border border-white/10 rounded-2xl px-6 py-4 text-[#BEF264] font-black text-2xl outline-none focus:border-[#BEF264] transition-all"
-                  />
-                </div>
+                    <div className="flex items-center justify-end gap-2">
+                       <button onClick={() => setEditProduct(p)} className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
+                          <Pencil className="w-4 h-4" />
+                       </button>
+                       <button onClick={() => confirmDelete(p)} className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                          <Trash2 className="w-4 h-4" />
+                       </button>
+                    </div>
+                 </div>
+              ))}
+           </div>
+
+           {filteredProducts.length === 0 && (
+              <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-20">
+                 <Database className="w-20 h-20 mx-auto text-blue-gray mb-6" />
+                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucun article trouvé dans ce secteur</p>
               </div>
-              <button type="submit" className="w-full bg-[#BEF264] text-black font-black py-5 rounded-[28px] shadow-2xl shadow-[#BEF264]/20 flex items-center justify-center gap-3 hover:bg-white transition-all uppercase tracking-widest">
-                {t('addRecord')} <ArrowRight className="w-5 h-5" />
-              </button>
-            </form>
-          </div>
+           )}
         </div>
       )}
 
-      {/* Edit Product Modal */}
-      {editProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 backdrop-blur-md p-4">
-          <div className="glass-card max-w-2xl w-full rounded-[40px] bg-white shadow-2xl border border-white/10 overflow-hidden relative scale-in">
-            <div className="p-10 border-b border-navy-50 flex justify-between items-center text-navy-brand">
-              <h3 className="text-2xl font-black uppercase tracking-tighter">Modifier le Registre des Actifs</h3>
-              <button onClick={() => setEditProduct(null)} className="p-3 hover:bg-navy-50 rounded-full transition-all"><X className="w-6 h-6" /></button>
-            </div>
-            <form onSubmit={handleEditProduct} className="p-10 space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="col-span-full space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Identifiant</label>
-                  <input
-                    disabled
-                    value={editProduct.name}
-                    className="w-full bg-navy-50/50 border border-navy-50 rounded-2xl px-6 py-4 text-gray-400 font-bold outline-none"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Réserve Actuelle</label>
-                  <input
-                    type="number"
-                    step="any"
-                    required
-                    value={editProduct.quantity}
-                    onChange={e => setEditProduct({ ...editProduct, quantity: e.target.value })}
-                    className="w-full bg-navy-50 border border-navy-brand rounded-2xl px-6 py-4 text-navy-brand font-black text-xl outline-none focus:border-navy-brand transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Coût Unitaire</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={editProduct.cost}
-                    onChange={e => setEditProduct({ ...editProduct, cost: e.target.value })}
-                    className="w-full bg-navy-50 border border-navy-100 rounded-2xl px-6 py-4 text-charcoal font-bold outline-none focus:border-navy-brand transition-all"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-2">Prix de Vente Unitaire</label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    required
-                    value={editProduct.price}
-                    onChange={e => setEditProduct({ ...editProduct, price: e.target.value })}
-                    className="w-full bg-navy-50 border border-navy-100 rounded-2xl px-6 py-4 text-charcoal font-black text-2xl text-navy-brand outline-none focus:border-navy-brand transition-all"
-                  />
-                </div>
-              </div>
-              <button type="submit" className="w-full bg-navy-brand text-white font-black py-5 rounded-[28px] shadow-2xl flex items-center justify-center gap-3 hover:bg-success-pro transition-all uppercase tracking-widest">
-                Confirmer les Modifications <ShieldCheck className="w-5 h-5" />
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Detail Product Modal */}
-      {detailProduct && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-navy-950/60 backdrop-blur-xl p-4" onClick={() => setDetailProduct(null)}>
-          <div className="creative-product-card scale-in shadow-[0_50px_100px_rgba(0,0,0,0.4)]" onClick={e => e.stopPropagation()}>
-            <div className="banner-area relative">
-              <div className="absolute top-6 left-6 flex items-center gap-2">
-                <span className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs md:text-sm md:text-xs font-black uppercase tracking-widest text-white border border-white/10">
-                  {detailProduct.category || 'Standard'}
-                </span>
-              </div>
-              <button onClick={() => setDetailProduct(null)} className="absolute top-6 right-6 p-2 hover:bg-white/10 rounded-full transition-all">
-                <X className="w-5 h-5" />
-              </button>
-              
-              <div className="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-[32px] flex items-center justify-center mb-4 border border-white/20 shadow-2xl group-hover:rotate-12 transition-transform">
-                 <Package className="w-12 h-12 text-white" />
-              </div>
-              <h3 className="text-2xl font-black uppercase tracking-tighter text-white">{detailProduct.name}</h3>
-              <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-white/50">Asset Intelligence Node</p>
-            </div>
-
-            <div className="reveal-content">
-              <div className="space-y-1">
-                <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray/40">Current Reserve</p>
-                <p className="text-4xl font-black text-charcoal">{getFormattedQuantity(detailProduct)}</p>
-                <div className="flex justify-center">
-                   <span className={`px-3 py-1 rounded-full text-xs font-black uppercase border mt-2 ${getStatusInfo(detailProduct.quantity).cls}`}>
-                     {getStatusInfo(detailProduct.quantity).text}
-                   </span>
-                </div>
+      {/* Modals for Add/Edit */}
+      {(showModal || editProduct) && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in">
+           <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
+              <div className="p-8 border-b border-navy-50 flex items-center justify-between bg-navy-50/50">
+                 <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">
+                    {editProduct ? 'Modifier Actif' : 'Nouvel Enregistrement'}
+                 </h2>
+                 <button onClick={() => {setShowModal(false); setEditProduct(null);}} className="p-2 hover:bg-navy-100 rounded-xl transition-all"><X className="w-5 h-5" /></button>
               </div>
 
-              <div className="stats-grid grid grid-cols-2 gap-4">
-                 <div className="bg-navy-50/50 p-4 rounded-3xl border border-navy-50">
-                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-blue-gray mb-1">Unit Cost</p>
-                    <p className="text-sm font-black text-charcoal">{store.formatCurrency(detailProduct.cost)}</p>
+              <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
+                 <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Nom de l'article</label>
+                    <input
+                      required
+                      type="text"
+                      placeholder="Désignation de l'actif..."
+                      value={editProduct ? editProduct.name : newProduct.name}
+                      onChange={e => editProduct ? setEditProduct({...editProduct, name: e.target.value}) : setNewProduct({...newProduct, name: e.target.value})}
+                      className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                    />
                  </div>
-                 <div className="bg-navy-50/50 p-4 rounded-3xl border border-navy-50">
-                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-blue-gray mb-1">Market Price</p>
-                    <p className="text-sm font-black text-navy-brand">{store.formatCurrency(detailProduct.price)}</p>
-                 </div>
-                 <div className="col-span-2 bg-navy-brand/5 p-4 rounded-3xl border border-navy-brand/10">
-                    <p className="text-xs md:text-sm md:text-xs font-black uppercase text-navy-brand mb-1">Total Asset Value</p>
-                    <p className="text-lg font-black text-navy-brand">{store.formatCurrency(detailProduct.quantity * detailProduct.cost)}</p>
-                 </div>
-              </div>
 
-              <div className="action-icons pt-4 flex gap-3">
-                 <button onClick={() => { setEditProduct(detailProduct); setDetailProduct(null); }} className="p-4 bg-navy-brand text-white rounded-2xl shadow-lg hover:scale-110 transition-all">
-                    <Pencil className="w-5 h-5" />
+                 <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Secteur / Catégorie</label>
+                      <select
+                        required
+                        value={editProduct ? editProduct.category : newProduct.category}
+                        onChange={e => editProduct ? setEditProduct({...editProduct, category: e.target.value}) : setNewProduct({...newProduct, category: e.target.value})}
+                        className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all"
+                      >
+                        <option value="">Sélectionner</option>
+                        {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Stock Initial</label>
+                      <input
+                        required
+                        type="number"
+                        value={editProduct ? editProduct.quantity : newProduct.quantity}
+                        onChange={e => editProduct ? setEditProduct({...editProduct, quantity: e.target.value}) : setNewProduct({...newProduct, quantity: e.target.value})}
+                        className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
+                      />
+                    </div>
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-6">
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Prix d'Achat (Unit)</label>
+                      <input
+                        required
+                        type="number"
+                        value={editProduct ? editProduct.cost : newProduct.cost}
+                        onChange={e => editProduct ? setEditProduct({...editProduct, cost: e.target.value}) : setNewProduct({...newProduct, cost: e.target.value})}
+                        className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Prix de Vente (Unit)</label>
+                      <input
+                        required
+                        type="number"
+                        value={editProduct ? editProduct.price : newProduct.price}
+                        onChange={e => editProduct ? setEditProduct({...editProduct, price: e.target.value}) : setNewProduct({...newProduct, price: e.target.value})}
+                        className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
+                      />
+                    </div>
+                 </div>
+
+                 <button
+                   type="submit"
+                   className="w-full py-5 bg-emerald-500 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-3"
+                 >
+                   <ShieldCheck className="w-5 h-5" /> {editProduct ? 'Sauvegarder Changements' : 'Inscrire au Registre'}
                  </button>
-                 <button onClick={() => { confirmDelete(detailProduct); setDetailProduct(null); }} className="p-4 bg-red-50 text-red-500 rounded-2xl border border-red-100 hover:bg-red-500 hover:text-white transition-all shadow-md">
-                    <Trash2 className="w-5 h-5" />
-                 </button>
-              </div>
-            </div>
-          </div>
+              </form>
+           </div>
         </div>
       )}
+
     </div>
   );
 }
