@@ -25,7 +25,8 @@ import {
   CreditCard,
   ArrowUpRight,
   Zap,
-  Edit2
+  Edit2,
+  Phone
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -339,6 +340,11 @@ export default function Sales() {
                    <div>
                       <h3 className="text-sm font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{s.name}</h3>
                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'}</p>
+                      {s.phone && s.phone !== 'none' && (
+                         <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                            <Phone className="w-2 h-2" /> {s.phone}
+                         </p>
+                      )}
                    </div>
                 </div>
 
@@ -456,16 +462,28 @@ export default function Sales() {
                   </div>
                </div>
 
-               <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Client</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Nom du client..."
-                    value={newSale.client}
-                    onChange={e => setNewSale({...newSale, client: e.target.value})}
-                    className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
-                  />
+               <div className="grid grid-cols-2 gap-6">
+                  <div>
+                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Client</label>
+                     <input
+                       type="text"
+                       required
+                       placeholder="Nom..."
+                       value={newSale.client}
+                       onChange={e => setNewSale({...newSale, client: e.target.value})}
+                       className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                     />
+                  </div>
+                  <div>
+                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Téléphone</label>
+                     <input
+                       type="text"
+                       placeholder="07..."
+                       value={newSale.phone}
+                       onChange={e => setNewSale({...newSale, phone: e.target.value})}
+                       className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                     />
+                  </div>
                </div>
 
                {/* Pricing Summary */}

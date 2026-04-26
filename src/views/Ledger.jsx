@@ -19,7 +19,8 @@ import {
   Filter,
   Activity,
   ChevronRight,
-  Edit2
+  Edit2,
+  Phone
 } from 'lucide-react';
 
 export default function Ledger() {
@@ -39,6 +40,7 @@ export default function Ledger() {
     paid: 0,
     type: 'expense',
     client: '',
+    phone: '',
     description: '',
     date: new Date().toISOString().split('T')[0]
   });
@@ -133,7 +135,7 @@ export default function Ledger() {
     }
     setShowModal(false);
     setEditingEntry(null);
-    setEntry({ name: '', amount: 0, paid: 0, type: 'expense', client: '', description: '', date: new Date().toISOString().split('T')[0] });
+    setEntry({ name: '', amount: 0, paid: 0, type: 'expense', client: '', phone: '', description: '', date: new Date().toISOString().split('T')[0] });
   };
 
   const handleEditEntry = (d) => {
@@ -144,6 +146,7 @@ export default function Ledger() {
       paid: d.paid || 0,
       type: d.type || 'expense',
       client: d.client || '',
+      phone: d.phone || '',
       description: d.description || '',
       date: d.date || new Date().toISOString().split('T')[0]
     });
@@ -247,6 +250,11 @@ export default function Ledger() {
                      <div>
                         <h3 className="text-lg font-black text-navy-950 uppercase tracking-tighter">{d.name}</h3>
                         <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-60">{d.client || 'OPÉRATION INTERNE'}</p>
+                        {d.phone && d.phone !== 'none' && (
+                           <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                              <Phone className="w-2 h-2" /> {d.phone}
+                           </p>
+                        )}
                      </div>
                   </div>
 
