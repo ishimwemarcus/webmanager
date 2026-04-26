@@ -189,7 +189,14 @@ export default function Admin() {
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
-                          <button onClick={() => store.updateRecord({ ...u, status: 'deleted' })} className="p-4 rounded-2xl bg-danger-pro/5 text-danger-pro border border-danger-pro/10 hover:bg-danger-pro hover:text-white transition-all">
+                          <button 
+                            onClick={() => {
+                              store.showConfirm(`PURGE NODE: Are you sure you want to delete ${u.name}?`, () => {
+                                store.deleteRecord({ ...u, record_type: 'user' });
+                              });
+                            }}
+                            className="p-4 rounded-2xl bg-danger-pro/5 text-danger-pro border border-danger-pro/10 hover:bg-danger-pro hover:text-white transition-all"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </>

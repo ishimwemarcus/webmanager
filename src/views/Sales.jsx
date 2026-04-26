@@ -223,6 +223,12 @@ export default function Sales() {
     setPayAmount('');
   };
 
+  const handleDeleteSale = (sale) => {
+    store.showConfirm(`Supprimer cette vente de ${sale.name} ?`, () => {
+      store.deleteRecord(sale);
+    });
+  };
+
   return (
     <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
       
@@ -367,7 +373,10 @@ export default function Sales() {
                    >
                       <Edit2 className="w-4 h-4" />
                    </button>
-                   <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                   <button 
+                      onClick={() => handleDeleteSale(s)}
+                      className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                   >
                       <Trash2 className="w-4 h-4" />
                    </button>
                    <button 

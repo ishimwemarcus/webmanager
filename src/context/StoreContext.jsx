@@ -315,33 +315,45 @@ export const StoreProvider = ({ children }) => {
   const deleteRecord = (record) => {
     const user = getCurrentUser();
     
+    const executeDelete = () => {
+      const del = prev => prev.filter(d => {
+        const dId = d.id || d.product_id || d.sale_id || d.key;
+        const rId = record.id || record.product_id || record.sale_id || record.key;
+        return dId !== rId;
+      });
+
+      const apiDelete = (key) => fetch(`${API_URL}?action=delete&key=${key}`, { 
+        method: 'POST', 
+        headers: { 'Bypass-Tunnel-Reminder': 'true' },
+        body: JSON.stringify(record) 
+      }).catch(()=>{});
+
+      if (record.record_type === 'product') { setProducts(del); apiDelete('biztrack_products'); }
+      else if (record.record_type === 'sale') { setSales(del); apiDelete('biztrack_sales'); }
+      else if (record.record_type === 'expense') { setExpenses(del); apiDelete('biztrack_expenses'); }
+      else if (record.record_type === 'user') { setUsers(del); apiDelete('biztrack_users'); }
+      else if (record.record_type === 'ledger_entry') { setLedgerManual(del); apiDelete('biztrack_ledger'); }
+      else if (record.record_type === 'wait_credit') { setWaitCredits(del); apiDelete('biztrack_wait'); }
+      else if (record.record_type === 'loss') { setLosses(del); apiDelete('biztrack_losses'); }
+      else if (record.record_type === 'reconciliation') { setReconciliations(del); apiDelete('biztrack_reconciliations'); }
+      else if (record.record_type === 'report') { setReportArchive(del); apiDelete('biztrack_reports'); }
+      else if (record.record_type === 'category') { setCategories(del); apiDelete('biztrack_categories'); }
+      else if (record.record_type === 'shift') { setShifts(del); apiDelete('biztrack_shifts'); }
+    };
+
     // Guardian Protocol: Owner Gate Enforcement for Master
     if (user?.role === 'Master' && record.createdBy && record.createdBy !== user.id && record.createdBy !== user.username) {
       const owner = users.find(u => u.username === record.createdBy || u.id === record.createdBy);
       if (owner && !clearanceGrants[owner.id]) {
-        showConfirm(`CLEARANCE REQUIRED: Node '${owner.name}' is locked. Purge operations are restricted without 'Consultant Access'.`, () => {}, () => {});
+        showConfirm(`CLEARANCE REQUIRED: Node '${owner.name}' is locked. Bypass Guardian Protocol and force purge?`, () => {
+          executeDelete();
+          showAlert("Guardian Protocol Bypassed.", "warning");
+        });
         return;
       }
     }
 
-    const del = prev => prev.filter(d => d.id !== record.id);
-    const apiDelete = (key) => fetch(`${API_URL}?action=delete&key=${key}`, { 
-      method: 'POST', 
-      headers: { 'Bypass-Tunnel-Reminder': 'true' },
-      body: JSON.stringify(record) 
-    }).catch(()=>{});
-
-    if (record.record_type === 'product') { setProducts(del); apiDelete('biztrack_products'); }
-    else if (record.record_type === 'sale') { setSales(del); apiDelete('biztrack_sales'); }
-    else if (record.record_type === 'expense') { setExpenses(del); apiDelete('biztrack_expenses'); }
-    else if (record.record_type === 'user') { setUsers(del); apiDelete('biztrack_users'); }
-    else if (record.record_type === 'ledger_entry') { setLedgerManual(del); apiDelete('biztrack_ledger'); }
-    else if (record.record_type === 'wait_credit') { setWaitCredits(del); apiDelete('biztrack_wait'); }
-    else if (record.record_type === 'loss') setLosses(del);
-    else if (record.record_type === 'reconciliation') setReconciliations(del);
-    else if (record.record_type === 'report') setReportArchive(del);
-    else if (record.record_type === 'category') setCategories(del);
-    else if (record.record_type === 'shift') { setShifts(del); apiDelete('biztrack_shifts'); }
+    executeDelete();
   };
 
   const formatCurrency = (value) => {
