@@ -22,7 +22,9 @@ import {
   Calculator,
   Calendar,
   Filter,
-  CreditCard
+  CreditCard,
+  ArrowUpRight,
+  Zap
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -30,6 +32,9 @@ export default function Sales() {
   const store = useStore();
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPayModal, setShowPayModal] = useState(null);
+  const [payAmount, setPayAmount] = useState('');
+  const [payMethod, setPayMethod] = useState('Cash');
   const [showModal, setShowModal] = useState(false);
   const [filterDate, setFilterDate] = useState('today');
   const [filterShift, setFilterShift] = useState(true);
@@ -149,16 +154,28 @@ export default function Sales() {
     setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null });
   };
 
-  const handlePopConfirm = (isCorrect) => {
-    if (!isCorrect) { closeAll(); return; }
-    const amount = parseFloat(newSale.amount);
-    const paid = parseFloat(newSale.paid);
-    const total = paid + (newSale.useCredit ? availableCredit : 0);
-    if (total > amount && !newSale.overpayType) {
-        registerSale(); // Auto-handle overpay as credit if logic exists, otherwise just proceed
-    } else {
-        registerSale();
-    }
+  const handlePayDebt = (e) => {
+    e.preventDefault();
+    if (!showPayModal || !payAmount) return;
+    
+    const payment = parseFloat(payAmount);
+    const currentPaid = parseFloat(showPayModal.paid) || 0;
+    const totalAmount = parseFloat(showPayModal.amount) || 0;
+    const newPaid = currentPaid + payment;
+    
+    // Determine new status
+    const newStatus = newPaid >= totalAmount ? 'PAID' : 'PARTIAL';
+    
+    store.updateRecord({
+      ...showPayModal,
+      paid: newPaid,
+      status: newStatus,
+      paymentMethod: payMethod // Update method for the final settlement if desired
+    });
+    
+    store.showAlert(`Règlement de ${store.formatCurrency(payment)} enregistré !`);
+    setShowPayModal(null);
+    setPayAmount('');
   };
 
   return (
@@ -302,14 +319,24 @@ export default function Sales() {
                    <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                       <Trash2 className="w-4 h-4" />
                    </button>
-                   <div className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest ${s.status?.includes('paid') ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' : 'bg-rose-500 text-white'}`}>
-                      {s.status}
-                   </div>
+                   <button 
+                     onClick={() => {
+                        if (s.status?.toLowerCase() === 'partial') {
+                           setShowPayModal(s);
+                           setPayAmount((parseFloat(s.amount)||0) - (parseFloat(s.paid)||0));
+                        }
+                     }}
+                     disabled={s.status?.toLowerCase() === 'paid'}
+                     className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${s.status?.toLowerCase() === 'paid' ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-default' : 'bg-rose-500 text-white hover:bg-rose-600 hover:scale-105 active:scale-95 shadow-lg shadow-rose-500/20'}`}
+                   >
+                      {s.status?.toLowerCase() === 'partial' ? <span className="flex items-center gap-1"><Zap className="w-2 h-2" /> {s.status}</span> : s.status}
+                   </button>
                 </div>
               </div>
             </div>
           ))
         ) : (
+
           <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-30">
              <ShoppingCart className="w-20 h-20 mx-auto text-blue-gray mb-6" />
              <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucune transaction enregistrée</p>
@@ -420,6 +447,57 @@ export default function Sales() {
                </div>
             </div>
          </div>
+      )}
+
+      {/* Debt Settlement Modal */}
+      {showPayModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in" onClick={() => setShowPayModal(null)}>
+           <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
+              <div className="text-center space-y-2 mb-10">
+                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">Règlement de Dette</h3>
+                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">Solder l'Obligation Financière</p>
+              </div>
+
+              <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
+                 <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Reste à payer</p>
+                 <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
+              </div>
+
+              <form onSubmit={handlePayDebt} className="space-y-8">
+                 <div className="space-y-6">
+                    <div className="relative">
+                       <Wallet className="absolute left-6 top-1/2 -translate-y-1/2 w-7 h-7 text-navy-950" />
+                       <input
+                         value={payAmount}
+                         onChange={e => setPayAmount(e.target.value)}
+                         type="number"
+                         step="0.01"
+                         required
+                         className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] pl-20 pr-8 py-6 text-3xl font-black text-navy-950 outline-none focus:border-navy-950 transition-all text-center"
+                         placeholder="0.00"
+                       />
+                    </div>
+                    
+                    <div className="flex bg-navy-50 p-1.5 rounded-3xl border border-navy-100">
+                       {['Cash', 'Momo', 'Card'].map(m => (
+                          <button
+                             key={m}
+                             type="button"
+                             onClick={() => setPayMethod(m)}
+                             className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
+                          >
+                             {m}
+                          </button>
+                       ))}
+                    </div>
+                 </div>
+
+                 <button type="submit" className="w-full py-8 bg-emerald-500 text-white rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-2xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-[0.98]">
+                    Valider le Règlement <CheckCircle2 className="w-6 h-6" />
+                 </button>
+              </form>
+           </div>
+        </div>
       )}
 
     </div>
