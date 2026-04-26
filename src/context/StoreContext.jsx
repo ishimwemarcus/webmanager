@@ -334,7 +334,12 @@ export const StoreProvider = ({ children }) => {
   };
 
   const formatCurrency = (value) => {
-    return `${parseFloat(value || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} ${currency}`;
+    const val = parseFloat(value || 0);
+    const noDecimals = currency === 'RWF' || currency === 'TZS' || currency === 'UGX';
+    return `${val.toLocaleString(undefined, {
+      minimumFractionDigits: noDecimals ? 0 : 2, 
+      maximumFractionDigits: noDecimals ? 0 : 2
+    })} ${currency}`;
   };
 
   const getSystemStatus = () => {

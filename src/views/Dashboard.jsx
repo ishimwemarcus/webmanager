@@ -50,7 +50,7 @@ export default function Dashboard() {
       {/* Premium Header */}
       <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6 border-b border-navy-100 pb-8">
         <div className="space-y-1 text-center md:text-left">
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-[clamp(1.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             Console de Contrôle
           </h1>
           <h2 className="text-xs font-black text-blue-gray tracking-[0.4em] uppercase italic">

@@ -248,10 +248,7 @@ export default function Sales() {
                   {s.status}
                 </span>
               </div>
-              <div className="flex items-center justify-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <p className="text-xs md:text-sm text-blue-gray uppercase tracking-[0.4em] font-black">{t('loginGateway')}</p>
-              </div>
+
               <div className="grid grid-cols-3 gap-2 mb-3">
                 <div className="bg-navy-50 rounded-xl p-2 text-center">
                   <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Volume</p>
@@ -596,7 +593,7 @@ export default function Sales() {
               <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Suivi Client (QR Link)</p>
               <div className="w-40 h-40 bg-white p-3 rounded-2xl mx-auto shadow-md">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${lastSaleRecord?.phone || 'none'}`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${encodeURIComponent(lastSaleRecord?.phone || 'none')}`)}`}
                   alt="Client Portal"
                   className="w-full h-full object-contain"
                 />

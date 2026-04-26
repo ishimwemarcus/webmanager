@@ -88,13 +88,13 @@ export default function TopBar({ onToggleSidebar }) {
           </button>
 
           {/* Currency Input Modifier */}
-          <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
-            <span className="text-xs md:text-sm font-black uppercase text-white/40" title="Currency Profile">CUR</span>
+          <div className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
+            <span className="hidden md:inline text-xs font-black uppercase text-white/40" title="Currency Profile">CUR</span>
             <input
               type="text"
               value={currency}
               onChange={e => setCurrency(e.target.value)}
-              className="w-10 bg-transparent text-white font-black text-xs text-center border-b border-white/20 focus:border-[#BEF264] outline-none transition-all"
+              className="w-8 md:w-10 bg-transparent text-white font-black text-xs text-center border-b border-white/20 focus:border-[#BEF264] outline-none transition-all uppercase"
               maxLength={4}
               title="Change System Currency"
             />
