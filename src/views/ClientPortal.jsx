@@ -10,7 +10,11 @@ import {
   CheckCircle2, 
   AlertCircle,
   QrCode,
-  ArrowLeft
+  ArrowLeft,
+  CreditCard,
+  Wallet,
+  Calendar,
+  Search
 } from 'lucide-react';
 
 export default function ClientPortal() {
@@ -21,7 +25,7 @@ export default function ClientPortal() {
   const allSales = store.getSales();
   const allWait = store.getWaitCredits();
 
-  const { clientSales, clientCredits, totalSpent, totalPaid, currentDebt, currentCredit } = useMemo(() => {
+  const { clientSales, totalSpent, totalPaid, currentDebt, currentCredit } = useMemo(() => {
     const decodedPhone = phone === 'none' ? '' : decodeURIComponent(phone || '');
     
     const s = allSales.filter(sale => 
@@ -40,14 +44,13 @@ export default function ClientPortal() {
     const credit = w.reduce((acc, curr) => acc + (parseFloat(curr.balance) || 0), 0);
 
     return {
-      clientSales: s,
-      clientCredits: w,
+      clientSales: s.sort((a,b) => new Date(b.date) - new Date(a.date)),
       totalSpent: spent,
       totalPaid: paid,
       currentDebt: debt,
       currentCredit: credit
     };
-  }, [allSales, allWait, decodedName]);
+  }, [allSales, allWait, decodedName, phone]);
 
   const [searchTerm, setSearchTerm] = React.useState('');
   const [searchPhone, setSearchPhone] = React.useState('');
@@ -60,167 +63,142 @@ export default function ClientPortal() {
 
   if (!decodedName) return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Dynamic Background Elements */}
       <div className="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-navy-brand/10 blur-[120px] rounded-full animate-pulse-gentle"></div>
       <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-emerald-500/10 blur-[100px] rounded-full animate-pulse-gentle delay-700"></div>
 
-      <div className="max-w-md w-full glass-card bg-white/80 backdrop-blur-3xl border border-white p-10 md:p-12 rounded-[56px] shadow-[0_32px_80px_rgba(0,0,0,0.1)] relative z-10 scale-in">
+      <div className="max-w-md w-full glass-card bg-white/80 backdrop-blur-3xl border border-white p-10 md:p-12 rounded-[56px] shadow-2xl relative z-10 scale-in">
         <div className="flex flex-col items-center text-center space-y-6 mb-10">
-           <div className="w-24 h-24 bg-navy-brand rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl shadow-navy-brand/40 animate-bounce-gentle">
+           <div className="w-24 h-24 bg-navy-brand rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl animate-bounce-gentle">
               <ShieldCheck className="w-12 h-12" />
            </div>
            <div>
-              <h1 className="text-3xl md:text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">Espace Client</h1>
-              <p className="text-xs font-black text-blue-gray uppercase tracking-[0.3em] mt-2 italic">Sécurisé par MARC Systems</p>
+              <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">Espace Client</h1>
+              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">Consultation Sécurisée MARC</p>
            </div>
-           <p className="text-sm font-bold text-navy-950/60 leading-relaxed">
-             Entrez votre identité pour consulter vos transactions, soldes et crédits en temps réel.
-           </p>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-6">
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Votre Nom Complet</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Nom de Compte</label>
               <input 
                 type="text" 
-                placeholder="Ex: Marcus Ishimwe"
+                required
+                placeholder="Votre nom complet..."
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
-                className="w-full bg-navy-50/50 border border-navy-100 rounded-[24px] px-6 py-4 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-sm"
+                className="w-full bg-navy-50/50 border-2 border-transparent rounded-[24px] px-6 py-5 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-inner uppercase"
               />
            </div>
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Numéro de Téléphone (Optionnel)</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Téléphone (Optionnel)</label>
               <input 
                 type="text" 
-                placeholder="Ex: 078XXXXXXX"
+                placeholder="078..."
                 value={searchPhone}
                 onChange={e => setSearchPhone(e.target.value)}
-                className="w-full bg-navy-50/50 border border-navy-100 rounded-[24px] px-6 py-4 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-sm"
+                className="w-full bg-navy-50/50 border-2 border-transparent rounded-[24px] px-6 py-5 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-inner"
               />
            </div>
-           <button 
-             type="submit"
-             className="w-full py-5 bg-navy-brand text-white font-black rounded-[24px] shadow-2xl shadow-navy-brand/30 hover:bg-navy-950 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3 active:scale-95"
-           >
-             Accéder à mon compte <CheckCircle2 className="w-5 h-5" />
+           <button type="submit" className="w-full bg-navy-950 text-white font-black py-6 rounded-[24px] shadow-2xl flex items-center justify-center gap-3 hover:bg-navy-brand transition-all uppercase tracking-widest text-xs">
+              Accéder au Registre <Search className="w-4 h-4" />
            </button>
         </form>
-
-        <div className="mt-12 pt-8 border-t border-navy-50 text-center">
-           <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest opacity-40">
-             © 2026 MARC Business Management • Cloud Protocol v4
-           </p>
-        </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-[calc(100vh-6rem)] bg-[#F8FAFC] pb-20">
-      {/* Premium Header */}
-      <div className="bg-navy-950 text-white p-8 md:p-12 rounded-b-[64px] shadow-2xl relative overflow-hidden">
-        <div className="absolute top-[-20%] right-[-10%] w-64 h-64 bg-navy-brand/20 blur-[100px] rounded-full"></div>
-        
-        <div className="max-w-4xl mx-auto space-y-8 relative z-10">
-          <div className="flex items-center justify-between">
-             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/10 cursor-pointer hover:bg-white/20 transition-all" onClick={() => window.history.back()}>
-                <ArrowLeft className="w-6 h-6 text-white" />
-             </div>
-             <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-xs md:text-sm font-black uppercase tracking-widest opacity-60">Portail Sécurisé</span>
-             </div>
-          </div>
-
-          <div className="space-y-2">
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
-            <p className="text-sm font-bold text-white/40 uppercase tracking-[0.4em]">Tableau de Bord Client</p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
-            <div className="bg-white/5 border border-white/10 p-5 rounded-[32px] backdrop-blur-md">
-               <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-1">Total Achats</p>
-               <p className="text-xl font-black">{store.formatCurrency(totalSpent)}</p>
-            </div>
-            <div className="bg-white/5 border border-white/10 p-5 rounded-[32px] backdrop-blur-md">
-               <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-1">Total Payé</p>
-               <p className="text-xl font-black text-emerald-400">{store.formatCurrency(totalPaid)}</p>
-            </div>
-            <div className="bg-rose-500/10 border border-rose-500/20 p-5 rounded-[32px] backdrop-blur-md">
-               <p className="text-xs md:text-sm font-black uppercase tracking-widest text-rose-400 mb-1">Dette Actuelle</p>
-               <p className="text-xl font-black text-rose-400">{store.formatCurrency(currentDebt)}</p>
-            </div>
-            <div className="bg-navy-brand/10 border border-navy-brand/20 p-5 rounded-[32px] backdrop-blur-md">
-               <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-brand mb-1">Crédit (Balance)</p>
-               <p className="text-xl font-black text-navy-brand">{store.formatCurrency(currentCredit)}</p>
-            </div>
-          </div>
+    <div className="min-h-screen bg-navy-50/30 pb-20 fade-in-up">
+      {/* Premium Portal Header */}
+      <div className="bg-navy-950 text-white p-8 md:p-16 rounded-b-[64px] shadow-2xl relative overflow-hidden">
+        <div className="absolute top-[-20%] left-[-10%] w-64 h-64 bg-navy-brand/20 blur-[100px] rounded-full"></div>
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-10 relative z-10">
+           <div className="flex items-center gap-8">
+              <div className="w-24 h-24 bg-white/10 backdrop-blur-xl rounded-[32px] flex items-center justify-center text-navy-brand border border-white/20 shadow-2xl">
+                 <ShieldCheck className="w-12 h-12" />
+              </div>
+              <div>
+                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">Client Certifié MARC v4</p>
+                 <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
+                 <p className="text-xs font-bold text-white/40 mt-3 flex items-center gap-2">
+                    <Calendar className="w-4 h-4" /> Membre depuis {clientSales.length > 0 ? new Date(clientSales[clientSales.length-1].date).toLocaleDateString() : 'Aujourd\'hui'}
+                 </p>
+              </div>
+           </div>
+           <button 
+             onClick={() => window.location.hash = '#/portal'}
+             className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl flex items-center gap-3 transition-all font-black text-xs uppercase tracking-widest backdrop-blur-md"
+           >
+             <ArrowLeft className="w-4 h-4" /> Quitter
+           </button>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 -mt-10 space-y-8 relative z-20">
-        {/* Active Transactions */}
-        <div className="bg-white rounded-[40px] shadow-xl border border-navy-50 overflow-hidden">
-           <div className="p-8 border-b border-navy-50 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-navy-50 rounded-xl flex items-center justify-center text-navy-brand">
-                  <Clock className="w-5 h-5" />
+      <div className="max-w-6xl mx-auto -mt-16 px-6 space-y-8">
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+           {[
+             { label: 'Achats Totaux', val: totalSpent, icon: ShoppingCart, color: 'text-navy-950', bg: 'bg-white' },
+             { label: 'Total Réglé', val: totalPaid, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+             { label: 'Dette Actuelle', val: currentDebt, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
+             { label: 'Solde Créditeur', val: currentCredit, icon: Wallet, color: 'text-navy-brand', bg: 'bg-navy-50' }
+           ].map((m, i) => (
+             <div key={i} className={`glass-card p-8 rounded-[40px] shadow-xl border border-navy-100 ${m.bg} group hover:scale-105 transition-all`}>
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${m.color} bg-current/10`}>
+                   <m.icon className="w-6 h-6" />
                 </div>
-                <h3 className="font-black uppercase tracking-widest text-navy-950 text-sm">Historique des Transactions</h3>
+                <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1">{m.label}</p>
+                <p className={`text-2xl font-black ${m.color}`}>{store.formatCurrency(m.val)}</p>
+             </div>
+           ))}
+        </div>
+
+        {/* Transaction History */}
+        <div className="glass-card bg-white rounded-[48px] border border-navy-100 shadow-2xl overflow-hidden">
+           <div className="p-10 border-b border-navy-50 flex items-center justify-between">
+              <div>
+                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter">Historique des Transactions</h3>
+                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">Registre complet de vos activités</p>
               </div>
-              <span className="text-xs md:text-sm font-black text-blue-gray/40">{clientSales.length} Achats</span>
+              <span className="px-6 py-2 bg-navy-50 text-navy-950 rounded-full text-xs font-black uppercase tracking-widest border border-navy-100">
+                 {clientSales.length} Opérations
+              </span>
            </div>
-           
+
            <div className="divide-y divide-navy-50">
-              {clientSales.map((sale, i) => (
-                <div key={i} className="p-8 flex items-center justify-between hover:bg-navy-50/30 transition-colors">
+              {clientSales.length > 0 ? clientSales.map((s, idx) => (
+                <div key={idx} className="p-8 flex items-center justify-between hover:bg-navy-50/50 transition-all group">
                    <div className="flex items-center gap-6">
-                      <div className="text-center min-w-[60px]">
-                        <p className="text-lg font-black text-navy-950">{new Date(sale.date).getDate()}</p>
-                        <p className="text-xs md:text-sm font-black uppercase text-blue-gray">{new Date(sale.date).toLocaleString('default', { month: 'short' })}</p>
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${s.paid >= s.amount ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+                         <Package className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-xs font-black uppercase text-navy-brand tracking-tight">{sale.name}</p>
-                        <p className="text-xs md:text-sm font-bold text-blue-gray opacity-60">Quantité: {sale.quantity}</p>
+                         <p className="font-black text-navy-950 uppercase text-lg leading-none">{s.name}</p>
+                         <p className="text-xs font-bold text-blue-gray mt-2 flex items-center gap-2">
+                            <Clock className="w-3.5 h-3.5 opacity-40" /> {new Date(s.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'})}
+                         </p>
                       </div>
                    </div>
                    <div className="text-right">
-                      <p className="font-black text-navy-950">{store.formatCurrency(sale.amount)}</p>
-                      <div className="flex items-center gap-2 justify-end mt-1">
-                        {sale.paid >= sale.amount ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <AlertCircle className="w-3.5 h-3.5 text-rose-500" />
-                        )}
-                        <span className={`text-xs font-black uppercase tracking-widest ${sale.paid >= sale.amount ? 'text-emerald-500' : 'text-rose-500'}`}>
-                          {sale.paid >= sale.amount ? 'Réglé' : 'Partiel'}
-                        </span>
-                      </div>
+                      <p className="text-xl font-black text-navy-950">{store.formatCurrency(s.amount)}</p>
+                      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500'}`}>
+                         {s.paid >= s.amount ? 'Soldé' : `Reste: ${store.formatCurrency(s.amount - s.paid)}`}
+                      </p>
                    </div>
                 </div>
-              ))}
-              {clientSales.length === 0 && (
-                <div className="p-6 md:p-20 text-center space-y-4">
-                   <Package className="w-12 h-12 text-navy-100 mx-auto" />
-                   <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Aucune transaction trouvée</p>
+              )) : (
+                <div className="p-20 text-center space-y-4 opacity-20">
+                   <Clock className="w-16 h-16 mx-auto" />
+                   <p className="text-sm font-black uppercase tracking-widest">Aucun historique détecté</p>
                 </div>
               )}
            </div>
         </div>
-
-        {/* Info Card */}
-        <div className="bg-navy-900 rounded-[40px] p-10 text-white flex flex-col md:flex-row items-center gap-8 shadow-2xl relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2"></div>
-           <div className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center p-2 flex-shrink-0 shadow-xl">
-              <QrCode className="w-full h-full text-navy-950" />
-           </div>
-           <div className="space-y-2 text-center md:text-left">
-              <h4 className="text-xl font-black uppercase tracking-tight">Accès Instantané</h4>
-              <p className="text-xs text-white/60 font-bold leading-relaxed">Scannez le QR code sur votre ticket à chaque achat pour mettre à jour votre tableau de bord et suivre vos crédits en temps réel.</p>
-           </div>
-        </div>
       </div>
+      
+      <p className="text-center text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-10 italic opacity-40">
+         Plateforme de Transparence Client MARC v4.0
+      </p>
     </div>
   );
 }

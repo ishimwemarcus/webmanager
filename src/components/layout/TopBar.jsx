@@ -38,17 +38,22 @@ export default function TopBar({ onToggleSidebar }) {
         >
           <Menu className="w-6 h-6 outline-none" />
         </button>
-        <div className="hidden sm:block">
-          <div className="flex items-center gap-3">
-            <h2 className="text-2xl font-black text-white uppercase tracking-tighter">
-              {t('dashboard').split(' ')[0]} <span className="font-black text-[#F59E0B]">{t('commandInterface')}</span>
-            </h2>
-            <div className="flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 rounded-full">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B] animate-pulse"></div>
-              <span className="text-xs font-black uppercase tracking-widest text-white">{t('liveSync')}</span>
+        <div className="hidden sm:flex items-center gap-6">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">
+                {t('dashboard').split(' ')[0]} <span className="font-black text-[#F59E0B]">{t('commandInterface')}</span>
+              </h2>
             </div>
+            <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-1 italic">{today}</p>
           </div>
-          <p className="text-xs md:text-sm text-white/50 font-bold uppercase tracking-[0.25em] mt-1 italic">{today}</p>
+
+          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+              <div className={`w-2 h-2 rounded-full animate-pulse ${store.getSystemStatus() === 'systemWarning' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
+              <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                {store.getSystemStatus() === 'systemWarning' ? 'Attention Requise' : 'Système Nominal'}
+              </span>
+          </div>
         </div>
       </div>
 
