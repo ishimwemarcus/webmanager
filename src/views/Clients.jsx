@@ -45,7 +45,7 @@ export default function Clients() {
   const vipCount = clientData.filter(c => c.totalSpent > 1000 && c.transactions > 2).length;
   const riskCount = clientData.filter(c => c.currentDebt > c.totalSpent * 0.3).length;
 
-  const portalUrl = `${window.location.origin}${window.location.pathname}#/portal`;
+  const portalUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal`;
 
   return (
     <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">

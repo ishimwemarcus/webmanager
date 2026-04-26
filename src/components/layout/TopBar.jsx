@@ -96,6 +96,15 @@ export default function TopBar({ onToggleSidebar }) {
             <Eye className="w-4 h-4" />
           </button>
 
+          {/* Portal QR Shortcut */}
+          <button
+            onClick={() => setShowQR(true)}
+            title="Generate Client Portal QR"
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
+          >
+            <QrCode className="w-4 h-4" />
+          </button>
+
           {/* Currency Input Modifier */}
           <div className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
             <span className="hidden md:inline text-xs font-black uppercase text-white/40" title="Currency Profile">CUR</span>
@@ -118,8 +127,9 @@ export default function TopBar({ onToggleSidebar }) {
             </div>
             <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">Accès Mobile</h3>
             <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">Scannez pour synchroniser ce terminal avec votre smartphone.</p>
-            <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200">
-              <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://guardian-business.surge.sh" alt="QR Code" className="w-full h-auto rounded-xl" />
+            <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200 relative overflow-hidden group">
+              <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#/portal')}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
             </div>
             <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">Guardian Protocol v4.0 Active</p>
           </div>
