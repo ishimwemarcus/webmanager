@@ -17,7 +17,8 @@ import {
   Terminal,
   Fingerprint,
   ArrowRight,
-  X
+  X,
+  Edit2
 } from 'lucide-react';
 
 export default function Admin() {
@@ -25,6 +26,7 @@ export default function Admin() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('accounts');
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
   const [pin, setPin] = useState('');
   const [visiblePass, setVisiblePass] = useState({});
 
@@ -178,6 +180,15 @@ export default function Admin() {
                           >
                             <Zap className="w-4 h-4" />
                           </button>
+                          <button 
+                            onClick={() => {
+                              setEditingUser(u);
+                              setShowInviteModal(true);
+                            }}
+                            className="p-4 rounded-2xl bg-navy-50 text-navy-brand border border-navy-100 hover:bg-emerald-500 hover:text-white transition-all"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
                           <button onClick={() => store.updateRecord({ ...u, status: 'deleted' })} className="p-4 rounded-2xl bg-danger-pro/5 text-danger-pro border border-danger-pro/10 hover:bg-danger-pro hover:text-white transition-all">
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -292,34 +303,40 @@ export default function Admin() {
         <div className="fixed inset-0 z-50 flex items-center justify-center modal-overlay p-4">
           <div className="glass-card rounded-[56px] shadow-2xl w-full max-w-xl relative bg-white border border-navy-50 overflow-hidden scale-in">
             <div className="p-6 md:p-12 text-center bg-navy-brand text-white">
-              <h3 className="text-3xl font-black uppercase tracking-tighter">Provision Account</h3>
+              <h3 className="text-3xl font-black uppercase tracking-tighter">{editingUser ? 'Update Identity' : 'Provision Account'}</h3>
               <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] mt-2 opacity-60">Identity Authorization</p>
-              <button onClick={() => setShowInviteModal(false)} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all"><X className="w-6 h-6" /></button>
+              <button onClick={() => { setShowInviteModal(false); setEditingUser(null); }} className="absolute top-10 right-10 p-3 rounded-full hover:bg-white/10 text-white transition-all"><X className="w-6 h-6" /></button>
             </div>
 
             <form onSubmit={(e) => {
               e.preventDefault();
-              store.addRecord({
+              const payload = {
                 record_type: 'user',
                 fullname: e.target.fullname.value.trim(),
                 username: e.target.username.value.trim(),
                 password: e.target.password.value,
                 role: e.target.role.value,
-                status: 'active'
-              });
+                status: editingUser ? editingUser.status : 'active'
+              };
+              if (editingUser) {
+                store.updateRecord({ ...editingUser, ...payload });
+              } else {
+                store.addRecord(payload);
+              }
               setShowInviteModal(false);
+              setEditingUser(null);
             }} className="p-6 md:p-12 space-y-8">
               <div className="space-y-6 text-center">
-                <input name="fullname" type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center italic" placeholder="Operator Name" />
-                <input name="username" type="text" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center font-mono" placeholder="username_sector" />
-                <input name="password" type="password" required className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center tracking-widest" placeholder="••••••••" />
-                <select name="role" className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none appearance-none text-center uppercase text-xs md:text-sm tracking-widest">
+                <input name="fullname" type="text" required defaultValue={editingUser?.fullname || editingUser?.name || ''} className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center italic" placeholder="Operator Name" />
+                <input name="username" type="text" required defaultValue={editingUser?.username || ''} className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center font-mono" placeholder="username_sector" />
+                <input name="password" type="password" required defaultValue={editingUser?.password || ''} className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none text-center tracking-widest" placeholder="••••••••" />
+                <select name="role" defaultValue={editingUser?.role || 'Operator'} className="w-full bg-navy-50 border border-navy-100 rounded-[28px] px-8 py-5 text-charcoal font-bold outline-none appearance-none text-center uppercase text-xs md:text-sm tracking-widest">
                   <option value="Operator">Operator Node</option>
                   <option value="Admin">Admin Node</option>
                   <option value="Master">Master Node</option>
                 </select>
               </div>
-              <button type="submit" className="btn-premium w-full !py-6">Authorize Node <ArrowRight className="w-5 h-5 ml-4" /></button>
+              <button type="submit" className="btn-premium w-full !py-6">{editingUser ? 'Sync Protocol' : 'Authorize Node'} <ArrowRight className="w-5 h-5 ml-4" /></button>
             </form>
           </div>
         </div>

@@ -18,7 +18,8 @@ import {
   Calendar,
   Filter,
   Activity,
-  ChevronRight
+  ChevronRight,
+  Edit2
 } from 'lucide-react';
 
 export default function Ledger() {
@@ -29,6 +30,7 @@ export default function Ledger() {
   const [customDates, setCustomDates] = useState({ start: '', end: '' });
   const [showModal, setShowModal] = useState(false);
   const [showPayModal, setShowPayModal] = useState(null);
+  const [editingEntry, setEditingEntry] = useState(null);
   const [payAmount, setPayAmount] = useState('');
 
   const [entry, setEntry] = useState({
@@ -111,15 +113,41 @@ export default function Ledger() {
   const handleAddEntry = (e) => {
     e.preventDefault();
     const recordType = entry.type === 'expense' ? 'expense' : 'ledger_entry';
-    store.addRecord({
-      ...entry,
-      amount: parseFloat(entry.amount) || 0,
-      paid: parseFloat(entry.paid) || 0,
-      record_type: recordType,
-      status: parseFloat(entry.paid) >= parseFloat(entry.amount) ? 'paid' : 'unpaid'
-    });
+    if (editingEntry) {
+      store.updateRecord({
+        ...editingEntry,
+        ...entry,
+        amount: parseFloat(entry.amount) || 0,
+        paid: parseFloat(entry.paid) || 0,
+        record_type: recordType,
+        status: parseFloat(entry.paid) >= parseFloat(entry.amount) ? 'paid' : 'unpaid'
+      });
+    } else {
+      store.addRecord({
+        ...entry,
+        amount: parseFloat(entry.amount) || 0,
+        paid: parseFloat(entry.paid) || 0,
+        record_type: recordType,
+        status: parseFloat(entry.paid) >= parseFloat(entry.amount) ? 'paid' : 'unpaid'
+      });
+    }
     setShowModal(false);
+    setEditingEntry(null);
     setEntry({ name: '', amount: 0, paid: 0, type: 'expense', client: '', description: '', date: new Date().toISOString().split('T')[0] });
+  };
+
+  const handleEditEntry = (d) => {
+    setEditingEntry(d);
+    setEntry({
+      name: d.name || '',
+      amount: d.amount || 0,
+      paid: d.paid || 0,
+      type: d.type || 'expense',
+      client: d.client || '',
+      description: d.description || '',
+      date: d.date || new Date().toISOString().split('T')[0]
+    });
+    setShowModal(true);
   };
 
   const handleMarkPaid = (e) => {
@@ -264,6 +292,12 @@ export default function Ledger() {
                         className="p-3 bg-navy-50 text-blue-gray rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm"
                      >
                         <Printer className="w-4 h-4" />
+                     </button>
+                     <button 
+                        onClick={() => handleEditEntry(d)}
+                        className="p-3 bg-navy-50 text-blue-gray rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                     >
+                        <Edit2 className="w-4 h-4" />
                      </button>
                      <button 
                        onClick={() => store.deleteRecord(d)}

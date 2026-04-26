@@ -24,7 +24,8 @@ import {
   Filter,
   CreditCard,
   ArrowUpRight,
-  Zap
+  Zap,
+  Edit2
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -40,6 +41,7 @@ export default function Sales() {
   const [filterShift, setFilterShift] = useState(true);
   const [customDates, setCustomDates] = useState({ start: '', end: '' });
   const [showConfirmPop, setShowConfirmPop] = useState(false);
+  const [editingSale, setEditingSale] = useState(null);
 
   const [newSale, setNewSale] = useState({
     product_id: '',
@@ -148,9 +150,52 @@ export default function Sales() {
     setTimeout(() => setShowSuccess(false), 3000);
   };
 
+  const handleEditSale = (s) => {
+    setEditingSale(s);
+    const product = products.find(p => p.name === s.name);
+    setNewSale({
+      product_id: s.product_id || (product ? product.id : ''),
+      client: s.client || '',
+      phone: s.phone || '',
+      quantity: s.quantity || 1,
+      amount: s.amount || 0,
+      paid: s.paid || 0,
+      paymentMethod: s.paymentMethod || 'Cash',
+      useCredit: s.useCredit !== false,
+      overpayType: null
+    });
+    setShowModal(true);
+  };
+
+  const updateSale = () => {
+    if (!editingSale) return;
+    const product = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
+    const amount = parseFloat(newSale.amount);
+    const paid = parseFloat(newSale.paid);
+    
+    const updatedSale = {
+      ...editingSale,
+      name: product ? product.name : editingSale.name,
+      product_id: newSale.product_id,
+      client: newSale.client,
+      quantity: parseFloat(newSale.quantity),
+      amount,
+      paid,
+      phone: newSale.phone,
+      paymentMethod: newSale.paymentMethod,
+      status: paid < amount ? 'partial' : 'paid'
+    };
+
+    store.updateRecord(updatedSale);
+    setShowSuccess(true);
+    closeAll();
+    setTimeout(() => setShowSuccess(false), 3000);
+  };
+
   const closeAll = () => {
     setShowModal(false);
     setShowConfirmPop(false);
+    setEditingSale(null);
     setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null });
   };
 
@@ -316,6 +361,12 @@ export default function Sales() {
                    <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
                       <Printer className="w-4 h-4" />
                    </button>
+                   <button 
+                      onClick={() => handleEditSale(s)}
+                      className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                   >
+                      <Edit2 className="w-4 h-4" />
+                   </button>
                    <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
                       <Trash2 className="w-4 h-4" />
                    </button>
@@ -349,7 +400,7 @@ export default function Sales() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in">
           <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-8 border-b border-navy-50 flex items-center justify-between bg-navy-50/50">
-               <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">Nouvelle Vente</h2>
+               <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{editingSale ? 'Modifier la Vente' : 'Nouvelle Vente'}</h2>
                <button onClick={closeAll} className="p-2 hover:bg-navy-100 rounded-xl transition-all"><X className="w-5 h-5" /></button>
             </div>
             
@@ -438,12 +489,12 @@ export default function Sales() {
                <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full mx-auto flex items-center justify-center mb-6">
                   <CheckCircle2 className="w-10 h-10" />
                </div>
-               <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">Confirmer Vente</h3>
+               <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{editingSale ? 'Confirmer Modification' : 'Confirmer Vente'}</h3>
                <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">Voulez-vous finaliser l'enregistrement de cette opération de {store.formatCurrency(newSale.amount)} ?</p>
                
                <div className="grid grid-cols-2 gap-4">
                   <button onClick={() => handlePopConfirm(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">Annuler</button>
-                  <button onClick={() => handlePopConfirm(true)} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">Confirmer</button>
+                  <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">Confirmer</button>
                </div>
             </div>
          </div>
