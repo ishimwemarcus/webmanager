@@ -74,7 +74,7 @@ export default function Dashboard() {
 
       {/* Primary Intelligence Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover-elevate hover:border-navy-brand transition-all">
            <div className="flex items-center justify-between mb-4">
               <div className="w-14 h-14 bg-navy-brand/10 text-navy-brand rounded-2xl flex items-center justify-center">
                  <ShoppingCart className="w-6 h-6" />
@@ -85,7 +85,7 @@ export default function Dashboard() {
            <p className="text-3xl font-black text-navy-950 leading-none">{store.formatCurrency(totalSales)}</p>
         </div>
 
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover-elevate hover:border-navy-brand transition-all">
            <div className="flex items-center justify-between mb-4">
               <div className="w-14 h-14 bg-rose-500/10 text-rose-500 rounded-2xl flex items-center justify-center">
                  <ShieldAlert className="w-6 h-6" />
@@ -96,7 +96,7 @@ export default function Dashboard() {
            <p className="text-3xl font-black text-rose-600 leading-none">{store.formatCurrency(totalDebt)}</p>
         </div>
 
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl rounded-[40px] group hover-elevate hover:border-navy-brand transition-all">
            <div className="flex items-center justify-between mb-4">
               <div className="w-14 h-14 bg-amber-500/10 text-amber-500 rounded-2xl flex items-center justify-center">
                  <Box className="w-6 h-6" />
@@ -107,7 +107,7 @@ export default function Dashboard() {
            <p className="text-3xl font-black text-navy-950 leading-none">{store.formatCurrency(totalStockValue)}</p>
         </div>
 
-        <div className="glass-card p-8 bg-navy-950 border border-navy-900 shadow-2xl rounded-[40px] group relative overflow-hidden">
+        <div className="glass-card p-8 bg-navy-950 border border-navy-900 shadow-2xl rounded-[40px] group hover-elevate relative overflow-hidden">
            <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-navy-brand/20 blur-3xl rounded-full"></div>
            <div className="flex items-center justify-between mb-4 relative z-10">
               <div className="w-14 h-14 bg-white/10 text-navy-brand rounded-2xl flex items-center justify-center backdrop-blur-xl border border-white/5">

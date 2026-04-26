@@ -169,7 +169,7 @@ export default function Sales() {
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-navy-brand text-white font-black px-8 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:bg-navy-900 transition-all uppercase tracking-widest text-xs"
+          className="btn-premium"
         >
           <Plus className="w-5 h-5" /> New Sale
         </button>
@@ -607,7 +607,7 @@ export default function Sales() {
                   printThermalReceipt(lastSaleRecord, store.currentOperator, store.formatCurrency);
                   setShowSuccess(false);
                 }}
-                className="w-full bg-[#2563eb] text-white font-black py-5 rounded-3xl flex items-center justify-center gap-3 shadow-lg hover:bg-black transition-all uppercase text-xs tracking-widest"
+                className="btn-premium w-full !bg-[#2563eb]"
               >
                 <Printer className="w-5 h-5" /> Imprimer le Ticket
               </button>
@@ -616,7 +616,7 @@ export default function Sales() {
                   shareReceipt(lastSaleRecord, store.currentOperator, store.formatCurrency);
                   setShowSuccess(false);
                 }}
-                className="w-full bg-success-pro text-white font-black py-5 rounded-3xl flex items-center justify-center gap-3 shadow-lg hover:bg-black transition-all uppercase text-xs tracking-widest"
+                className="btn-premium w-full !bg-success-pro"
               >
                 <ShoppingCart className="w-5 h-5" /> Partager (WhatsApp)
               </button>

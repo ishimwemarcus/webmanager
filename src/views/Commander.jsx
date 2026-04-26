@@ -124,7 +124,7 @@ export default function Commander() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Forecast Card */}
-        <div className="lg:col-span-2 glass-card rounded-[40px] bg-white p-10 space-y-8 shadow-2xl border border-navy-100 relative overflow-hidden">
+        <div className="lg:col-span-2 glass-card rounded-[40px] bg-white p-10 space-y-8 shadow-2xl border border-navy-100 relative overflow-hidden hover-elevate">
           <div className="absolute top-0 right-0 p-8 opacity-5">
             <TrendingUp className="w-40 h-40 text-navy-brand" />
           </div>
@@ -194,7 +194,7 @@ export default function Commander() {
         </div>
 
         {/* Leaderboard Card */}
-        <div className="bg-[#064E3B] rounded-[24px] p-4 text-white space-y-4 shadow-[0_16px_32px_-8px_rgba(6,78,59,0.3)] border border-emerald-500/20 relative overflow-hidden">
+        <div className="bg-[#064E3B] rounded-[24px] p-4 text-white space-y-4 shadow-[0_16px_32px_-8px_rgba(6,78,59,0.3)] border border-emerald-500/20 relative overflow-hidden hover-elevate">
           <div className="absolute top-0 right-0 p-8 opacity-10">
             <UserPlus className="w-40 h-40 text-emerald-400" />
           </div>

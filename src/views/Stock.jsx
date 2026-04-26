@@ -169,7 +169,7 @@ export default function Stock() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-emerald-500 shadow-2xl group hover:scale-[1.02] transition-all">
+        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-emerald-500 shadow-2xl group hover-elevate hover:border-navy-brand transition-all">
           <div className="w-16 h-16 rounded-[24px] bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <TrendingUp className="w-8 h-8" />
           </div>
@@ -178,7 +178,7 @@ export default function Stock() {
             <p className="text-3xl font-black text-navy-950">{store.formatCurrency(products.reduce((acc, p) => acc + ((parseFloat(p.price) || 0) * (parseFloat(p.quantity) || 0)), 0))}</p>
           </div>
         </div>
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-2xl group hover:scale-[1.02] transition-all">
+        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-2xl group hover-elevate transition-all">
           <div className="w-16 h-16 rounded-[24px] bg-navy-50 text-navy-brand flex items-center justify-center">
             <Package className="w-8 h-8" />
           </div>
@@ -219,7 +219,7 @@ export default function Stock() {
             return (
               <div 
                 key={cat.id}
-                className="glass-card flex items-center justify-between group cursor-pointer hover:border-emerald-500 transition-all"
+                className="glass-card p-10 flex items-center justify-between group cursor-pointer hover-elevate hover:border-emerald-500 transition-all"
                 onClick={() => setSelectedCategory(cat.name)}
               >
                 <div className="flex items-center gap-6">

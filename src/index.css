@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  /* Guardian Elite: Deep Midnight & Gold Accents */
+  /* Guardian Elite: Midnight Navy & Gold Core Identity */
   --color-navy-brand: #0369A1;
   --color-accent-green: #22C55E;
   --color-bg-soft: #F8FAFC;
@@ -20,6 +20,7 @@
   --color-pure-black: #0F172A;
   --color-blue-gray: #64748B;
 
+  /* Expanded Navy Palette for depth */
   --color-navy-50: #F0F9FF;
   --color-navy-100: #E0F2FE;
   --color-navy-200: #BAE6FD;
@@ -47,7 +48,7 @@
     font-family: 'Outfit', 'Inter', sans-serif;
     background-color: #F8FAFC !important;
     color: #0F172A !important;
-    transition: background 0.5s ease;
+    overflow-x: hidden;
   }
 
   h1, h2, h3, h4 {
@@ -56,28 +57,97 @@
     text-transform: uppercase;
   }
 
+  /* --- MASTER POLISH UTILITIES --- */
+
   .glass-card {
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
+    border-radius: 40px;
   }
 
+  .hover-elevate {
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .hover-elevate:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 40px 80px -20px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-premium {
+    @apply flex items-center justify-center gap-3 px-10 py-5 bg-navy-brand text-white font-black rounded-3xl shadow-2xl transition-all duration-500 uppercase tracking-widest text-xs;
+  }
+  .btn-premium:hover {
+    @apply bg-navy-900 -translate-y-1 shadow-navy-brand/30;
+  }
+  .btn-premium:active {
+    @apply scale-95;
+  }
+
+  /* Smooth Animations */
   .fade-in-up {
-    animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
+    from { opacity: 0; transform: translateY(30px); }
     to { opacity: 1; transform: translateY(0); }
   }
 
   .scale-in {
-    animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
 
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle 3s ease-in-out infinite;
+  }
+
+  @keyframes bounceGentle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Utility Classes */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .no-print {
+    @media print {
+      display: none !important;
+    }
+  }
+
+  /* Eye Care Mode */
+  .eye-care-mode {
+    filter: sepia(0.3) contrast(0.9);
+  }
+
+  /* Skeleton Shimmer */
+  .skeleton {
+    background: #f1f5f9;
+    background-image: linear-gradient(
+      90deg,
+      #f1f5f9 0px,
+      #e2e8f0 40px,
+      #f1f5f9 80px
+    );
+    background-size: 600px;
+    animation: shimmer 2s infinite linear;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: 400px 0; }
   }
 }

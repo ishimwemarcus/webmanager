@@ -94,7 +94,7 @@ export default function Clients() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover-elevate hover:border-navy-brand transition-all">
           <div className="w-16 h-16 bg-navy-brand/10 text-navy-brand rounded-2xl flex items-center justify-center">
             <Users className="w-8 h-8" />
           </div>
@@ -103,7 +103,7 @@ export default function Clients() {
             <p className="text-3xl font-black text-navy-950">{totalClients} <span className="text-sm">Clients</span></p>
           </div>
         </div>
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover-elevate hover:border-navy-brand transition-all">
           <div className="w-16 h-16 bg-[#F59E0B]/10 text-[#F59E0B] rounded-2xl flex items-center justify-center">
             <Star className="w-8 h-8" />
           </div>
@@ -112,7 +112,7 @@ export default function Clients() {
             <p className="text-3xl font-black text-navy-950">{vipCount}</p>
           </div>
         </div>
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover:border-navy-brand transition-all">
+        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover-elevate hover:border-navy-brand transition-all">
           <div className="w-16 h-16 bg-rose-500/10 text-rose-500 rounded-2xl flex items-center justify-center">
             <AlertTriangle className="w-8 h-8" />
           </div>
