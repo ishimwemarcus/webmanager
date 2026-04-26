@@ -67,27 +67,17 @@ export default function Commander() {
     const wickX = x + width / 2;
     
     // Scale wicks/body
-    const chartHeight = 256; // Matching h-64
+    const chartHeight = 256; 
     const maxVal = Math.max(...forecastData.map(d => d.high)) * 1.1;
     const minVal = Math.min(...forecastData.map(d => d.low)) * 0.9;
     const scale = (val) => chartHeight - ((val - minVal) / (maxVal - minVal) * chartHeight);
 
     return (
       <g>
-        {/* Wick */}
-        <line 
-          x1={wickX} y1={scale(high)} 
-          x2={wickX} y2={scale(low)} 
-          stroke={fill} strokeWidth={2} 
-        />
-        {/* Body */}
+        <line x1={wickX} y1={scale(high)} x2={wickX} y2={scale(low)} stroke={fill} strokeWidth={2} />
         <rect 
-          x={x + width * 0.15} 
-          y={scale(Math.max(open, close))} 
-          width={width * 0.7} 
-          height={Math.max(Math.abs(scale(open) - scale(close)), 2)} 
-          fill={fill}
-          rx={4}
+          x={x + width * 0.15} y={scale(Math.max(open, close))} width={width * 0.7} 
+          height={Math.max(Math.abs(scale(open) - scale(close)), 2)} fill={fill} rx={4}
           className="transition-all hover:fill-[#0F172A]/60 cursor-pointer"
         />
       </g>
@@ -98,230 +88,97 @@ export default function Commander() {
   const criticalDebt = clients.filter(c => (parseFloat(c.balance) || 0) > 500);
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-8 pb-20 fade-in-up px-2 md:px-0">
+      {/* Premium Header */}
+      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Intelligence d'Entreprise
-          </h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">
-            Centre {t('commanderInterface')}
-          </h2>
+          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">Intelligence</h1>
+          <h2 className="text-[10px] md:text-xs font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic">Protocoles Prédictifs & Audit</h2>
         </div>
-        <div className="flex gap-4">
-          <div className="px-8 py-4 bg-white border border-navy-100 rounded-2xl shadow-xl flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-navy-50 flex items-center justify-center text-navy-brand">
-              <Cpu className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">Indice d'Efficacité</p>
-              <p className="text-xl font-black text-navy-brand italic">98.4% <span className="text-emerald-500">↑</span></p>
-            </div>
-          </div>
+        <div className="flex items-center gap-2 px-6 py-4 bg-navy-50 border border-navy-100 rounded-3xl">
+           <Zap className="w-5 h-5 text-gold animate-pulse" />
+           <span className="text-[10px] font-black uppercase tracking-widest text-navy-950">Moteur Neural Actif</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* Forecast Card */}
-        <div className="lg:col-span-2 glass-card rounded-[40px] bg-white p-10 space-y-8 shadow-2xl border border-navy-100 relative overflow-hidden hover-elevate">
-          <div className="absolute top-0 right-0 p-8 opacity-5">
-            <TrendingUp className="w-40 h-40 text-navy-brand" />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="glass-card group hover-elevate hover:border-navy-brand transition-all">
+          <div className="w-12 h-12 bg-navy-brand/10 text-navy-brand rounded-2xl flex items-center justify-center mb-4">
+            <BarChart3 className="w-6 h-6" />
           </div>
-
-          <div className="relative z-10 flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-navy-950 flex items-center gap-3">
-                <BarChart3 className="w-6 h-6 text-emerald-500" /> {t('forecasting')}
-              </h3>
-              <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Protocole de Projection Quantique v.4.0</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
-                <span className="text-xs md:text-sm md:text-xs font-black text-blue-gray uppercase tracking-widest">Haussier</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-rose-500"></div>
-                <span className="text-xs md:text-sm md:text-xs font-black text-blue-gray uppercase tracking-widest">Baissier</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-64 w-full bg-navy-50 rounded-[32px] p-6 border border-navy-100 relative group">
-            <div className="absolute inset-0 grid grid-cols-7 gap-4 px-6 py-6 pointer-events-none opacity-5">
-              {Array.from({ length: 7 }).map((_, i) => <div key={i} className="h-full border-r border-navy-950"></div>)}
-            </div>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={forecastData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 900, fill: '#64748B' }} dy={10} />
-                <YAxis hide domain={['dataMin - 100', 'dataMax + 100']} />
-                <Tooltip
-                  cursor={{ fill: 'rgba(15, 23, 42, 0.05)' }}
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      const data = payload[0].payload;
-                      return (
-                        <div className="bg-white border border-navy-100 rounded-2xl p-4 shadow-2xl">
-                          <p className="text-xs md:text-sm font-black text-blue-gray uppercase mb-2">Analyse du {data.name}</p>
-                          <div className="space-y-1">
-                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">OUVERTURE</span><span className="text-xs md:text-sm font-mono text-navy-950">{store.formatCurrency(data.open)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">HAUT</span><span className="text-xs md:text-sm font-mono text-emerald-600">{store.formatCurrency(data.high)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">BAS</span><span className="text-xs md:text-sm font-mono text-rose-600">{store.formatCurrency(data.low)}</span></div>
-                            <div className="flex justify-between gap-8"><span className="text-xs text-blue-gray">CLÔTURE</span><span className={`text-xs md:text-sm font-mono ${data.isUp ? 'text-emerald-600' : 'text-rose-600'}`}>{store.formatCurrency(data.close)}</span></div>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                <Bar dataKey="forecast" shape={<Candle />} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          <div className="pt-6 border-t border-white/5 grid grid-cols-2 gap-10">
-            <div>
-              <p className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-white/30 mb-1">{t('projectedRevenue')} (7D)</p>
-              <p className="text-3xl font-black text-white">{store.formatCurrency(forecastData.reduce((s, f) => s + f.close, 0))}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-xs md:text-sm font-black uppercase tracking-[0.2em] text-emerald-400 mb-1">Indice de Stabilité</p>
-              <p className="text-xl font-black text-white italic tracking-tighter">QUALITÉ SUPÉRIEURE <Zap className="inline w-5 h-5 text-emerald-400 fill-emerald-400" /></p>
-            </div>
-          </div>
+          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Score d'Efficacité</p>
+          <p className="text-2xl md:text-3xl font-black text-navy-950 uppercase">Optimal</p>
         </div>
 
-        {/* Leaderboard Card */}
-        <div className="bg-[#064E3B] rounded-[24px] p-4 text-white space-y-4 shadow-[0_16px_32px_-8px_rgba(6,78,59,0.3)] border border-emerald-500/20 relative overflow-hidden hover-elevate">
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <UserPlus className="w-40 h-40 text-emerald-400" />
+        <div className="glass-card group hover-elevate hover:border-rose-500 transition-all">
+          <div className="w-12 h-12 bg-rose-500/10 text-rose-600 rounded-2xl flex items-center justify-center mb-4">
+            <BadgeAlert className="w-6 h-6" />
           </div>
-
-          <div className="relative z-10">
-            <h3 className="text-xl font-black uppercase tracking-tight flex items-center gap-3">
-              <BadgeAlert className="w-6 h-6 text-emerald-400" /> {t('leaderboard')}
-            </h3>
-            <p className="text-xs md:text-sm font-bold text-emerald-400/50 mt-1 uppercase tracking-widest italic">Classement de Performance Opérationnelle</p>
-          </div>
-
-          <div className="space-y-4 relative z-10">
-            {leaderboardData.map((op, i) => (
-              <div key={i} className="bg-white/5 p-6 rounded-[28px] border border-white/5 flex items-center justify-between group hover:bg-emerald-500/10 hover:border-emerald-500/30 transition-all">
-                <div className="flex items-center gap-5">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black text-xl shadow-2xl transition-all ${i === 0 ? 'bg-[#22c55e] text-navy-950 shadow-[#22c55e]/20' : 'bg-white/10 text-white'}`}>
-                    {i + 1}
-                  </div>
-                  <div>
-                    <p className="text-sm font-black uppercase tracking-tighter">{op.name}</p>
-                    <p className="text-xs md:text-sm font-black text-white/30 uppercase tracking-widest">{op.count} Opérations</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-black text-[#22c55e] tabular-nums">{store.formatCurrency(op.revenue)}</p>
-                </div>
-              </div>
-            ))}
-            {leaderboardData.length === 0 && <p className="p-10 text-center opacity-20 italic font-black uppercase tracking-widest text-xs">En attente de flux de données...</p>}
-          </div>
+          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Alerte Stocks</p>
+          <p className="text-2xl md:text-3xl font-black text-rose-600 uppercase">{criticalStock.length} Critiques</p>
         </div>
 
+        <div className="glass-card group hover-elevate hover:border-emerald-500 transition-all">
+          <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">
+            <TrendingUp className="w-6 h-6" />
+          </div>
+          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Projection Ventes</p>
+          <p className="text-2xl md:text-3xl font-black text-emerald-600 uppercase">+12% Prévu</p>
+        </div>
+
+        <div className="glass-card group hover-elevate hover:border-gold transition-all">
+          <div className="w-12 h-12 bg-gold/10 text-gold-dark rounded-2xl flex items-center justify-center mb-4">
+            <UserPlus className="w-6 h-6" />
+          </div>
+          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Engagement Client</p>
+          <p className="text-2xl md:text-3xl font-black text-gold-dark uppercase">Élevé</p>
+        </div>
       </div>
 
-      {/* Risk Room */}
-      <div className="glass-card overflow-hidden">
-        <div className="p-6 md:p-10 border-b border-navy-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h3 className="text-xl font-black uppercase tracking-tight text-danger-pro flex items-center gap-3">
-              <ShieldAlert className="w-6 h-6" /> {t('riskRoom')}
-            </h3>
-            <p className="text-xs font-bold text-blue-gray mt-1 uppercase tracking-widest">Anomalies critiques actives dans l'écosystème</p>
-          </div>
-          <span className="px-5 py-2 bg-red-50 text-red-600 rounded-full text-xs md:text-sm font-black uppercase tracking-widest animate-pulse border border-red-100 self-start sm:self-auto">
-            {criticalStock.length + criticalDebt.length} Anomalies détectées
-          </span>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 glass-card space-y-8">
+           <div className="flex items-center justify-between">
+              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">Forecasting (Modèle Candlestick)</h3>
+              <div className="flex items-center gap-4">
+                 <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"></div><span className="text-[8px] font-black uppercase">Hausse</span></div>
+                 <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500"></div><span className="text-[8px] font-black uppercase">Baisse</span></div>
+              </div>
+           </div>
+           <div className="h-64 md:h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={forecastData}>
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 10, fontWeight: 900}} />
+                  <Tooltip content={({ payload }) => payload?.[0] ? (
+                    <div className="bg-navy-950 text-white p-4 rounded-2xl shadow-2xl border border-white/10 scale-in">
+                       <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-2">{payload[0].payload.name}</p>
+                       <p className="text-xs font-bold text-emerald-400">High: {store.formatCurrency(payload[0].payload.high)}</p>
+                       <p className="text-xs font-bold text-rose-400">Low: {store.formatCurrency(payload[0].payload.low)}</p>
+                    </div>
+                  ) : null} />
+                  <Bar dataKey="close" shape={<Candle />} />
+                </BarChart>
+              </ResponsiveContainer>
+           </div>
         </div>
 
-        {/* ✅ MOBILE: Card List */}
-        <div className="block lg:hidden divide-y divide-navy-50">
-          {[...criticalStock.map(p => ({ type: 'stock', item: p })), ...criticalDebt.map(c => ({ type: 'debt', item: c }))].map((entry, i) => (
-            <div key={i} className="p-4">
-              <div className="flex items-start gap-3 mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${entry.type === 'stock' ? 'bg-red-50 text-red-500' : 'bg-orange-50 text-orange-500'}`}>
-                  {entry.type === 'stock' ? <AlertTriangle className="w-5 h-5" /> : <BadgeAlert className="w-5 h-5" />}
+        <div className="glass-card">
+           <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-8">Classement Opérateurs</h3>
+           <div className="space-y-4">
+              {leaderboardData.map((op, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-navy-50 rounded-2xl border border-navy-100/50 group hover:border-navy-brand transition-all cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-white border border-navy-100 flex items-center justify-center text-navy-brand font-black">
+                      {i + 1}
+                    </div>
+                    <div>
+                      <p className="text-xs font-black text-navy-950 uppercase">{op.name}</p>
+                      <p className="text-[8px] font-bold text-blue-gray uppercase">{op.count} Transactions</p>
+                    </div>
+                  </div>
+                  <p className="text-sm font-black text-navy-brand">{store.formatCurrency(op.revenue)}</p>
                 </div>
-                <div>
-                  <p className="font-black text-navy-brand uppercase tracking-tight text-sm">{entry.type === 'stock' ? entry.item.name : entry.item.client}</p>
-                  <p className="text-xs text-red-500 font-black uppercase">{entry.type === 'stock' ? 'Rupture Critique' : 'Dette Massive'}</p>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <div className="bg-red-50 rounded-xl p-2 text-center">
-                  <p className="text-xs md:text-sm text-red-400 uppercase font-black">Gravité</p>
-                  <p className="text-xs md:text-sm font-black text-red-600">{entry.type === 'stock' ? 'Immédiat' : 'Défaut Risque'}</p>
-                </div>
-                <div className="bg-navy-50 rounded-xl p-2 text-center">
-                  <p className="text-xs md:text-sm text-blue-gray uppercase font-black">Impact</p>
-                  <p className="text-xs font-black text-navy-900">{entry.type === 'stock' ? store.formatCurrency((parseFloat(entry.item.price) || 0) * 10) : `-${store.formatCurrency(entry.item.balance)}`}</p>
-                </div>
-              </div>
-              <button className={`w-full py-3 text-white text-xs md:text-sm font-black uppercase tracking-widest rounded-xl ${entry.type === 'stock' ? 'bg-navy-brand' : 'bg-red-600'}`}>
-                {entry.type === 'stock' ? 'Restocker' : 'Contacter Client'}
-              </button>
-            </div>
-          ))}
-          {criticalStock.length === 0 && criticalDebt.length === 0 && (
-            <div className="p-6 md:p-12 text-center text-blue-gray/30 font-black uppercase tracking-widest">Aucune Anomalie Critique</div>
-          )}
-        </div>
-
-        {/* ✅ DESKTOP: Full Table */}
-        <div className="hidden lg:block overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-navy-50/50 text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">
-                <th className="p-8">Type d'Anomalie</th>
-                <th className="p-8">Node / Entité</th>
-                <th className="p-8 text-center">Gravité</th>
-                <th className="p-8 text-right">Impact Financier</th>
-                <th className="p-8 text-center">Action Requise</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-navy-50">
-              {criticalStock.map((p, i) => (
-                <tr key={i} className="hover:bg-red-50 transition-colors">
-                  <td className="p-8 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center"><AlertTriangle className="w-5 h-5" /></div>
-                    <span className="text-xs font-black uppercase tracking-widest text-red-500">Rupture Critique</span>
-                  </td>
-                  <td className="p-8 font-black uppercase text-navy-brand">{p.name}</td>
-                  <td className="p-8 text-center text-xs md:text-sm font-black text-red-600 uppercase">Immédiat (0 Stock)</td>
-                  <td className="p-8 text-right font-black text-navy-900">{store.formatCurrency((parseFloat(p.price) || 0) * 10)}</td>
-                  <td className="p-8 text-center">
-                    <button className="px-6 py-3 bg-navy-brand text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg">Restocker</button>
-                  </td>
-                </tr>
               ))}
-              {criticalDebt.map((c, i) => (
-                <tr key={i} className="hover:bg-red-50 transition-colors">
-                  <td className="p-8 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-red-50 text-red-500 flex items-center justify-center"><BadgeAlert className="w-5 h-5" /></div>
-                    <span className="text-xs font-black uppercase tracking-widest text-red-600">Dette Massive</span>
-                  </td>
-                  <td className="p-8 font-black uppercase text-navy-brand">{c.client}</td>
-                  <td className="p-8 text-center text-xs md:text-sm font-black text-red-600 uppercase">Risque de Défaut</td>
-                  <td className="p-8 text-right font-black text-red-600">-{store.formatCurrency(c.balance)}</td>
-                  <td className="p-8 text-center">
-                    <button className="px-6 py-3 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-lg">Contacter Client</button>
-                  </td>
-                </tr>
-              ))}
-              {criticalStock.length === 0 && criticalDebt.length === 0 && (
-                <tr><td colSpan="5" className="p-6 md:p-20 text-center text-blue-gray/30 font-black uppercase tracking-[0.5em]">Aucune Anomalie Critique</td></tr>
-              )}
-            </tbody>
-          </table>
+           </div>
         </div>
       </div>
     </div>

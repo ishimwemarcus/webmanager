@@ -31,28 +31,28 @@ export default function TopBar({ onToggleSidebar }) {
   return (
     <header className="h-14 md:h-20 bg-gradient-to-r from-[#064E3B] to-[#0F172A] border-b border-white/10 flex items-center justify-between px-4 md:px-10 z-[100] no-print transition-all duration-500">
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-4 md:gap-6">
         <button
           onClick={onToggleSidebar}
-          className="p-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white lg:hidden transition-all border border-white/10"
+          className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white/10 hover:bg-white/20 text-white lg:hidden transition-all border border-white/10"
         >
-          <Menu className="w-6 h-6 outline-none" />
+          <Menu className="w-5 h-5 md:w-6 md:h-6 outline-none" />
         </button>
-        <div className="hidden sm:flex items-center gap-6">
+        <div className="flex items-center gap-4 md:gap-6">
           <div className="flex flex-col">
-            <div className="flex items-center gap-3">
-              <h2 className="text-sm md:text-lg font-black text-white uppercase tracking-tighter">
-                VUE <span className="text-[#F59E0B]">CONSOLE DE GESTION</span>
+            <div className="flex items-center gap-2 md:gap-3">
+              <h2 className="text-xs md:text-lg font-black text-white uppercase tracking-tighter">
+                VUE <span className="text-[#F59E0B] hidden xs:inline">CONSOLE DE GESTION</span><span className="text-[#F59E0B] xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">SYNCHRONISATION</span>
               </div>
             </div>
-            <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{today}</p>
+            <p className="text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{today}</p>
           </div>
 
-          <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
               <div className={`w-2 h-2 rounded-full animate-pulse ${store.getSystemStatus() === 'systemWarning' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-white">
                 {store.getSystemStatus() === 'systemWarning' ? 'Attention Requise' : 'Système Nominal'}

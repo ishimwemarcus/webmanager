@@ -14,7 +14,8 @@ import {
   CreditCard,
   Wallet,
   Calendar,
-  Search
+  Search,
+  ShoppingCart
 } from 'lucide-react';
 
 export default function ClientPortal() {
