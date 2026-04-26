@@ -39,18 +39,18 @@ export default function Sidebar({ className }) {
   ];
 
   return (
-    <aside className={`w-72 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
+    <aside className={`w-72 bg-[#BEF264] flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-black/5 ${className}`}>
       <div className="p-8">
         <div
           onClick={() => window.location.href = '/'}
           className="flex flex-col items-center text-center gap-4 group/logo cursor-pointer hover:opacity-90 transition-all active:scale-95"
         >
-          <div className="w-24 h-24 rounded-[2rem] bg-white/5 p-4 shadow-2xl border border-white/10 relative overflow-hidden group/logo-img flex items-center justify-center backdrop-blur-xl">
+          <div className="w-24 h-24 rounded-[2rem] bg-white p-4 shadow-2xl relative overflow-hidden group/logo-img flex items-center justify-center">
             <svg viewBox="0 0 100 100" className="w-14 h-14 group-hover:scale-110 transition-transform duration-700 animate-bounce-gentle">
               <defs>
                 <linearGradient id="sidebar-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#F59E0B' }} />
-                  <stop offset="100%" style={{ stopColor: '#D97706' }} />
+                  <stop offset="0%" style={{ stopColor: '#0F172A' }} />
+                  <stop offset="100%" style={{ stopColor: '#0369A1' }} />
                 </linearGradient>
               </defs>
               <path
@@ -64,16 +64,16 @@ export default function Sidebar({ className }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-[-0.05em] text-white uppercase leading-none">
+            <h1 className="text-3xl font-black tracking-[-0.05em] text-navy-950 uppercase leading-none">
               MARC
             </h1>
-            <div className="h-1.5 w-12 bg-[#F59E0B] mx-auto mt-3 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+            <div className="h-1.5 w-12 bg-navy-brand mx-auto mt-3 rounded-full"></div>
           </div>
         </div>
       </div>
 
       <div className="px-4 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">Management Sectors</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-navy-950/40 mb-6 ml-4 italic">Management Sectors</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -82,8 +82,8 @@ export default function Sidebar({ className }) {
               className={({ isActive }) => `
                 flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-500 group relative
                 ${isActive 
-                  ? 'bg-[#F59E0B] text-black shadow-[0_10px_20px_rgba(245,158,11,0.3)] translate-x-1' 
-                  : 'hover:bg-white/5 text-white/40 hover:text-white hover:translate-x-1'}
+                  ? 'bg-navy-950 text-white shadow-2xl translate-x-1' 
+                  : 'hover:bg-black/5 text-navy-950/60 hover:text-navy-950 hover:translate-x-1'}
                 active:scale-95
               `}
             >
@@ -98,7 +98,7 @@ export default function Sidebar({ className }) {
       <div className="p-4 mt-auto space-y-3">
         <div 
           onClick={() => store.setIsShiftEndModalOpen(true)}
-          className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs md:text-sm uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
+          className="flex items-center gap-3 px-6 py-4 bg-rose-50 border border-rose-100 rounded-2xl text-rose-600 font-black text-xs md:text-sm uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-100 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>{t('logout') || 'End Shift'}</span>
