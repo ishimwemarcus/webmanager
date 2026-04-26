@@ -12,7 +12,8 @@ import {
   AlertTriangle,
   Calculator,
   Cpu,
-  LogOut
+  LogOut,
+  Wallet
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
@@ -26,16 +27,15 @@ export default function Sidebar({ className }) {
   })();
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'Performance' },
-    { to: '/commander', icon: Cpu, label: 'Prendre Commande' },
-    { to: '/stock', icon: Package, label: 'Inventaire' },
-    { to: '/sales', icon: ShoppingCart, label: 'Transactions' },
-    { to: '/wait', icon: Clock, label: 'Crédits Clients' },
-    { to: '/reports', icon: BarChart2, label: 'Intelligence' },
-    { to: '/clients', icon: Users, label: 'Base Clients' },
-    { to: '/shifts', icon: Clock, label: 'Journal des Postes' },
-    { to: '/spoilage', icon: AlertTriangle, label: 'Pertes (Avaries)' },
-    { to: '/cloture', icon: Calculator, label: 'Clôture Caisse' }
+    { to: '/', icon: LayoutDashboard, label: 'PERFORMANCE' },
+    { to: '/commander', icon: Cpu, label: 'COMMANDER' },
+    { to: '/stock', icon: Package, label: 'INVENTORY' },
+    { to: '/sales', icon: ShoppingCart, label: 'TRANSACTIONS' },
+    { to: '/wait', icon: Clock, label: 'CREDITS' },
+    { to: '/reports', icon: BarChart2, label: 'REPORTS' },
+    { to: '/clients', icon: Users, label: 'CLIENTS VIP' },
+    { to: '/spoilage', icon: AlertTriangle, label: 'PERTES' },
+    { to: '/cloture', icon: Calculator, label: 'CAISSE' }
   ];
 
   return (
@@ -73,7 +73,7 @@ export default function Sidebar({ className }) {
       </div>
 
       <div className="px-4 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">Management Sectors</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">Management Sectors</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -88,7 +88,7 @@ export default function Sidebar({ className }) {
               `}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
+              <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
               <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
             </NavLink>
           ))}
@@ -96,12 +96,20 @@ export default function Sidebar({ className }) {
       </div>
 
       <div className="p-4 mt-auto space-y-3">
+        <NavLink 
+          to="/cloture"
+          className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 transition-all group"
+        >
+          <Calculator className="w-4 h-4" />
+          <span>CASHREGISTER</span>
+        </NavLink>
+
         <div 
           onClick={() => store.setIsShiftEndModalOpen(true)}
-          className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs md:text-sm uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
+          className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>{t('logout') || 'End Shift'}</span>
+          <span>LOGOUT</span>
         </div>
       </div>
     </aside>
