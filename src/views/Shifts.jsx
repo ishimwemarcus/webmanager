@@ -73,7 +73,7 @@ export default function Shifts() {
 
       <div className="grid grid-cols-1 gap-6">
         {filteredShifts.length > 0 ? filteredShifts.map((shift, i) => (
-          <div key={i} className="glass-card bg-white border border-navy-100 shadow-xl overflow-hidden group hover:border-navy-brand transition-all">
+          <div key={i} className="glass-card bg-white border border-navy-100 shadow-xl overflow-hidden group hover-elevate hover:border-navy-brand transition-all">
             <div className="p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 bg-navy-50 rounded-3xl flex flex-col items-center justify-center text-navy-brand border border-navy-100 group-hover:bg-navy-brand group-hover:text-white transition-all">
