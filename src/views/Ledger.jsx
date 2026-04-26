@@ -170,7 +170,7 @@ export default function Ledger() {
           >
             <ShieldCheck className="w-5 h-5" /> Réconciliation Globale
           </button>
-          <button onClick={() => setShowModal(true)} className="flex-1 md:flex-none bg-[#BEF264] text-black font-black px-8 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:bg-white transition-all uppercase tracking-widest text-xs">
+          <button onClick={() => setShowModal(true)} className="btn-premium !bg-gold !text-black">
             <Plus className="w-5 h-5" /> Entrée Manuelle
           </button>
         </div>
@@ -178,22 +178,22 @@ export default function Ledger() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 no-print">
-        <div className="glass-card p-6 rounded-[24px] border-l-4 border-red-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Débit (Dépenses)</p>
-          <p className="text-2xl font-black text-white">{store.formatCurrency(metrics.totalExpensed)}</p>
+        <div className="glass-card p-6 rounded-[24px] border-l-4 border-red-500 bg-white shadow-xl hover-elevate">
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2">Débit (Dépenses)</p>
+          <p className="text-2xl font-black text-navy-950">{store.formatCurrency(metrics.totalExpensed)}</p>
         </div>
-        <div className="glass-card p-6 rounded-[24px] border-l-4 border-green-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Crédit Stocké</p>
-          <p className="text-2xl font-black text-green-400">{store.formatCurrency(metrics.totalClientCredits)}</p>
+        <div className="glass-card p-6 rounded-[24px] border-l-4 border-green-400 bg-white shadow-xl hover-elevate">
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2">Crédit Stocké</p>
+          <p className="text-2xl font-black text-green-500">{store.formatCurrency(metrics.totalClientCredits)}</p>
         </div>
 
-        <div className="glass-card p-6 rounded-[24px] border-l-4 border-blue-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Créances Clients</p>
-          <p className="text-2xl font-black text-blue-400">{store.formatCurrency(metrics.totalOutstanding)}</p>
+        <div className="glass-card p-6 rounded-[24px] border-l-4 border-blue-400 bg-white shadow-xl hover-elevate">
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2">Créances Clients</p>
+          <p className="text-2xl font-black text-blue-500">{store.formatCurrency(metrics.totalOutstanding)}</p>
         </div>
-        <div className="glass-card p-6 rounded-[24px] border-l-4 border-purple-400 bg-white/5 backdrop-blur-xl">
-          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/50 mb-2">Pourboires</p>
-          <p className="text-2xl font-black text-purple-400">{store.formatCurrency(metrics.totalTips)}</p>
+        <div className="glass-card p-6 rounded-[24px] border-l-4 border-purple-400 bg-white shadow-xl hover-elevate">
+          <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2">Pourboires</p>
+          <p className="text-2xl font-black text-purple-500">{store.formatCurrency(metrics.totalTips)}</p>
         </div>
       </div>
 
@@ -223,7 +223,7 @@ export default function Ledger() {
         </div>
       </div>
 
-      <div className="glass-card rounded-[24px] overflow-hidden border border-white/10 shadow-2xl bg-white/5 backdrop-blur-2xl">
+      <div className="glass-card rounded-[24px] overflow-hidden border border-navy-100 shadow-2xl bg-white">
 
         {/* ✅ MOBILE: Card List */}
         <div className="block lg:hidden divide-y divide-navy-50">

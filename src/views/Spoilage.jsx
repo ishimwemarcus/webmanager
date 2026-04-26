@@ -99,13 +99,13 @@ export default function Spoilage() {
   };
 
   return (
-    <div className="max-w-full mx-auto min-h-[calc(100vh-6rem)] bg-[#064E3B] rounded-[24px] p-4 md:p-8 space-y-4 shadow-[0_40px_100px_rgba(0,0,0,0.4)] border border-white/5 fade-in-up">
+    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-50 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-[clamp(1.75rem,5vw,2.5rem)] font-black uppercase tracking-tighter text-white leading-none">{t('spoilage')}</h1>
-          <h2 className="text-sm font-bold text-[#F59E0B] tracking-[0.2em] uppercase mt-1">Audit des Pertes Critiques</h2>
+          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">{t('spoilage')}</h1>
+          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">Audit des Pertes Critiques</h2>
         </div>
-        <button onClick={() => handleOpenModal()} className="bg-[#BEF264] text-black font-black px-8 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:bg-white transition-all uppercase tracking-widest text-xs">
+        <button onClick={() => handleOpenModal()} className="btn-premium !bg-gold !text-black">
           <Plus className="w-5 h-5" /> Signaler une Perte
         </button>
       </div>
@@ -185,7 +185,7 @@ export default function Spoilage() {
 
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/40 backdrop-blur-md p-4">
-          <div className="glass-card max-w-lg w-full rounded-[40px] bg-white shadow-2xl border border-white/10 overflow-hidden relative scale-in">
+          <div className="glass-card max-w-lg w-full rounded-[40px] bg-white shadow-2xl border border-white/10 overflow-hidden relative scale-in hover-elevate">
             <div className="p-8 border-b border-navy-50 flex justify-between items-center">
               <h3 className="text-xl font-black uppercase tracking-tighter text-navy-brand">{editingLoss ? 'Modifier l\'Avarie' : 'Signaler une Avarie'}</h3>
               <button onClick={() => setShowModal(false)} className="p-2 hover:bg-navy-50 rounded-full transition-all text-blue-gray"><X className="w-5 h-5" /></button>
