@@ -165,22 +165,27 @@ export const StoreProvider = ({ children }) => {
     return report;
   };
 
-  const getClientWaitBalance = (clientName) => {
+  const getClientWaitBalance = (clientName, phone = 'none') => {
     if (!clientName) return 0;
     const searchName = clientName.trim().toLowerCase();
+    const searchPhone = (phone || 'none').trim();
+    
     return waitCredits
       .filter(w => (w.client || '').trim().toLowerCase() === searchName
+                && (w.phone || 'none').trim() === searchPhone
                 && (parseFloat(w.balance)||0) > 0)
       .reduce((s, w) => s + (parseFloat(w.balance)||0), 0);
   };
 
 
-  const getClientDebtBalance = (clientName) => {
+  const getClientDebtBalance = (clientName, phone = 'none') => {
     if (!clientName) return 0;
+    const searchName = clientName?.toLowerCase().trim();
+    const searchPhone = (phone || 'none').trim();
     
     // Calculate debt from unpaid sales
     const salesDebt = scopeFilter(sales)
-      .filter(s => s.client?.toLowerCase() === clientName?.toLowerCase())
+      .filter(s => s.client?.toLowerCase().trim() === searchName && (s.phone || 'none').trim() === searchPhone)
       .reduce((sum, s) => {
         const debt = Math.max(0, (parseFloat(s.amount) || 0) - (parseFloat(s.paid) || 0));
         return sum + debt;
@@ -188,7 +193,7 @@ export const StoreProvider = ({ children }) => {
 
     // Calculate debt from manual ledger receivables
     const ledgerDebt = scopeFilter(ledgerManual)
-      .filter(l => l.type === 'receivable' && l.client?.toLowerCase() === clientName?.toLowerCase())
+      .filter(l => l.type === 'receivable' && l.client?.toLowerCase().trim() === searchName && (l.phone || 'none').trim() === searchPhone)
       .reduce((sum, l) => {
         const debt = Math.max(0, (parseFloat(l.amount) || 0) - (parseFloat(l.paid) || 0));
         return sum + debt;
@@ -486,7 +491,9 @@ export const StoreProvider = ({ children }) => {
       ...saleRecord,
       client: clientName,
       record_type: 'sale',
-      date: saleRecord.date || new Date().toISOString()
+      date: saleRecord.date || new Date().toISOString(),
+      operator: currentOperator,
+      shiftId: shiftStart
     });
 
     // 2. Decrement stock quantity
@@ -500,12 +507,14 @@ export const StoreProvider = ({ children }) => {
 
     // 3. Handle Credit Deduction (Wait Credits)
     if (useCredit && searchName) {
-      const available = getClientWaitBalance(clientName);
+      const available = getClientWaitBalance(clientName, saleRecord.phone);
       let remainingToDeduct = Math.min(available, actualAmount);
       
       if (remainingToDeduct > 0) {
         const clientCredits = waitCredits
-          .filter(w => (w.client || '').trim().toLowerCase() === searchName && (parseFloat(w.balance) || 0) > 0)
+          .filter(w => (w.client || '').trim().toLowerCase() === searchName 
+                    && (w.phone || 'none').trim() === (saleRecord.phone || 'none').trim()
+                    && (parseFloat(w.balance) || 0) > 0)
           .sort((a,b) => new Date(a.date) - new Date(b.date));
 
         for (const wc of clientCredits) {
@@ -525,7 +534,9 @@ export const StoreProvider = ({ children }) => {
 
       // Find unpaid sales to clear
       const unpaidSales = sales
-        .filter(s => (s.client || '').trim().toLowerCase() === searchName && (parseFloat(s.amount) || 0) > (parseFloat(s.paid) || 0))
+        .filter(s => (s.client || '').trim().toLowerCase() === searchName 
+                  && (s.phone || 'none').trim() === (saleRecord.phone || 'none').trim()
+                  && (parseFloat(s.amount) || 0) > (parseFloat(s.paid) || 0))
         .sort((a,b) => new Date(a.date) - new Date(b.date));
       
       for (const s of unpaidSales) {
@@ -541,6 +552,7 @@ export const StoreProvider = ({ children }) => {
         addRecord({
           record_type: 'wait_credit',
           client: clientName,
+          phone: saleRecord.phone || 'none',
           amount: remainingProfit,
           balance: remainingProfit,
           status: 'active',

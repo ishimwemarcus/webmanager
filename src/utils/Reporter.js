@@ -20,12 +20,12 @@ export const generateDailySummary = (sales, expenses, ledger, losses = [], date 
   const whatsappText = `
 *DAILY REPORT - ${date}*
 --------------------------
-*Total Sales:* ${totalSales.toLocaleString()} €
-*Cash Collected:* ${cashCollected.toLocaleString()} €
-*Total Expenses:* ${totalExpenses.toLocaleString()} €
-*Total Losses (Waste):* ${totalLossValuation.toLocaleString()} €
+*Total Sales:* ${totalSales.toLocaleString()}
+*Cash Collected:* ${cashCollected.toLocaleString()}
+*Total Expenses:* ${totalExpenses.toLocaleString()}
+*Total Losses (Waste):* ${totalLossValuation.toLocaleString()}
 --------------------------
-*Net Profit (Adjusted):* ${netProfit.toLocaleString()} €
+*Net Profit (Adjusted):* ${netProfit.toLocaleString()}
 *Performance:* ${performance}
   `.trim();
 
@@ -61,20 +61,20 @@ _Date: ${date}_
 --------------------------
 *📦 INVENTORY*
 - Reserve: ${totalInStock} units
-- Valuation: ${totalAssetValue.toLocaleString()} €
+- Valuation: ${totalAssetValue.toLocaleString()}
 
 *💰 TRANSACTIONS*
-- Gross Revenue: ${totalSales.toLocaleString()} €
-- Cash Liquid: ${cashCollected.toLocaleString()} €
+- Gross Revenue: ${totalSales.toLocaleString()}
+- Cash Liquid: ${cashCollected.toLocaleString()}
 
 *📉 LOSSES (PERTES)*
-- Cumulative Waste: ${totalLossValue.toLocaleString()} €
+- Cumulative Waste: ${totalLossValue.toLocaleString()}
 
 *⏳ CREDITS (WAIT)*
-- Outstanding: ${totalWaitBalance.toLocaleString()} €
+- Outstanding: ${totalWaitBalance.toLocaleString()}
 
 *📜 LEDGER*
-- Indexed Volume: ${ledgerTotal.toLocaleString()} €
+- Indexed Volume: ${ledgerTotal.toLocaleString()}
 --------------------------
 _Status: Full Business Intelligence Active_
   `.trim();

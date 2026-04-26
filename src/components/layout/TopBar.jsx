@@ -41,11 +41,15 @@ export default function TopBar({ onToggleSidebar }) {
         <div className="hidden sm:flex items-center gap-6">
           <div className="flex flex-col">
             <div className="flex items-center gap-3">
-              <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tighter">
-                {t('dashboard').split(' ')[0]} <span className="font-black text-[#F59E0B]">{t('commandInterface')}</span>
+              <h2 className="text-sm md:text-lg font-black text-white uppercase tracking-tighter">
+                VUE <span className="text-[#F59E0B]">CONSOLE DE GESTION</span>
               </h2>
+              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">SYNCHRONISATION</span>
+              </div>
             </div>
-            <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-1 italic">{today}</p>
+            <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{today}</p>
           </div>
 
           <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">

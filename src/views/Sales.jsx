@@ -51,8 +51,8 @@ export default function Sales() {
   const products = store.getProducts();
   const sales = store.getSales();
   const waitCredits = store.getWaitCredits ? store.getWaitCredits() : [];
-  const availableCredit = store.getClientWaitBalance && newSale.client ? store.getClientWaitBalance(newSale.client) : 0;
-  const clientDebt = store.getClientDebtBalance && newSale.client ? store.getClientDebtBalance(newSale.client) : 0;
+  const availableCredit = store.getClientWaitBalance && newSale.client ? store.getClientWaitBalance(newSale.client, newSale.phone) : 0;
+  const clientDebt = store.getClientDebtBalance && newSale.client ? store.getClientDebtBalance(newSale.client, newSale.phone) : 0;
 
   const filteredSales = useMemo(() => {
     const now = new Date();
