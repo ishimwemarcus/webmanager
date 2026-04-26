@@ -155,7 +155,11 @@ export const StoreProvider = ({ children }) => {
   const getLosses = () => [...losses].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getReconciliations = () => [...reconciliations].sort((a,b) => new Date(b.date) - new Date(a.date));
   const getShifts = () => [...shifts].sort((a,b) => new Date(b.end) - new Date(a.end));
-  const getShiftTransactions = (shiftId) => sales.filter(s => s.shiftId === shiftId);
+  const getShiftTransactions = (shiftId) => ({
+    sales: sales.filter(s => s.shiftId === shiftId),
+    expenses: ledgerManual.filter(l => l.shiftId === shiftId && l.type === 'expense'),
+    losses: losses.filter(l => l.shiftId === shiftId)
+  });
   // Get total wait credit for a specific client name
   const getReportArchive = () => [...reportArchive].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
@@ -235,12 +239,14 @@ export const StoreProvider = ({ children }) => {
   const addRecord = (record) => {
     record.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     // Tag with current user so data stays isolated per operator
-    if (record.record_type !== 'user') {
+    if (record.record_type !== 'user' && record.record_type !== 'shift') {
       const cu = getCurrentUser();
-      record.createdBy = currentOperator || cu?.username || 'Unknown';
-      record.operator = currentOperator || 'Unknown';
-      record.timestamp = new Date().toISOString(); // Precision Time Stamping
-      record.shiftId = shiftStart || record.timestamp; // Link to specific shift
+      const op = currentOperator || cu?.username || 'Admin';
+      record.operator = op;
+      record.createdBy = op;
+      record.timestamp = new Date().toISOString(); 
+      record.shiftId = shiftStart || record.timestamp; 
+      record.currency = currency; // Lock currency at time of record
     }
     // Sanitize numeric fields
     if (record.amount !== undefined) record.amount = parseFloat(record.amount) || 0;

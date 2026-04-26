@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Package,
   ShoppingCart,
+  BookOpen,
   ChevronRight,
   Clock,
   BarChart2,
@@ -20,16 +21,21 @@ export default function Sidebar({ className }) {
   const { t } = useLanguage();
   const store = useStore();
 
+  const currentUser = (() => {
+    try { return JSON.parse(localStorage.getItem('biztrack_user')); } catch { return null; }
+  })();
+
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'PERFORMANCE' },
     { to: '/commander', icon: Cpu, label: 'PRENDRE COMMANDE' },
-    { to: '/shifts', icon: Clock, label: 'JOURNAL DES POSTES' },
     { to: '/stock', icon: Package, label: 'INVENTAIRE' },
     { to: '/sales', icon: ShoppingCart, label: 'TRANSACTIONS' },
     { to: '/wait', icon: Clock, label: 'CRÉDITS CLIENTS' },
+    { to: '/reports', icon: BarChart2, label: 'INTELLIGENCE' },
     { to: '/clients', icon: Users, label: 'BASE CLIENTS' },
+    { to: '/shifts', icon: Clock, label: 'JOURNAL DES POSTES' },
     { to: '/spoilage', icon: AlertTriangle, label: 'PERTES (AVARIES)' },
-    { to: '/reports', icon: BarChart2, label: 'INTELLIGENCE' }
+    { to: '/cloture', icon: Calculator, label: 'CLÔTURE CAISSE' }
   ];
 
   return (
@@ -92,23 +98,19 @@ export default function Sidebar({ className }) {
       <div className="p-4 mt-auto space-y-3">
         <NavLink 
           to="/cloture"
-          className="flex items-center justify-center gap-3 px-4 py-4 bg-navy-900 border border-white/10 rounded-2xl text-white font-black text-[10px] uppercase tracking-[0.2em] shadow-xl hover:bg-navy-brand transition-all group"
+          className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 transition-all group"
         >
-          <Calculator className="w-4 h-4 text-[#F59E0B] group-hover:rotate-12 transition-transform" />
-          CASHREGISTER
+          <Calculator className="w-4 h-4" />
+          <span>CASHREGISTER</span>
         </NavLink>
-        
-        <button 
-          onClick={() => {
-            store.setCurrentOperator('');
-            localStorage.removeItem('biztrack_operator');
-            window.location.reload();
-          }}
-          className="w-full flex items-center justify-center gap-3 px-4 py-4 bg-white/5 border border-white/5 rounded-2xl text-white/40 font-black text-[10px] uppercase tracking-[0.2em] hover:bg-rose-500/10 hover:text-rose-500 transition-all group"
+
+        <div 
+          onClick={() => store.setIsShiftEndModalOpen(true)}
+          className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          LOGOUT
-        </button>
+          <span>LOGOUT</span>
+        </div>
       </div>
     </aside>
   );

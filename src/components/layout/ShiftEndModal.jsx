@@ -8,13 +8,19 @@ export default function ShiftEndModal({ isOpen, onClose }) {
   const { t } = useLanguage();
   const [endTime, setEndTime] = useState(new Date().toISOString().slice(0, 16)); // YYYY-MM-DDTHH:mm
 
-  const shiftSales = useMemo(() => {
+  const shiftData = useMemo(() => {
     return store.getShiftTransactions(store.shiftStart);
-  }, [store.shiftStart, store.getSales()]);
+  }, [store.shiftStart, store.getSales(), store.getLedgerManual()]);
 
   const revenue = useMemo(() => {
-    return shiftSales.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
-  }, [shiftSales]);
+    return (shiftData.sales || []).reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
+  }, [shiftData.sales]);
+
+  const expenseTotal = useMemo(() => {
+    return (shiftData.expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+  }, [shiftData.expenses]);
+
+  const netCash = revenue - expenseTotal;
 
   if (!isOpen) return null;
 
@@ -27,8 +33,11 @@ export default function ShiftEndModal({ isOpen, onClose }) {
       start: store.shiftStart,
       end: finalEnd,
       revenue: revenue,
-      transactions: shiftSales.length,
-      sales: shiftSales // Archiving the exact transaction list aside
+      expenses: expenseTotal,
+      net: netCash,
+      transactions: shiftData.sales.length,
+      sales: shiftData.sales,
+      expenseList: shiftData.expenses
     });
 
     store.setShiftStart('');
@@ -82,7 +91,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                 <p className="text-xs font-black uppercase tracking-widest text-navy-brand italic">Strictement à vous</p>
              </div>
              <div className="divide-y divide-navy-50 border border-navy-50 rounded-[32px] overflow-hidden bg-white shadow-sm">
-                {shiftSales.map((s, i) => (
+                {shiftData.sales.map((s, i) => (
                   <div key={i} className="p-5 flex items-center justify-between hover:bg-navy-50/50 transition-colors">
                      <div className="flex items-center gap-4">
                         <div className="w-10 h-10 bg-navy-50 rounded-xl flex items-center justify-center text-navy-950 font-black text-xs">
@@ -96,7 +105,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                      <p className="font-black text-navy-brand">{store.formatCurrency(s.amount)}</p>
                   </div>
                 ))}
-                {shiftSales.length === 0 && (
+                {shiftData.sales.length === 0 && (
                   <div className="p-10 text-center text-blue-gray text-xs font-black uppercase tracking-widest opacity-40 italic">
                     Aucune transaction effectuée durant ce poste.
                   </div>
@@ -107,14 +116,14 @@ export default function ShiftEndModal({ isOpen, onClose }) {
 
         <div className="p-10 bg-navy-50/50 border-t border-navy-50 flex flex-col md:flex-row items-center justify-between gap-6">
            <div className="text-center md:text-left">
-              <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1">Recette du Poste</p>
-              <p className="text-3xl font-black text-navy-brand">{store.formatCurrency(revenue)}</p>
+              <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Net à Remettre</p>
+              <p className="text-3xl font-black text-navy-950">{store.formatCurrency(netCash)}</p>
            </div>
            <button 
              onClick={handleConfirm}
-             className="w-full md:w-auto px-12 py-5 bg-navy-brand text-white font-black rounded-3xl shadow-2xl hover:bg-navy-900 transition-all uppercase tracking-widest text-sm flex items-center justify-center gap-3"
+             className="btn-premium !bg-navy-950"
            >
-             Confirmer & Quitter le Poste <CheckCircle2 className="w-5 h-5" />
+             Confirmer & Fermer le Poste <CheckCircle2 className="w-5 h-5" />
            </button>
         </div>
       </div>

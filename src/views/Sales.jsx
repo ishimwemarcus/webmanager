@@ -593,7 +593,7 @@ export default function Sales() {
               <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray">Suivi Client (QR Link)</p>
               <div className="w-40 h-40 bg-white p-3 rounded-2xl mx-auto shadow-md">
                 <img 
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${encodeURIComponent(lastSaleRecord?.phone || 'none')}`)}`}
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`${window.location.origin}${window.location.pathname}#/portal/${encodeURIComponent(lastSaleRecord?.client)}/${encodeURIComponent(lastSaleRecord?.phone || 'none')}`)}`}
                   alt="Client Portal"
                   className="w-full h-full object-contain"
                 />
