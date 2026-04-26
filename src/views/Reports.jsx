@@ -78,43 +78,114 @@ export default function Reports() {
 
     const docDefinition = {
       content: [
-        { text: 'MARC INTELLIGENCE - RAPPORT D\'ACTIVITÉ', style: 'header' },
-        { text: `Date du Rapport: ${reportDate}`, style: 'subheader' },
+        { text: 'ACCOUNTING & OPERATIONS REPORT', style: 'mainHeader' },
+        { text: `Operating Date: ${reportDate}`, style: 'mainSubheader' },
+        { canvas: [{ type: 'line', x1: 0, y1: 5, x2: 515, y2: 5, lineWidth: 1 }] },
         { text: '\n' },
+
+        { text: 'FINANCIAL PERFORMANCE SUMMARY', style: 'sectionHeader' },
         {
+          layout: 'noBorders',
           table: {
-            widths: ['*', '*'],
+            widths: ['*', 'auto'],
             body: [
-              [{ text: 'Indicateur', style: 'tableHeader' }, { text: 'Valeur', style: 'tableHeader' }],
-              ['Revenus Bruts', store.formatCurrency(totalSalesRev)],
-              ['Cash Encaissé', store.formatCurrency(totalSalesCash)],
-              ['Dépenses', store.formatCurrency(totalExpense)],
-              ['Pertes', store.formatCurrency(totalLossValuation)],
-              ['Profit Net', store.formatCurrency(netCashCollected)]
+              ['Gross Sales Revenue', { text: store.formatCurrency(totalSalesRev), alignment: 'right' }],
+              ['Cash Liquid Collected', { text: store.formatCurrency(totalSalesCash), alignment: 'right' }],
+              [{ text: 'Operating Expenses', color: 'red' }, { text: store.formatCurrency(totalExpense), alignment: 'right', color: 'red' }],
+              [{ text: 'Losses (Spoilage)', color: 'red' }, { text: store.formatCurrency(totalLossValuation), alignment: 'right', color: 'red' }],
+              [{ text: 'ADJUSTED NET PROFIT', style: 'netProfitLabel' }, { text: store.formatCurrency(netCashCollected), style: 'netProfitValue' }]
             ]
           }
         },
-        { text: '\n\nJournal des Ventes détaillée:', style: 'sectionHeader' },
+        { text: '\n' },
+
+        { text: 'SALES TRANSACTIONS', style: 'sectionHeader' },
         {
           table: {
-            widths: ['auto', '*', 'auto', 'auto'],
+            headerRows: 1,
+            widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto'],
             body: [
-              ['Heure', 'Client', 'Article', 'Total'],
+              [
+                { text: 'Time', style: 'tableHeader' },
+                { text: 'Operator', style: 'tableHeader' },
+                { text: 'Client', style: 'tableHeader' },
+                { text: 'Product', style: 'tableHeader' },
+                { text: 'Qty', style: 'tableHeader', alignment: 'right' },
+                { text: 'Total', style: 'tableHeader', alignment: 'right' },
+                { text: 'Paid', style: 'tableHeader', alignment: 'right' }
+              ],
               ...dailySales.map(s => [
                 new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                s.client || 'STANDARD',
+                (s.operator || 'ADMIN').toUpperCase(),
+                (s.client || 'STANDARD').toUpperCase(),
                 s.name,
-                store.formatCurrency(s.amount)
+                { text: s.quantity, alignment: 'right' },
+                { text: store.formatCurrency(s.amount), alignment: 'right' },
+                { text: store.formatCurrency(s.paid), alignment: 'right', color: '#10B981', bold: true }
               ])
             ]
-          }
-        }
+          },
+          layout: 'lightHorizontalLines'
+        },
+        { text: '\n' },
+
+        { text: 'LEDGER & LOSS LOG', style: 'sectionHeader' },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['auto', 'auto', 'auto', '*', 'auto'],
+            body: [
+              [
+                { text: 'Type', style: 'tableHeader' },
+                { text: 'Time', style: 'tableHeader' },
+                { text: 'Entity', style: 'tableHeader' },
+                { text: 'Description', style: 'tableHeader' },
+                { text: 'Amount', style: 'tableHeader', alignment: 'right' }
+              ],
+              ...dailyLedger.map(l => [
+                { text: l.type.toUpperCase(), color: l.type === 'expense' ? 'red' : '#10B981', bold: true },
+                new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                (l.client || 'SYSTEM').toUpperCase(),
+                l.name,
+                { text: store.formatCurrency(l.amount), alignment: 'right' }
+              ])
+            ]
+          },
+          layout: 'lightHorizontalLines'
+        },
+        { text: '\n' },
+
+        { text: 'INVENTORY / ASSET VALUATION', style: 'sectionHeader' },
+        {
+          table: {
+            headerRows: 1,
+            widths: ['*', 'auto', 'auto', 'auto'],
+            body: [
+              [
+                { text: 'Product', style: 'tableHeader' },
+                { text: 'Qty', style: 'tableHeader', alignment: 'right' },
+                { text: 'Unit Cost', style: 'tableHeader', alignment: 'right' },
+                { text: 'Asset Value', style: 'tableHeader', alignment: 'right' }
+              ],
+              ...allProducts.map(p => [
+                p.name,
+                { text: p.quantity, alignment: 'right' },
+                { text: store.formatCurrency(p.cost), alignment: 'right' },
+                { text: store.formatCurrency(p.quantity * p.cost), alignment: 'right', bold: true }
+              ])
+            ]
+          },
+          layout: 'lightHorizontalLines'
+        },
+        { text: `Total Inventory Asset Valuation: ${store.formatCurrency(allProducts.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}`, alignment: 'right', bold: true, margin: [0, 10, 0, 0] }
       ],
       styles: {
-        header: { fontSize: 22, bold: true, color: '#082F49', alignment: 'center' },
-        subheader: { fontSize: 12, alignment: 'center', color: '#64748B' },
-        sectionHeader: { fontSize: 14, bold: true, margin: [0, 15, 0, 5] },
-        tableHeader: { bold: true, fontSize: 13, color: 'black' }
+        mainHeader: { fontSize: 24, bold: true, alignment: 'center', margin: [0, 0, 0, 5] },
+        mainSubheader: { fontSize: 10, alignment: 'center', color: '#64748B', margin: [0, 0, 0, 20] },
+        sectionHeader: { fontSize: 12, bold: true, margin: [0, 20, 0, 10], underline: true },
+        tableHeader: { fontSize: 9, bold: true, color: '#64748B' },
+        netProfitLabel: { fontSize: 16, bold: true, margin: [0, 10, 0, 0] },
+        netProfitValue: { fontSize: 16, bold: true, alignment: 'right', margin: [0, 10, 0, 0] }
       }
     };
 

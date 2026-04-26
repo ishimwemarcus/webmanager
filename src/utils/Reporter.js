@@ -172,7 +172,7 @@ export const printThermalReport = (reportData, formatCurrency) => {
   const content = `
     <html>
       <head>
-        <title>Rapport Journalier</title>
+        <title>Accounting Report</title>
         <style>
           body { font-family: 'Courier New', Courier, monospace; width: 80mm; margin: 0 auto; padding: 10px; font-size: 13px; color: #000; }
           .center { text-align: center; }
@@ -180,44 +180,43 @@ export const printThermalReport = (reportData, formatCurrency) => {
           .large { font-size: 16px; }
           .divider { border-top: 1px dashed #000; margin: 10px 0; border-bottom: none; }
           .flex { display: flex; justify-content: space-between; margin-bottom: 6px; }
+          .header { font-size: 14px; font-weight: 900; margin-bottom: 5px; text-transform: uppercase; }
         </style>
       </head>
       <body>
-        <div class="center bold large">MARC Intelligence</div>
-        <div class="center">RAPPORT DE FIN DE JOURNÉE</div>
+        <div class="center header">ACCOUNTING & OPERATIONS</div>
+        <div class="center bold">MARC MANAGEMENT PLATFORM</div>
         <div class="divider"></div>
-        <div><span class="bold">Date:</span> ${new Date().toLocaleDateString('fr-FR')}</div>
+        <div><span class="bold">OPERATING DATE:</span> ${new Date().toLocaleDateString('fr-FR')}</div>
         <div class="divider"></div>
         
         <div class="flex">
-          <span class="bold">VENTES TOTALES:</span>
+          <span>Gross Revenue:</span>
           <span>${formatCurrency(reportData.totalSales)}</span>
         </div>
         <div class="flex">
-          <span class="bold">CASH RÉCOLTÉ:</span>
+          <span>Cash Collected:</span>
           <span>${formatCurrency(reportData.cashCollected)}</span>
         </div>
-        <div class="divider"></div>
-        
         <div class="flex">
-          <span>DÉPENSES:</span>
+          <span>Expenses:</span>
           <span>${formatCurrency(reportData.totalExpenses)}</span>
         </div>
         <div class="flex">
-          <span>PERTES (SPOIL):</span>
+          <span>Losses (Spoilage):</span>
           <span>${formatCurrency(reportData.totalLossValuation)}</span>
         </div>
         <div class="divider"></div>
         
         <div class="flex bold large">
-          <span>PROFIT NET:</span>
+          <span>NET PROFIT:</span>
           <span>${formatCurrency(reportData.netProfit)}</span>
         </div>
         <div class="divider"></div>
         
-        <div class="center bold italic">${reportData.performance}</div>
+        <div class="center bold italic" style="text-transform: uppercase;">STATUS: ${reportData.performance}</div>
         <div class="divider"></div>
-        <div class="center" style="font-size: 10px;">GÉNÉRÉ PAR MARC v4.0</div>
+        <div class="center" style="font-size: 9px; opacity: 0.7;">HIGH-FIDELITY AUDIT LOG v4.0</div>
         
         <script>
           window.onload = () => {
@@ -401,19 +400,18 @@ export const printFullMasterReport = (data, formatCurrency) => {
 
 export const shareDailyReport = (reportData, formatCurrency) => {
   const text = `
-📊 *RAPPORT JOURNALIER - MARC*
-📅 *Date:* ${new Date().toLocaleDateString('fr-FR')}
+📜 *ACCOUNTING & OPERATIONS REPORT*
+📅 *Operating Date:* ${new Date().toLocaleDateString('fr-FR')}
 ---------------------------------------
-💰 *Total Revenu:* ${formatCurrency(reportData.totalSales)}
-💵 *Cash Encaissé:* ${formatCurrency(reportData.cashCollected)}
-🧾 *Créances Client:* ${formatCurrency(reportData.unpaidLedger)}
-🛑 *Total Dépenses:* ${formatCurrency(reportData.totalExpenses)}
-📉 *Total Pertes:* ${formatCurrency(reportData.totalLossValuation)}
+💰 *Gross Sales Revenue:* ${formatCurrency(reportData.totalSales)}
+💵 *Cash Liquid Collected:* ${formatCurrency(reportData.cashCollected)}
+🛑 *Operating Expenses:* ${formatCurrency(reportData.totalExpenses)}
+📉 *Losses (Spoilage):* ${formatCurrency(reportData.totalLossValuation)}
 ---------------------------------------
-✨ *PROFIT NET (CASH):* ${formatCurrency(reportData.netProfit)}
-🏢 *Performance:* ${reportData.performance}
+✨ *ADJUSTED NET PROFIT:* ${formatCurrency(reportData.netProfit)}
+🏢 *Status:* ${reportData.performance.toUpperCase()}
 ---------------------------------------
-_Généré par le système d'intelligence MARC_
+_Sent from MARC Management Platform_
   `.trim();
   
   const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
