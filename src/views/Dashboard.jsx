@@ -28,11 +28,17 @@ export default function Dashboard() {
   const waitCredits = store.getWaitCredits ? store.getWaitCredits() : [];
 
   // Metrics Calculations
-  const totalStockValue = products.reduce((s, p) => s + ((p.quantity || 0) * (parseFloat(p.cost) || 0)), 0);
+  const totalStockValue = products.reduce((s, p) => s + ((parseFloat(p.quantity) || 0) * (parseFloat(p.cost) || 0)), 0);
   const totalSales = sales.reduce((s, r) => s + (parseFloat(r.amount) || 0), 0);
   const totalPaid = sales.reduce((s, r) => s + (parseFloat(r.paid) || 0), 0);
-  const totalDebt = Math.max(0, totalSales - totalPaid);
-  const totalLoss = losses.reduce((s, l) => s + (parseFloat(l.amount) || 0), 0);
+  
+  // Decoupled Debt/Credit Logic: Avoid global cancellation
+  const totalDebt = sales.reduce((s, r) => {
+    const debt = Math.max(0, (parseFloat(r.amount) || 0) - (parseFloat(r.paid) || 0));
+    return s + debt;
+  }, 0);
+  
+  const totalLoss = losses.reduce((s, l) => s + (parseFloat(l.amount || l.valuation) || 0), 0);
   const totalCredit = waitCredits.reduce((s, w) => s + (parseFloat(w.balance) || 0), 0);
   
   const chartData = useMemo(() => {
@@ -250,6 +256,55 @@ export default function Dashboard() {
 
         </div>
 
+      </div>
+
+      {/* Actionable Ledger Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
+         <div className="glass-card bg-white p-8 rounded-[48px] border-rose-50 shadow-sm group hover:border-rose-200 transition-all">
+            <div className="flex items-center gap-3 mb-6">
+               <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                  <TrendingDown className="w-5 h-5" />
+               </div>
+               <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Top Débiteurs (Impayés)</p>
+            </div>
+            <div className="space-y-3">
+               {sales.filter(s => (parseFloat(s.amount)||0) > (parseFloat(s.paid)||0)).slice(0, 3).map((s, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-navy-50/50 rounded-2xl border border-navy-50 group-hover:bg-rose-50/10 transition-colors">
+                     <div>
+                        <p className="text-xs font-black text-navy-950 uppercase">{s.client || 'Client Standard'}</p>
+                        <p className="text-[9px] font-black text-blue-gray uppercase opacity-60">{s.name}</p>
+                     </div>
+                     <p className="text-sm font-black text-rose-600">-{store.formatCurrency((parseFloat(s.amount)||0) - (parseFloat(s.paid)||0))}</p>
+                  </div>
+               ))}
+               {sales.filter(s => (parseFloat(s.amount)||0) > (parseFloat(s.paid)||0)).length === 0 && (
+                  <p className="text-[10px] text-center py-6 text-blue-gray uppercase font-black opacity-20 italic">Aucune dette active</p>
+               )}
+            </div>
+         </div>
+
+         <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-50 shadow-sm group hover:border-emerald-200 transition-all">
+            <div className="flex items-center gap-3 mb-6">
+               <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5" />
+               </div>
+               <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Top Crédits (Reliquats)</p>
+            </div>
+            <div className="space-y-3">
+               {waitCredits.filter(w => (parseFloat(w.balance)||0) > 0).slice(0, 3).map((w, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-emerald-50/20 rounded-2xl border border-emerald-50 group-hover:bg-emerald-50/30 transition-colors">
+                     <div>
+                        <p className="text-xs font-black text-navy-950 uppercase">{w.client || 'Client Standard'}</p>
+                        <p className="text-[9px] font-black text-blue-gray uppercase opacity-60">{new Date(w.date).toLocaleDateString()}</p>
+                     </div>
+                     <p className="text-sm font-black text-emerald-600">+{store.formatCurrency(w.balance)}</p>
+                  </div>
+               ))}
+               {waitCredits.filter(w => (parseFloat(w.balance)||0) > 0).length === 0 && (
+                  <p className="text-[10px] text-center py-6 text-blue-gray uppercase font-black opacity-20 italic">Aucun crédit actif</p>
+               )}
+            </div>
+         </div>
       </div>
 
     </div>
