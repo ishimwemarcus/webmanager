@@ -1,184 +1,345 @@
-import React, { useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
-  ShieldAlert,
-  TrendingUp,
-  UserPlus,
-  Cpu,
-  AlertTriangle,
-  BarChart3,
-  BadgeAlert,
-  Zap
+  ShoppingCart, Plus, Minus, Trash2, Search, Check,
+  User, ChevronRight, X, Zap, Package, AlertTriangle,
+  CreditCard, Wallet, Clock
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from 'recharts';
 
 export default function Commander() {
   const store = useStore();
   const { t } = useLanguage();
 
-  const sales = store.getSales();
-  const products = store.getProducts();
-  const clients = store.getWaitCredits ? store.getWaitCredits() : [];
+  const products = store.getProducts().filter(p => p.quantity > 0);
+  const allClients = store.getWaitCredits ? store.getWaitCredits() : [];
 
-  // 1. Operator Leaderboard Logic
-  const leaderboardData = useMemo(() => {
-    const table = {};
-    sales.forEach(s => {
-      const op = s.operator || 'Admin';
-      if (!table[op]) table[op] = { name: op, revenue: 0, count: 0 };
-      table[op].revenue += (parseFloat(s.amount) || 0);
-      table[op].count += 1;
+  // State
+  const [cart, setCart] = useState([]); // [{product, qty, unitPrice}]
+  const [clientName, setClientName] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [amountPaid, setAmountPaid] = useState('');
+  const [search, setSearch] = useState('');
+  const [activeCategory, setActiveCategory] = useState('ALL');
+  const [success, setSuccess] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Categories
+  const categories = useMemo(() => {
+    const cats = ['ALL', ...new Set(products.map(p => p.category).filter(Boolean))];
+    return cats;
+  }, [products]);
+
+  // Filtered products
+  const filteredProducts = useMemo(() => {
+    return products.filter(p => {
+      const matchCat = activeCategory === 'ALL' || p.category === activeCategory;
+      const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase());
+      return matchCat && matchSearch;
     });
-    return Object.values(table).sort((a, b) => b.revenue - a.revenue);
-  }, [sales]);
+  }, [products, search, activeCategory]);
 
-  // 2. Forecasting Logic (Candlestick Simulation)
-  const forecastData = useMemo(() => {
-    const dailyRev = {};
-    sales.forEach(s => {
-      const ds = s.date?.split('T')[0];
-      if (ds) dailyRev[ds] = (dailyRev[ds] || 0) + (parseFloat(s.amount) || 0);
+  // Cart calculations
+  const cartTotal = cart.reduce((sum, item) => sum + (item.qty * item.unitPrice), 0);
+  const paid = parseFloat(amountPaid) || 0;
+  const change = paid - cartTotal;
+  const clientDebt = clientName ? store.getClientDebtBalance(clientName, clientPhone || 'none') : 0;
+  const clientCredit = clientName ? store.getClientWaitBalance(clientName, clientPhone || 'none') : 0;
+
+  // Cart actions
+  const addToCart = (product) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.product.id === product.id);
+      if (existing) {
+        if (existing.qty >= product.quantity) return prev; // Stock limit
+        return prev.map(i => i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+      }
+      return [...prev, { product, qty: 1, unitPrice: parseFloat(product.price) || 0 }];
     });
-    const values = Object.values(dailyRev);
-    const avg = values.length > 0 ? values.reduce((m, v) => m + v, 0) / values.length : 1000;
-
-    return Array.from({ length: 7 }).map((_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() + i);
-      const base = avg * (1 + (Math.random() * 0.1 - 0.05));
-      const open = base * (1 + (Math.random() * 0.05 - 0.025));
-      const close = base * (1 + (Math.random() * 0.05 - 0.025));
-      return {
-        name: d.toLocaleDateString(undefined, { weekday: 'short' }),
-        open: open,
-        close: close,
-        high: Math.max(open, close) * (1 + Math.random() * 0.02),
-        low: Math.min(open, close) * (1 - Math.random() * 0.02),
-        isUp: close >= open
-      };
-    });
-  }, [sales]);
-
-  // Custom Candle Component
-  const Candle = (props) => {
-    const { x, y, width, open, close, high, low, isUp } = props;
-    const fill = isUp ? '#22c55e' : '#ef4444';
-    const wickX = x + width / 2;
-    
-    // Scale wicks/body
-    const chartHeight = 256; 
-    const maxVal = Math.max(...forecastData.map(d => d.high)) * 1.1;
-    const minVal = Math.min(...forecastData.map(d => d.low)) * 0.9;
-    const scale = (val) => chartHeight - ((val - minVal) / (maxVal - minVal) * chartHeight);
-
-    return (
-      <g>
-        <line x1={wickX} y1={scale(high)} x2={wickX} y2={scale(low)} stroke={fill} strokeWidth={2} />
-        <rect 
-          x={x + width * 0.15} y={scale(Math.max(open, close))} width={width * 0.7} 
-          height={Math.max(Math.abs(scale(open) - scale(close)), 2)} fill={fill} rx={4}
-          className="transition-all hover:fill-[#0F172A]/60 cursor-pointer"
-        />
-      </g>
-    );
   };
 
-  const criticalStock = products.filter(p => p.quantity <= 2);
-  const criticalDebt = clients.filter(c => (parseFloat(c.balance) || 0) > 500);
+  const removeFromCart = (productId) => {
+    setCart(prev => prev.filter(i => i.product.id !== productId));
+  };
+
+  const updateQty = (productId, delta) => {
+    setCart(prev => prev.map(i => {
+      if (i.product.id !== productId) return i;
+      const newQty = i.qty + delta;
+      if (newQty <= 0) return null;
+      if (newQty > i.product.quantity) return i;
+      return { ...i, qty: newQty };
+    }).filter(Boolean));
+  };
+
+  // Process sale
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    setIsProcessing(true);
+
+    // Save one sale record per cart item
+    cart.forEach(item => {
+      const saleRecord = {
+        record_type: 'sale',
+        name: item.product.name,
+        amount: item.qty * item.unitPrice,
+        paid: Math.min(paid > 0 ? (paid / cartTotal) * (item.qty * item.unitPrice) : 0, item.qty * item.unitPrice),
+        quantity: item.qty,
+        client: clientName || 'Comptoir',
+        phone: clientPhone || 'none',
+        date: new Date().toISOString(),
+      };
+      store.addRecord(saleRecord);
+
+      // Decrement stock
+      const updatedProduct = { ...item.product, quantity: item.product.quantity - item.qty };
+      store.updateRecord(updatedProduct);
+    });
+
+    setTimeout(() => {
+      setCart([]);
+      setClientName('');
+      setClientPhone('');
+      setAmountPaid('');
+      setIsProcessing(false);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    }, 600);
+  };
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-4 md:space-y-8 pb-20 fade-in-up px-2 md:px-0">
-      {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="max-w-[1800px] mx-auto h-[calc(100vh-6rem)] flex flex-col fade-in-up">
+      {/* Header */}
+      <div className="border-b border-navy-100 pb-4 flex items-center justify-between mb-4 no-print">
         <div>
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">Intelligence</h1>
-          <h2 className="text-[10px] md:text-xs font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic">Protocoles Prédictifs & Audit</h2>
+          <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+            Prendre Commande
+          </h1>
+          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic">
+            Point de Vente Actif — {store.currentOperator}
+          </p>
         </div>
-        <div className="flex items-center gap-2 px-6 py-4 bg-navy-50 border border-navy-100 rounded-3xl">
-           <Zap className="w-5 h-5 text-gold animate-pulse" />
-           <span className="text-[10px] font-black uppercase tracking-widest text-navy-950">Moteur Neural Actif</span>
-        </div>
+        {success && (
+          <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest scale-in shadow-2xl">
+            <Check className="w-5 h-5" /> Vente Enregistrée!
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <div className="glass-card group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-12 h-12 bg-navy-brand/10 text-navy-brand rounded-2xl flex items-center justify-center mb-4">
-            <BarChart3 className="w-6 h-6" />
+      {/* Main Layout */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
+
+        {/* LEFT — Product Catalog */}
+        <div className="lg:col-span-2 flex flex-col gap-3 min-h-0">
+          {/* Search + Categories */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex items-center gap-3 flex-1 bg-white border border-navy-100 rounded-2xl px-4 py-3 shadow-sm">
+              <Search className="w-4 h-4 text-blue-gray flex-shrink-0" />
+              <input
+                type="text"
+                placeholder="Rechercher un produit..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="flex-1 bg-transparent outline-none text-sm font-black text-navy-950 placeholder:text-blue-gray/40 uppercase"
+              />
+              {search && <button onClick={() => setSearch('')}><X className="w-4 h-4 text-blue-gray" /></button>}
+            </div>
           </div>
-          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Score d'Efficacité</p>
-          <p className="text-2xl md:text-3xl font-black text-navy-950 uppercase">Optimal</p>
+
+          {/* Categories */}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest flex-shrink-0 transition-all ${
+                  activeCategory === cat
+                    ? 'bg-navy-950 text-white shadow-lg'
+                    : 'bg-white text-navy-950 border border-navy-100 hover:border-navy-brand'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Product Grid */}
+          <div className="flex-1 overflow-y-auto scrollbar-hide">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pb-4">
+              {filteredProducts.map(product => {
+                const inCart = cart.find(i => i.product.id === product.id);
+                const outOfStock = product.quantity <= 0;
+                return (
+                  <button
+                    key={product.id}
+                    onClick={() => !outOfStock && addToCart(product)}
+                    disabled={outOfStock}
+                    className={`glass-card text-left transition-all hover-elevate active:scale-95 relative overflow-hidden ${
+                      inCart ? 'border-navy-brand bg-navy-50 shadow-navy-brand/20 shadow-xl' : 'hover:border-navy-brand'
+                    } ${outOfStock ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+                  >
+                    {inCart && (
+                      <div className="absolute top-2 right-2 w-6 h-6 bg-navy-brand rounded-full flex items-center justify-center text-white text-[10px] font-black z-10">
+                        {inCart.qty}
+                      </div>
+                    )}
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
+                      inCart ? 'bg-navy-brand text-white' : 'bg-navy-50 text-navy-brand'
+                    }`}>
+                      <Package className="w-5 h-5" />
+                    </div>
+                    <p className="font-black text-navy-950 uppercase text-xs leading-tight truncate">{product.name}</p>
+                    <p className="text-[10px] font-bold text-blue-gray mt-1 uppercase">{product.category || 'Général'}</p>
+                    <div className="flex items-center justify-between mt-3">
+                      <p className="font-black text-navy-brand text-sm">{store.formatCurrency(product.price)}</p>
+                      <p className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                        product.quantity <= 3
+                          ? 'bg-rose-50 text-rose-500'
+                          : 'bg-emerald-50 text-emerald-600'
+                      }`}>
+                        {product.quantity <= 3 ? `⚠ ${product.quantity}` : `${product.quantity} en stock`}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+
+              {filteredProducts.length === 0 && (
+                <div className="col-span-full p-16 text-center opacity-30">
+                  <Package className="w-12 h-12 mx-auto text-blue-gray mb-4" />
+                  <p className="font-black uppercase text-blue-gray tracking-widest text-xs">Aucun produit trouvé</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="glass-card group hover-elevate hover:border-rose-500 transition-all">
-          <div className="w-12 h-12 bg-rose-500/10 text-rose-600 rounded-2xl flex items-center justify-center mb-4">
-            <BadgeAlert className="w-6 h-6" />
-          </div>
-          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Alerte Stocks</p>
-          <p className="text-2xl md:text-3xl font-black text-rose-600 uppercase">{criticalStock.length} Critiques</p>
-        </div>
-
-        <div className="glass-card group hover-elevate hover:border-emerald-500 transition-all">
-          <div className="w-12 h-12 bg-emerald-500/10 text-emerald-600 rounded-2xl flex items-center justify-center mb-4">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Projection Ventes</p>
-          <p className="text-2xl md:text-3xl font-black text-emerald-600 uppercase">+12% Prévu</p>
-        </div>
-
-        <div className="glass-card group hover-elevate hover:border-gold transition-all">
-          <div className="w-12 h-12 bg-gold/10 text-gold-dark rounded-2xl flex items-center justify-center mb-4">
-            <UserPlus className="w-6 h-6" />
-          </div>
-          <p className="text-[9px] md:text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Engagement Client</p>
-          <p className="text-2xl md:text-3xl font-black text-gold-dark uppercase">Élevé</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 glass-card space-y-8">
-           <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">Forecasting (Modèle Candlestick)</h3>
-              <div className="flex items-center gap-4">
-                 <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500"></div><span className="text-[8px] font-black uppercase">Hausse</span></div>
-                 <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500"></div><span className="text-[8px] font-black uppercase">Baisse</span></div>
+        {/* RIGHT — Order Summary / Checkout */}
+        <div className="flex flex-col gap-3 min-h-0">
+          {/* Client Info */}
+          <div className="glass-card bg-white border border-navy-100 shadow-sm">
+            <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-3 flex items-center gap-2 italic">
+              <User className="w-3.5 h-3.5" /> Client (Optionnel)
+            </p>
+            <input
+              type="text"
+              placeholder="Nom du client..."
+              value={clientName}
+              onChange={e => setClientName(e.target.value)}
+              className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-sm font-black text-navy-950 uppercase outline-none focus:border-navy-brand transition-all mb-2 placeholder:text-blue-gray/40 placeholder:normal-case"
+            />
+            <input
+              type="text"
+              placeholder="Téléphone (optionnel)..."
+              value={clientPhone}
+              onChange={e => setClientPhone(e.target.value)}
+              className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-sm font-black text-navy-950 outline-none focus:border-navy-brand transition-all placeholder:text-blue-gray/40"
+            />
+            {clientName && (clientDebt > 0 || clientCredit > 0) && (
+              <div className="mt-3 flex gap-2">
+                {clientDebt > 0 && <span className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase">Dette: {store.formatCurrency(clientDebt)}</span>}
+                {clientCredit > 0 && <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase">Crédit: {store.formatCurrency(clientCredit)}</span>}
               </div>
-           </div>
-           <div className="h-64 md:h-80 w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={forecastData}>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748B', fontSize: 10, fontWeight: 900}} />
-                  <Tooltip content={({ payload }) => payload?.[0] ? (
-                    <div className="bg-navy-950 text-white p-4 rounded-2xl shadow-2xl border border-white/10 scale-in">
-                       <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-2">{payload[0].payload.name}</p>
-                       <p className="text-xs font-bold text-emerald-400">High: {store.formatCurrency(payload[0].payload.high)}</p>
-                       <p className="text-xs font-bold text-rose-400">Low: {store.formatCurrency(payload[0].payload.low)}</p>
-                    </div>
-                  ) : null} />
-                  <Bar dataKey="close" shape={<Candle />} />
-                </BarChart>
-              </ResponsiveContainer>
-           </div>
-        </div>
+            )}
+          </div>
 
-        <div className="glass-card">
-           <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-8">Classement Opérateurs</h3>
-           <div className="space-y-4">
-              {leaderboardData.map((op, i) => (
-                <div key={i} className="flex items-center justify-between p-4 bg-navy-50 rounded-2xl border border-navy-100/50 group hover:border-navy-brand transition-all cursor-pointer">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-white border border-navy-100 flex items-center justify-center text-navy-brand font-black">
-                      {i + 1}
-                    </div>
-                    <div>
-                      <p className="text-xs font-black text-navy-950 uppercase">{op.name}</p>
-                      <p className="text-[8px] font-bold text-blue-gray uppercase">{op.count} Transactions</p>
-                    </div>
+          {/* Cart Items */}
+          <div className="flex-1 glass-card bg-white border border-navy-100 shadow-sm overflow-hidden flex flex-col min-h-0">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest italic flex items-center gap-2">
+                <ShoppingCart className="w-3.5 h-3.5" /> Commande en cours
+              </p>
+              {cart.length > 0 && (
+                <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:underline">
+                  Tout vider
+                </button>
+              )}
+            </div>
+
+            <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2">
+              {cart.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-full opacity-20 py-8">
+                  <ShoppingCart className="w-10 h-10 text-blue-gray mb-2" />
+                  <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest">Panier vide</p>
+                </div>
+              )}
+              {cart.map(item => (
+                <div key={item.product.id} className="flex items-center gap-3 bg-navy-50 rounded-2xl p-3 group hover:bg-navy-100 transition-all">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-black text-navy-950 uppercase text-xs truncate">{item.product.name}</p>
+                    <p className="text-[10px] font-bold text-blue-gray">{store.formatCurrency(item.unitPrice)} / unité</p>
                   </div>
-                  <p className="text-sm font-black text-navy-brand">{store.formatCurrency(op.revenue)}</p>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => updateQty(item.product.id, -1)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-rose-500 hover:text-rose-500 transition-all">
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="w-6 text-center font-black text-sm text-navy-950">{item.qty}</span>
+                    <button onClick={() => updateQty(item.product.id, 1)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-emerald-500 hover:text-emerald-500 transition-all">
+                      <Plus className="w-3 h-3" />
+                    </button>
+                    <button onClick={() => removeFromCart(item.product.id)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-rose-500 hover:bg-rose-500 hover:text-white transition-all ml-1">
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                  <p className="font-black text-navy-brand text-sm w-16 text-right">{store.formatCurrency(item.qty * item.unitPrice)}</p>
                 </div>
               ))}
-           </div>
+            </div>
+
+            {/* Totals */}
+            {cart.length > 0 && (
+              <div className="border-t border-navy-100 pt-3 mt-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest">Total Commande</p>
+                  <p className="text-xl font-black text-navy-950">{store.formatCurrency(cartTotal)}</p>
+                </div>
+
+                {/* Payment input */}
+                <div className="flex items-center gap-2 bg-navy-50 rounded-xl px-4 py-3 border border-transparent focus-within:border-navy-brand transition-all">
+                  <CreditCard className="w-4 h-4 text-blue-gray flex-shrink-0" />
+                  <input
+                    type="number"
+                    placeholder="Montant reçu..."
+                    value={amountPaid}
+                    onChange={e => setAmountPaid(e.target.value)}
+                    className="flex-1 bg-transparent outline-none text-sm font-black text-navy-950 placeholder:text-blue-gray/40"
+                  />
+                </div>
+
+                {paid > 0 && (
+                  <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl ${
+                    change >= 0 ? 'bg-emerald-50 border border-emerald-100' : 'bg-rose-50 border border-rose-100'
+                  }`}>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${change >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {change >= 0 ? 'Monnaie à rendre' : 'Reste à payer'}
+                    </p>
+                    <p className={`font-black text-lg ${change >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                      {store.formatCurrency(Math.abs(change))}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Checkout Button */}
+          <button
+            onClick={handleCheckout}
+            disabled={cart.length === 0 || isProcessing}
+            className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 transition-all shadow-2xl ${
+              cart.length === 0
+                ? 'bg-navy-100 text-blue-gray cursor-not-allowed'
+                : isProcessing
+                ? 'bg-navy-brand text-white animate-pulse'
+                : 'bg-navy-950 text-white hover:bg-navy-brand active:scale-95 shadow-navy-950/30'
+            }`}
+          >
+            {isProcessing ? (
+              <><Clock className="w-5 h-5 animate-spin" /> Traitement...</>
+            ) : (
+              <><Zap className="w-5 h-5" /> Valider la Vente — {cart.length > 0 ? store.formatCurrency(cartTotal) : '—'}</>
+            )}
+          </button>
         </div>
       </div>
     </div>
