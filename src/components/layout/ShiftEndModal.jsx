@@ -27,18 +27,26 @@ export default function ShiftEndModal({ isOpen, onClose }) {
   const handleConfirm = () => {
     const finalEnd = new Date(endTime).toISOString();
     
-    store.addRecord({
+    const existingShift = store.getShifts().find(s => s.start === store.shiftStart);
+    const shiftDataToSave = {
       record_type: 'shift',
       operator: store.currentOperator,
       start: store.shiftStart,
       end: finalEnd,
+      status: 'closed',
       revenue: revenue,
       expenses: expenseTotal,
       net: netCash,
       transactions: shiftData.sales.length,
       sales: shiftData.sales,
       expenseList: shiftData.expenses
-    });
+    };
+
+    if (existingShift) {
+      store.updateRecord({ ...existingShift, ...shiftDataToSave });
+    } else {
+      store.addRecord(shiftDataToSave);
+    }
 
     store.setShiftStart('');
     store.setCurrentOperator('');
@@ -86,7 +94,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
           <div className="space-y-4">
              <div className="flex items-center justify-between px-2">
                 <p className="text-xs font-black uppercase tracking-widest text-blue-gray flex items-center gap-2">
-                  <ShoppingCart className="w-4 h-4" /> Vos Transactions ({shiftSales.length})
+                  <ShoppingCart className="w-4 h-4" /> Vos Transactions ({shiftData.sales.length})
                 </p>
                 <p className="text-xs font-black uppercase tracking-widest text-navy-brand italic">Strictement à vous</p>
              </div>

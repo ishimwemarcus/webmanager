@@ -15,6 +15,19 @@ export default function ShiftGateway() {
       const name = operator.trim().toUpperCase();
       const shiftId = new Date().toISOString();
       
+      const shiftRecord = {
+        record_type: 'shift',
+        operator: name,
+        start: shiftId,
+        end: null,
+        status: 'open',
+        revenue: 0,
+        transactions: 0,
+        currency: selectedCurrency
+      };
+      
+      store.addRecord(shiftRecord);
+      
       store.setCurrentOperator(name);
       store.setCurrency(selectedCurrency);
       

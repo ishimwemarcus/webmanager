@@ -235,6 +235,170 @@ export const printThermalReport = (reportData, formatCurrency) => {
   printWindow.document.close();
 };
 
+export const printFullMasterReport = (data, formatCurrency) => {
+  const { 
+    reportDate, 
+    financials, 
+    sales, 
+    ledger, 
+    inventory, 
+    shifts 
+  } = data;
+
+  const content = `
+    <html>
+      <head>
+        <title>Accounting & Operations Report</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+          body { font-family: 'Inter', sans-serif; padding: 60px; color: #0f172a; line-height: 1.6; max-width: 1000px; margin: 0 auto; background: white; }
+          .header { text-align: center; margin-bottom: 60px; }
+          .header h1 { font-size: 38px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -1.5px; color: #082f49; }
+          .header p { font-size: 16px; color: #64748b; margin: 8px 0 0; font-weight: 700; }
+          
+          .section { margin-bottom: 50px; }
+          .section-title { font-size: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 3px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 25px; letter-spacing: 1px; color: #0f172a; }
+          
+          .metrics-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+          .metric-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 600; color: #334155; }
+          .metric-row.red { color: #ef4444; }
+          .metric-row.bold-large { font-size: 24px; font-weight: 900; margin-top: 15px; border-top: 2px solid #e2e8f0; padding-top: 15px; color: #0f172a; }
+          
+          table { width: 100%; border-collapse: collapse; font-size: 13px; }
+          th { text-align: left; padding: 14px 10px; border-bottom: 2px solid #f1f5f9; color: #64748b; text-transform: uppercase; font-size: 11px; font-weight: 900; letter-spacing: 0.5px; }
+          td { padding: 14px 10px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+          .text-right { text-align: right; }
+          .text-center { text-align: center; }
+          
+          .total-footer { text-align: right; margin-top: 25px; font-size: 18px; font-weight: 900; color: #082f49; }
+          
+          @media print {
+            body { padding: 20px; }
+            .section { page-break-inside: avoid; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>ACCOUNTING & OPERATIONS REPORT</h1>
+          <p>Operating Date: ${reportDate}</p>
+        </div>
+
+        <div class="section">
+          <div class="section-title">FINANCIAL PERFORMANCE SUMMARY</div>
+          <div class="metrics-grid">
+            <div class="metric-row"><span>Gross Sales Revenue</span> <span>${formatCurrency(financials.totalSales)}</span></div>
+            <div class="metric-row"><span>Cash Liquid Collected</span> <span>${formatCurrency(financials.cashCollected)}</span></div>
+            <div class="metric-row red"><span>Operating Expenses</span> <span>${formatCurrency(financials.totalExpenses)}</span></div>
+            <div class="metric-row red"><span>Losses (Spoilage)</span> <span>${formatCurrency(financials.totalLossValuation)}</span></div>
+            <div class="metric-row bold-large"><span>ADJUSTED NET PROFIT</span> <span>${formatCurrency(financials.netProfit)}</span></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">SALES TRANSACTIONS</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th><th>Operator</th><th>Client</th><th>Product</th><th class="text-right">Qty</th><th class="text-right">Total</th><th class="text-right">Paid</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${sales.map(s => `
+                <tr>
+                  <td style="font-weight: 700;">${new Date(s.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                  <td>${(s.operator || 'ADMIN').toUpperCase()}</td>
+                  <td>${(s.client || 'STANDARD').toUpperCase()}</td>
+                  <td>${s.name}</td>
+                  <td class="text-right">${s.quantity}</td>
+                  <td class="text-right" style="font-weight: 700;">${formatCurrency(s.amount)}</td>
+                  <td class="text-right" style="color: #10b981; font-weight: 900;">${formatCurrency(s.paid)}</td>
+                </tr>
+              `).join('')}
+              ${sales.length === 0 ? '<tr><td colspan="7" class="text-center" style="padding: 40px; color: #94a3b8;">Aucune transaction enregistrée</td></tr>' : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">LEDGER & LOSS LOG</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th><th>Time</th><th>Operator</th><th>Entity</th><th>Description</th><th class="text-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${ledger.map(l => `
+                <tr>
+                  <td style="color: ${l.type === 'expense' ? '#ef4444' : '#10b981'}; font-weight: 900; font-size: 10px;">${l.type.toUpperCase()}</td>
+                  <td>${new Date(l.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                  <td>${(l.operator || 'ADMIN').toUpperCase()}</td>
+                  <td>${(l.client || 'SYSTEM').toUpperCase()}</td>
+                  <td style="font-style: italic;">${l.name}</td>
+                  <td class="text-right" style="font-weight: 700;">${formatCurrency(l.amount)}</td>
+                </tr>
+              `).join('')}
+              ${ledger.length === 0 ? '<tr><td colspan="6" class="text-center" style="padding: 40px; color: #94a3b8;">Aucune entrée au grand livre</td></tr>' : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section">
+          <div class="section-title">INVENTORY / ASSET VALUATION</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Product</th><th class="text-right">Qty</th><th class="text-right">Unit Cost</th><th class="text-right">Asset Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${inventory.map(p => `
+                <tr>
+                  <td style="font-weight: 900; color: #082f49;">${p.name}</td>
+                  <td class="text-right">${p.quantity}</td>
+                  <td class="text-right">${formatCurrency(p.cost)}</td>
+                  <td class="text-right" style="font-weight: 700;">${formatCurrency(p.quantity * p.cost)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <div class="total-footer">Total Inventory Asset Valuation: ${formatCurrency(inventory.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">EMPLOYEE SHIFT PERFORMANCE</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Operator</th><th>Shift Period</th><th class="text-center">Transactions</th><th class="text-right">Revenue</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${shifts.map(sh => `
+                <tr>
+                  <td style="font-weight: 700;">${sh.operator.toUpperCase()}</td>
+                  <td>${new Date(sh.start).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - ${sh.end ? new Date(sh.end).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'EN COURS'}</td>
+                  <td class="text-center">${sh.transactionCount || 0}</td>
+                  <td class="text-right" style="font-weight: 700;">${formatCurrency(sh.revenue || 0)}</td>
+                </tr>
+              `).join('')}
+              ${shifts.length === 0 ? '<tr><td colspan="4" class="text-center" style="padding: 40px; color: #94a3b8;">Aucune donnée de poste</td></tr>' : ''}
+            </tbody>
+          </table>
+        </div>
+
+        <script>
+          window.onload = () => { setTimeout(() => { window.print(); window.onafterprint = () => window.close(); }, 600); }
+        </script>
+      </body>
+    </html>
+  `;
+  const printWindow = window.open('', '_blank');
+  printWindow.document.write(content);
+  printWindow.document.close();
+};
+
 export const shareDailyReport = (reportData, formatCurrency) => {
   const text = `
 📊 *RAPPORT JOURNALIER - MARC*

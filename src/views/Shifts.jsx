@@ -14,7 +14,7 @@ export default function Shifts() {
 
   const filteredShifts = useMemo(() => {
     if (showAll) return allShifts;
-    return allShifts.filter(s => s.end && s.end.startsWith(filterDate));
+    return allShifts.filter(s => (s.end || s.start).startsWith(filterDate));
   }, [allShifts, filterDate, showAll]);
 
   const stats = useMemo(() => {
@@ -87,7 +87,7 @@ export default function Shifts() {
                        <Clock className="w-3.5 h-3.5" /> 
                        {new Date(shift.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
                        <span className="opacity-30">→</span> 
-                       {new Date(shift.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                       {shift.end ? new Date(shift.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : <span className="text-emerald-500 animate-pulse">EN COURS</span>}
                     </p>
                     <p className="text-xs font-bold text-blue-gray flex items-center gap-1.5">
                        <Calendar className="w-3.5 h-3.5" />

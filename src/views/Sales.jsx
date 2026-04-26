@@ -339,7 +339,7 @@ export default function Sales() {
                    </div>
                    <div>
                       <h3 className="text-sm font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{s.name}</h3>
-                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'}</p>
+                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'} | PAR: {s.operator || 'ADMIN'}</p>
                       {s.phone && s.phone !== 'none' && (
                          <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                             <Phone className="w-2 h-2" /> {s.phone}

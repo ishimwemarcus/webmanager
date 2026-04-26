@@ -2,12 +2,13 @@
 // Guardian XAMPP Local Database API
 // Handles concurrent JSON saves across network phones
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Bypass-Tunnel-Reminder");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Bypass-Tunnel-Reminder, Origin, Accept");
+header("Access-Control-Allow-Credentials: true");
 header("Access-Control-Max-Age: 86400");
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(204);
+    header("HTTP/1.1 200 OK");
     exit;
 }
 

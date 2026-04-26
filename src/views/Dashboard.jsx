@@ -20,7 +20,7 @@ import {
   MessageSquare,
   Printer
 } from 'lucide-react';
-import { generateDailySummary, shareDailyReport, printThermalReport } from '../utils/Reporter';
+import { generateDailySummary, shareDailyReport, printThermalReport, printFullMasterReport } from '../utils/Reporter';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export default function Dashboard() {
@@ -82,11 +82,18 @@ export default function Dashboard() {
             <button 
                onClick={() => {
                   const summary = generateDailySummary(sales, store.getExpenses(), store.getLedgerManual(), losses);
-                  printThermalReport(summary.raw, store.formatCurrency);
+                  printFullMasterReport({
+                     reportDate: new Date().toISOString().split('T')[0],
+                     financials: summary.raw,
+                     sales: sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])),
+                     ledger: store.getLedgerManual().filter(l => l.date && l.date.startsWith(new Date().toISOString().split('T')[0])),
+                     inventory: store.getProducts(),
+                     shifts: store.getShifts ? store.getShifts().filter(s => s.start && s.start.startsWith(new Date().toISOString().split('T')[0])) : []
+                  }, store.formatCurrency);
                }}
                className="flex items-center gap-2 px-6 py-4 bg-white border border-emerald-200 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-xl active:scale-95"
             >
-               <Printer className="w-4 h-4" /> Print Summary
+               <Printer className="w-4 h-4" /> Print Full Report
             </button>
             <button 
                onClick={() => {

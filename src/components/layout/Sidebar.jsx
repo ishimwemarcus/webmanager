@@ -104,6 +104,16 @@ export default function Sidebar({ className }) {
           <span>CASHREGISTER</span>
         </NavLink>
 
+        <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl mb-3 flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#10B981]/20 text-[#10B981] flex items-center justify-center">
+            <Users className="w-4 h-4" />
+          </div>
+          <div className="overflow-hidden">
+            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Session Active</p>
+            <p className="text-xs font-black text-white uppercase truncate">{store.currentOperator || 'Administrateur'}</p>
+          </div>
+        </div>
+
         <div 
           onClick={() => store.setIsShiftEndModalOpen(true)}
           className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"

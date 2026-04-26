@@ -249,7 +249,7 @@ export default function Ledger() {
                      </div>
                      <div>
                         <h3 className="text-lg font-black text-navy-950 uppercase tracking-tighter">{d.name}</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-60">{d.client || 'OPÉRATION INTERNE'}</p>
+                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-60">{d.client || 'OPÉRATION INTERNE'} | PAR: {d.operator || 'ADMIN'}</p>
                         {d.phone && d.phone !== 'none' && (
                            <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                               <Phone className="w-2 h-2" /> {d.phone}

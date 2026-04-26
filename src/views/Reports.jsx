@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
-import { printThermalReport } from '../utils/Reporter';
+import { printThermalReport, printFullMasterReport } from '../utils/Reporter';
 import { 
   Download, 
   Calendar, 
@@ -141,9 +141,21 @@ export default function Reports() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-           <button onClick={() => window.print()} className="p-4 bg-white border border-emerald-100 rounded-2xl text-navy-950 hover:bg-emerald-50 transition-all shadow-sm">
-              <Printer className="w-5 h-5" />
-           </button>
+            <button 
+               onClick={() => {
+                  printFullMasterReport({
+                     reportDate,
+                     financials: reportData,
+                     sales: dailySales,
+                     ledger: dailyLedger,
+                     inventory: allProducts,
+                     shifts: dailyShifts
+                  }, store.formatCurrency);
+               }}
+               className="p-4 bg-white border border-emerald-100 rounded-2xl text-navy-950 hover:bg-emerald-50 transition-all shadow-sm no-print"
+            >
+               <Printer className="w-5 h-5" />
+            </button>
            <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95">
              <Download className="w-5 h-5 text-emerald-400" /> Export PDF
            </button>
