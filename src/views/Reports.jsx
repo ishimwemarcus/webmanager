@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Cpu,
   BarChart2,
-  PieChart
+  PieChart,
+  Wallet
 } from 'lucide-react';
 
 import { getFormattedQuantity } from '../utils/ProductUtils';

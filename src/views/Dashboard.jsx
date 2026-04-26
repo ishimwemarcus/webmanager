@@ -13,7 +13,9 @@ import {
   Database,
   CreditCard,
   AlertCircle,
-  Cpu
+  Cpu,
+  Layers,
+  Wallet
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 

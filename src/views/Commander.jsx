@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   ShoppingCart, Plus, Minus, Trash2, Search, Check,
   User, ChevronRight, X, Zap, Package, AlertTriangle,
-  CreditCard, Wallet, Clock, Filter, Layers
+  CreditCard, Wallet, Clock, Filter, Layers, ShieldCheck
 } from 'lucide-react';
 
 export default function Commander() {
