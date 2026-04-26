@@ -8,14 +8,16 @@ import {
   CheckCircle2,
   AlertTriangle,
   ShieldCheck,
-  Users
+  Users,
+  Search,
+  ArrowRight
 } from 'lucide-react';
 
 export default function Wait() {
   const store = useStore();
   const { t } = useLanguage();
-  const waitCredits = store.getWaitCredits();
-  const sales = store.getSales();
+  const waitCredits = store.getWaitCredits ? store.getWaitCredits() : [];
+  const sales = store.getSales ? store.getSales() : [];
 
   const clientMap = waitCredits.reduce((acc, w) => {
     const key = w.client?.toLowerCase() || 'unknown';
@@ -28,7 +30,7 @@ export default function Wait() {
     return acc;
   }, {});
 
-  const clients = Object.values(clientMap);
+  const clients = Object.values(clientMap).sort((a,b) => b.total - a.total);
   const grandTotal = clients.reduce((s, c) => s + c.total, 0);
 
   const handleMarkUsed = (record) => {
@@ -36,133 +38,142 @@ export default function Wait() {
   };
 
   const confirmDelete = (record) => {
-    store.showConfirm(t('confirmAction'), () => {
+    store.showConfirm("Voulez-vous supprimer ce reliquat du registre ?", () => {
       store.deleteRecord(record);
     });
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
-      <div className="border-b border-navy-100 pb-8 no-print">
-        <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-          {t('waitSystem')}
-        </h1>
-        <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase">
-          {t('creditRetention')}
-        </h2>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-xl group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-navy-50 text-navy-brand flex items-center justify-center">
-            <Wallet className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Solde Global</p>
-            <p className="text-3xl font-black text-navy-950">{store.formatCurrency(grandTotal)}</p>
-          </div>
-        </div>
-        <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-emerald-500 shadow-xl group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-16 h-16 rounded-[24px] bg-emerald-50 text-emerald-600 flex items-center justify-center">
-            <Users className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1">Débiteurs Actifs</p>
-            <p className="text-3xl font-black text-navy-950">{clients.filter(c => c.total > 0).length} <span className="text-xs text-blue-gray opacity-40">Comptes</span></p>
-          </div>
+    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+      
+      {/* Premium Header */}
+      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+        <div className="space-y-1">
+          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+            Reliquats Clients
+          </h1>
+          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+            Gestion des Crédits — Rétention de Valeur
+          </p>
         </div>
       </div>
 
-      {clients.length > 0 ? (
-        <div className="grid grid-cols-1 gap-8">
-          {clients.map((c, i) => (
-            <div key={i} className="glass-card rounded-[24px] overflow-hidden border border-navy-50 shadow-2xl bg-white group transition-all duration-700">
-              <div className={`px-4 md:px-10 py-6 md:py-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-navy-50 ${c.total > 0 ? 'bg-navy-50/30' : 'bg-transparent'}`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-[24px] bg-navy-brand text-white flex items-center justify-center font-black text-2xl flex-shrink-0">
-                    {c.client?.[0]?.toUpperCase() || '?'}
-                  </div>
-                  <div>
-                    <p className="text-xl font-black text-navy-950 uppercase tracking-tight">{c.client}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="w-2 h-2 rounded-full bg-success-pro animate-pulse"></div>
-                      <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray">
-                        {c.phone || 'Aucun Contact'}
-                      </p>
+      {/* Metrics Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <Wallet className="w-10 h-10" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Solde Global Client</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(grandTotal)}</p>
+          </div>
+        </div>
+
+        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-20 h-20 rounded-3xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
+            <Users className="w-10 h-10" />
+          </div>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Comptes Débiteurs</p>
+            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+              {clients.filter(c => c.total > 0).length} <span className="text-xs font-black">Actifs</span>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Client List */}
+      <div className="space-y-6">
+        {clients.length > 0 ? (
+          clients.map((c, i) => (
+            <div key={i} className="glass-card bg-white rounded-[40px] border border-emerald-50 shadow-sm overflow-hidden animate-fade-in">
+              <div className="p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-emerald-50 bg-emerald-50/10">
+                 <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-[24px] bg-navy-950 text-white flex items-center justify-center font-black text-2xl shadow-xl">
+                       {c.client?.[0]?.toUpperCase() || '?'}
                     </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-1">Valeur Totale</p>
-                  <p className={`text-2xl font-black tracking-tighter ${c.total > 0 ? 'text-navy-brand' : 'text-blue-gray/20'}`}>
-                    {store.formatCurrency(c.total)}
-                  </p>
-                </div>
+                    <div>
+                       <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{c.client}</h3>
+                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || 'Aucun contact indexé'}</p>
+                    </div>
+                 </div>
+                 <div className="text-right">
+                    <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Position Nette</p>
+                    <p className={`text-3xl font-black tracking-tighter ${c.total > 0 ? 'text-emerald-600' : 'text-blue-gray/20'}`}>
+                       {store.formatCurrency(c.total)}
+                    </p>
+                 </div>
               </div>
 
               <div className="divide-y divide-navy-50">
-                {c.records.map((r, j) => (
-                  <div key={j} className="flex flex-col sm:flex-row sm:items-center justify-between px-4 md:px-10 py-4 md:py-6 hover:bg-navy-50 transition-all gap-3">
-                    <div className="flex items-center gap-4">
-                      <div className={`w-3 h-3 rounded-full flex-shrink-0 ${(parseFloat(r.balance)||0) > 0 ? 'bg-success-pro shadow-lg' : 'bg-navy-100'}`}></div>
-                      <div>
-                        <p className="font-bold text-navy-950 uppercase tracking-tight">{r.note || 'Retention Protocol'}</p>
-                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-1 italic">{store.formatDate(r.date)}</p>
-                      </div>
+                 {c.records.map((r, j) => (
+                    <div key={j} className="flex flex-col md:flex-row md:items-center justify-between p-6 hover:bg-emerald-50/20 transition-all gap-4">
+                       <div className="flex items-center gap-4">
+                          <div className={`w-3 h-3 rounded-full ${(parseFloat(r.balance)||0) > 0 ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-navy-100'}`}></div>
+                          <div>
+                             <p className="text-xs font-black text-navy-950 uppercase tracking-tight">{r.note || 'Reliquat Automatique'}</p>
+                             <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest mt-0.5 opacity-60 italic">{new Date(r.date).toLocaleDateString()} — {new Date(r.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
+                          </div>
+                       </div>
+
+                       <div className="flex items-center justify-between md:justify-end gap-10">
+                          <div className="text-center md:text-right">
+                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Initial</p>
+                             <p className="text-xs font-black text-navy-950">{store.formatCurrency(r.amount)}</p>
+                          </div>
+                          <div className="text-right">
+                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Réserve</p>
+                             <p className={`text-xl font-black ${(parseFloat(r.balance)||0) > 0 ? 'text-emerald-600' : 'text-blue-gray/20 line-through'}`}>
+                                {store.formatCurrency(r.balance || 0)}
+                             </p>
+                          </div>
+                          <div className="flex gap-2">
+                             {(parseFloat(r.balance)||0) > 0 && (
+                                <button
+                                  onClick={() => handleMarkUsed(r)}
+                                  className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                                  title="Marquer comme utilisé"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                </button>
+                             )}
+                             <button
+                               onClick={() => confirmDelete(r)}
+                               className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                               title="Supprimer"
+                             >
+                               <Trash2 className="w-4 h-4" />
+                             </button>
+                          </div>
+                       </div>
                     </div>
-                    <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 ml-7 sm:ml-0">
-                      <div>
-                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest">Inception</p>
-                        <p className="text-sm font-bold text-navy-950">{store.formatCurrency(r.amount)}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest">Reserve</p>
-                        <p className={`text-lg font-black ${(parseFloat(r.balance)||0) > 0 ? 'text-success-pro' : 'text-blue-gray/20 line-through'}`}>
-                          {store.formatCurrency(r.balance || 0)}
-                        </p>
-                      </div>
-                      <div className="flex gap-1">
-                        {(parseFloat(r.balance)||0) > 0 && (
-                          <button
-                            onClick={() => handleMarkUsed(r)}
-                            className="p-3 rounded-2xl text-blue-gray hover:text-success-pro hover:bg-navy-50 transition-all"
-                          >
-                            <CheckCircle2 className="w-5 h-5" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => confirmDelete(r)}
-                          className="p-3 rounded-2xl text-blue-gray hover:text-danger-pro hover:bg-navy-50 transition-all"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                 ))}
               </div>
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="glass-card rounded-[48px] p-32 text-center border border-navy-50 shadow-2xl bg-white">
-          <Clock className="w-20 h-20 mx-auto mb-8 text-blue-gray/10" />
-          <h3 className="text-3xl font-black text-navy-brand uppercase tracking-tighter mb-4">No Balances Detected</h3>
-          <p className="text-sm font-bold text-blue-gray uppercase tracking-widest italic">All retention protocols are nominal.</p>
-        </div>
-      )}
-
-      <div className="glass-card rounded-[32px] p-8 border border-navy-50 bg-white shadow-xl mt-12">
-        <div className="flex items-center gap-6">
-          <div className="p-4 bg-navy-50 rounded-2xl text-navy-brand">
-            <ShieldCheck className="w-6 h-6" />
+          ))
+        ) : (
+          <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-20">
+             <Clock className="w-20 h-20 mx-auto text-blue-gray mb-6" />
+             <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucun reliquat client détecté</p>
           </div>
-          <div className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest leading-relaxed">
-            <p className="text-navy-brand mb-1">Operational Protocol: Retention</p>
-            <p>Monitors stored client value for future transaction linkage. Assets remain active until manually cleared or used during sales checkout.</p>
-          </div>
-        </div>
+        )}
       </div>
+
+      {/* Protocol Banner */}
+      <div className="glass-card bg-navy-950 p-8 rounded-[40px] text-white flex items-center gap-6 shadow-2xl relative overflow-hidden">
+         <div className="absolute bottom-[-50%] right-[-10%] w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full"></div>
+         <div className="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 relative z-10">
+            <ShieldCheck className="w-7 h-7 text-emerald-400" />
+         </div>
+         <div className="relative z-10">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-1">Protocole Opérationnel : Rétention</p>
+            <p className="text-[11px] font-bold text-white/40 leading-relaxed max-w-2xl">
+               Le système suit automatiquement les soldes clients pour un couplage futur lors des transactions. Les actifs restent actifs jusqu'à leur utilisation lors du passage en caisse.
+            </p>
+         </div>
+      </div>
+
     </div>
   );
 }

@@ -135,10 +135,7 @@ export default function Sales() {
       useCredit: newSale.useCredit
     };
 
-    store.addRecord(finalSale);
-
-    // Stock decrement
-    store.updateRecord({ ...product, quantity: product.quantity - finalSale.quantity });
+    store.processSmartTransaction(finalSale);
 
     setLastSaleRecord(finalSale);
     setShowSuccess(true);

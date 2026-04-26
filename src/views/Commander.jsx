@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   ShoppingCart, Plus, Minus, Trash2, Search, Check,
   User, ChevronRight, X, Zap, Package, AlertTriangle,
-  CreditCard, Wallet, Clock
+  CreditCard, Wallet, Clock, Filter, Layers
 } from 'lucide-react';
 
 export default function Commander() {
@@ -12,8 +12,7 @@ export default function Commander() {
   const { t } = useLanguage();
 
   const products = store.getProducts().filter(p => p.quantity > 0);
-  const allClients = store.getWaitCredits ? store.getWaitCredits() : [];
-
+  
   // State
   const [cart, setCart] = useState([]); // [{product, qty, unitPrice}]
   const [clientName, setClientName] = useState('');
@@ -41,30 +40,30 @@ export default function Commander() {
 
   // Cart calculations
   const cartTotal = cart.reduce((sum, item) => sum + (item.qty * item.unitPrice), 0);
-  const paid = parseFloat(amountPaid) || 0;
-  const change = paid - cartTotal;
+  const paidInput = parseFloat(amountPaid) || 0;
+  const change = paidInput - cartTotal;
   const clientDebt = clientName ? store.getClientDebtBalance(clientName, clientPhone || 'none') : 0;
   const clientCredit = clientName ? store.getClientWaitBalance(clientName, clientPhone || 'none') : 0;
 
   // Cart actions
   const addToCart = (product) => {
     setCart(prev => {
-      const existing = prev.find(i => i.product.id === product.id);
+      const existing = prev.find(i => i.product.id === (product.id || product.product_id));
       if (existing) {
         if (existing.qty >= product.quantity) return prev; // Stock limit
-        return prev.map(i => i.product.id === product.id ? { ...i, qty: i.qty + 1 } : i);
+        return prev.map(i => i.product.id === (product.id || product.product_id) ? { ...i, qty: i.qty + 1 } : i);
       }
       return [...prev, { product, qty: 1, unitPrice: parseFloat(product.price) || 0 }];
     });
   };
 
   const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(i => i.product.id !== productId));
+    setCart(prev => prev.filter(i => (i.product.id || i.product.product_id) !== productId));
   };
 
   const updateQty = (productId, delta) => {
     setCart(prev => prev.map(i => {
-      if (i.product.id !== productId) return i;
+      if ((i.product.id || i.product.product_id) !== productId) return i;
       const newQty = i.qty + delta;
       if (newQty <= 0) return null;
       if (newQty > i.product.quantity) return i;
@@ -77,23 +76,24 @@ export default function Commander() {
     if (cart.length === 0) return;
     setIsProcessing(true);
 
-    // Save one sale record per cart item
+    // Save one sale record per cart item using Smart Transaction engine
     cart.forEach(item => {
+      const shareOfPaid = cartTotal > 0 ? (paidInput / cartTotal) * (item.qty * item.unitPrice) : 0;
       const saleRecord = {
         record_type: 'sale',
         name: item.product.name,
         amount: item.qty * item.unitPrice,
-        paid: Math.min(paid > 0 ? (paid / cartTotal) * (item.qty * item.unitPrice) : 0, item.qty * item.unitPrice),
+        paid: Math.min(shareOfPaid, item.qty * item.unitPrice),
         quantity: item.qty,
         client: clientName || 'Comptoir',
         phone: clientPhone || 'none',
         date: new Date().toISOString(),
+        product_id: item.product.id || item.product.product_id,
+        useCredit: true
       };
-      store.addRecord(saleRecord);
-
-      // Decrement stock
-      const updatedProduct = { ...item.product, quantity: item.product.quantity - item.qty };
-      store.updateRecord(updatedProduct);
+      
+      // Use the smart engine to handle debt/credit/stock automatically
+      store.processSmartTransaction(saleRecord);
     });
 
     setTimeout(() => {
@@ -104,244 +104,229 @@ export default function Commander() {
       setIsProcessing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
-    }, 600);
+    }, 800);
   };
 
   return (
-    <div className="max-w-[1800px] mx-auto h-[calc(100vh-6rem)] flex flex-col fade-in-up">
-      {/* Header */}
+    <div className="max-w-[1800px] mx-auto h-[calc(100vh-6rem)] flex flex-col animate-fade-in px-4 lg:px-0">
+      
+      {/* Premium Header */}
       <div className="border-b border-navy-100 pb-4 flex items-center justify-between mb-4 no-print">
         <div>
           <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             Prendre Commande
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic">
+          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
             Point de Vente Actif — {store.currentOperator}
           </p>
         </div>
         {success && (
-          <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-sm uppercase tracking-widest scale-in shadow-2xl">
-            <Check className="w-5 h-5" /> Vente Enregistrée!
+          <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest animate-bounce-gentle shadow-2xl">
+            <Check className="w-5 h-5" /> Vente Enregistrée avec Succès!
           </div>
         )}
       </div>
 
-      {/* Main Layout */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 min-h-0">
+      {/* Main Grid */}
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
 
-        {/* LEFT — Product Catalog */}
-        <div className="lg:col-span-2 flex flex-col gap-3 min-h-0">
-          {/* Search + Categories */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex items-center gap-3 flex-1 bg-white border border-navy-100 rounded-2xl px-4 py-3 shadow-sm">
-              <Search className="w-4 h-4 text-blue-gray flex-shrink-0" />
-              <input
-                type="text"
-                placeholder="Rechercher un produit..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="flex-1 bg-transparent outline-none text-sm font-black text-navy-950 placeholder:text-blue-gray/40 uppercase"
-              />
-              {search && <button onClick={() => setSearch('')}><X className="w-4 h-4 text-blue-gray" /></button>}
-            </div>
-          </div>
+        {/* Product Catalog — Left Side (8 cols) */}
+        <div className="lg:col-span-8 flex flex-col gap-4 min-h-0">
+           
+           {/* Filters & Search */}
+           <div className="flex flex-col md:flex-row gap-4 items-center">
+              <div className="flex-1 relative w-full group">
+                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
+                 <input
+                   type="text"
+                   placeholder="Rechercher un produit..."
+                   value={search}
+                   onChange={e => setSearch(e.target.value)}
+                   className="w-full bg-white border border-emerald-100 rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-sm outline-none focus:border-emerald-500 transition-all uppercase"
+                 />
+              </div>
 
-          {/* Categories */}
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest flex-shrink-0 transition-all ${
-                  activeCategory === cat
-                    ? 'bg-navy-950 text-white shadow-lg'
-                    : 'bg-white text-navy-950 border border-navy-100 hover:border-navy-brand'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 w-full md:w-auto">
+                 {categories.map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => setActiveCategory(cat)}
+                      className={`px-6 py-3 rounded-2xl font-black text-[9px] uppercase tracking-widest flex-shrink-0 transition-all ${
+                        activeCategory === cat
+                          ? 'bg-navy-950 text-white shadow-lg'
+                          : 'bg-white text-navy-950 border border-emerald-100 hover:border-emerald-500 shadow-sm'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                 ))}
+              </div>
+           </div>
 
-          {/* Product Grid */}
-          <div className="flex-1 overflow-y-auto scrollbar-hide">
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pb-4">
-              {filteredProducts.map(product => {
-                const inCart = cart.find(i => i.product.id === product.id);
-                const outOfStock = product.quantity <= 0;
-                return (
-                  <button
-                    key={product.id}
-                    onClick={() => !outOfStock && addToCart(product)}
-                    disabled={outOfStock}
-                    className={`glass-card text-left transition-all hover-elevate active:scale-95 relative overflow-hidden ${
-                      inCart ? 'border-navy-brand bg-navy-50 shadow-navy-brand/20 shadow-xl' : 'hover:border-navy-brand'
-                    } ${outOfStock ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    {inCart && (
-                      <div className="absolute top-2 right-2 w-6 h-6 bg-navy-brand rounded-full flex items-center justify-center text-white text-[10px] font-black z-10">
-                        {inCart.qty}
-                      </div>
+           {/* Products Display */}
+           <div className="flex-1 overflow-y-auto scrollbar-hide pr-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 pb-10">
+                 {filteredProducts.map(product => {
+                    const id = product.id || product.product_id;
+                    const inCart = cart.find(i => (i.product.id || i.product.product_id) === id);
+                    const isLow = product.quantity <= 3;
+                    
+                    return (
+                       <div
+                         key={id}
+                         onClick={() => addToCart(product)}
+                         className={`glass-card bg-white p-5 rounded-[32px] border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''}`}
+                       >
+                          {inCart && (
+                             <div className="absolute top-4 right-4 w-7 h-7 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-black text-[10px] shadow-lg animate-scale-in">
+                                {inCart.qty}
+                             </div>
+                          )}
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${inCart ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                             <Package className="w-6 h-6" />
+                          </div>
+                          <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight mb-1 group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || 'Général'}</p>
+                          
+                          <div className="flex items-center justify-between mt-auto">
+                             <p className="text-sm font-black text-navy-950">{store.formatCurrency(product.price)}</p>
+                             <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[8px] font-black uppercase ${isLow ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                                {isLow ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}
+                                {product.quantity}
+                             </div>
+                          </div>
+                       </div>
+                    );
+                 })}
+              </div>
+           </div>
+        </div>
+
+        {/* Checkout Terminal — Right Side (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col gap-6 min-h-0 pb-10">
+           
+           {/* Client Panel */}
+           <div className="glass-card bg-white p-6 rounded-[40px] border-emerald-50 shadow-sm">
+              <div className="flex items-center gap-3 mb-6">
+                 <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center">
+                    <User className="w-5 h-5" />
+                 </div>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Profil Client</p>
+              </div>
+
+              <div className="space-y-4">
+                 <input
+                   type="text"
+                   placeholder="NOM DU CLIENT..."
+                   value={clientName}
+                   onChange={e => setClientName(e.target.value)}
+                   className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                 />
+                 <input
+                   type="text"
+                   placeholder="TÉLÉPHONE..."
+                   value={clientPhone}
+                   onChange={e => setClientPhone(e.target.value)}
+                   className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                 />
+              </div>
+
+              {clientName && (clientDebt > 0 || clientCredit > 0) && (
+                 <div className="mt-6 flex flex-wrap gap-2">
+                    {clientDebt > 0 && (
+                       <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100">
+                          Dette: {store.formatCurrency(clientDebt)}
+                       </div>
                     )}
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${
-                      inCart ? 'bg-navy-brand text-white' : 'bg-navy-50 text-navy-brand'
-                    }`}>
-                      <Package className="w-5 h-5" />
-                    </div>
-                    <p className="font-black text-navy-950 uppercase text-xs leading-tight truncate">{product.name}</p>
-                    <p className="text-[10px] font-bold text-blue-gray mt-1 uppercase">{product.category || 'Général'}</p>
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="font-black text-navy-brand text-sm">{store.formatCurrency(product.price)}</p>
-                      <p className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
-                        product.quantity <= 3
-                          ? 'bg-rose-50 text-rose-500'
-                          : 'bg-emerald-50 text-emerald-600'
-                      }`}>
-                        {product.quantity <= 3 ? `⚠ ${product.quantity}` : `${product.quantity} en stock`}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-
-              {filteredProducts.length === 0 && (
-                <div className="col-span-full p-16 text-center opacity-30">
-                  <Package className="w-12 h-12 mx-auto text-blue-gray mb-4" />
-                  <p className="font-black uppercase text-blue-gray tracking-widest text-xs">Aucun produit trouvé</p>
-                </div>
+                    {clientCredit > 0 && (
+                       <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                          Crédit: {store.formatCurrency(clientCredit)}
+                       </div>
+                    )}
+                 </div>
               )}
-            </div>
-          </div>
+           </div>
+
+           {/* Cart Terminal */}
+           <div className="flex-1 glass-card bg-white p-8 rounded-[48px] border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
+              <div className="flex items-center justify-between mb-8">
+                 <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
+                       <ShoppingCart className="w-5 h-5" />
+                    </div>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Panier</p>
+                 </div>
+                 {cart.length > 0 && (
+                    <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">Purger</button>
+                 )}
+              </div>
+
+              <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
+                 {cart.length === 0 && (
+                    <div className="h-full flex flex-col items-center justify-center opacity-10 text-center py-10">
+                       <ShoppingCart className="w-16 h-16 mb-4" />
+                       <p className="text-xs font-black uppercase tracking-widest">Panier Vide</p>
+                    </div>
+                 )}
+                 {cart.map(item => (
+                    <div key={item.product.id || item.product.product_id} className="flex items-center gap-4 group">
+                       <div className="flex-1 min-w-0">
+                          <p className="text-[11px] font-black text-navy-950 uppercase truncate">{item.product.name}</p>
+                          <p className="text-[9px] font-black text-blue-gray uppercase opacity-60">{store.formatCurrency(item.unitPrice)}/u</p>
+                       </div>
+                       <div className="flex items-center gap-3">
+                          <button onClick={() => updateQty(item.product.id || item.product.product_id, -1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus className="w-3.5 h-3.5" /></button>
+                          <span className="w-5 text-center text-sm font-black text-navy-950">{item.qty}</span>
+                          <button onClick={() => updateQty(item.product.id || item.product.product_id, 1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"><Plus className="w-3.5 h-3.5" /></button>
+                       </div>
+                       <p className="text-[11px] font-black text-navy-950 w-20 text-right">{store.formatCurrency(item.qty * item.unitPrice)}</p>
+                    </div>
+                 ))}
+              </div>
+
+              <div className="mt-8 pt-8 border-t border-navy-50 space-y-4">
+                 <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray italic">Sous-total</p>
+                    <p className="text-2xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(cartTotal)}</p>
+                 </div>
+
+                 <div className="relative group">
+                    <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
+                    <input
+                      type="number"
+                      placeholder="MONTANT REÇU..."
+                      value={amountPaid}
+                      onChange={e => setAmountPaid(e.target.value)}
+                      className="w-full bg-navy-50 border border-transparent rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                    />
+                 </div>
+
+                 {paidInput > 0 && (
+                    <div className={`p-4 rounded-2xl flex items-center justify-between border ${change >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
+                       <p className="text-[9px] font-black uppercase tracking-widest">{change >= 0 ? 'À rendre' : 'Manquant'}</p>
+                       <p className="text-xl font-black">{store.formatCurrency(Math.abs(change))}</p>
+                    </div>
+                 )}
+
+                 <button
+                   onClick={handleCheckout}
+                   disabled={cart.length === 0 || isProcessing}
+                   className={`w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl ${
+                     cart.length === 0 || isProcessing
+                       ? 'bg-navy-100 text-blue-gray cursor-not-allowed opacity-50'
+                       : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]'
+                   }`}
+                 >
+                   {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
+                   {isProcessing ? 'Validation...' : 'Finaliser la Vente'}
+                 </button>
+              </div>
+           </div>
+
         </div>
 
-        {/* RIGHT — Order Summary / Checkout */}
-        <div className="flex flex-col gap-3 min-h-0">
-          {/* Client Info */}
-          <div className="glass-card bg-white border border-navy-100 shadow-sm">
-            <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-3 flex items-center gap-2 italic">
-              <User className="w-3.5 h-3.5" /> Client (Optionnel)
-            </p>
-            <input
-              type="text"
-              placeholder="Nom du client..."
-              value={clientName}
-              onChange={e => setClientName(e.target.value)}
-              className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-sm font-black text-navy-950 uppercase outline-none focus:border-navy-brand transition-all mb-2 placeholder:text-blue-gray/40 placeholder:normal-case"
-            />
-            <input
-              type="text"
-              placeholder="Téléphone (optionnel)..."
-              value={clientPhone}
-              onChange={e => setClientPhone(e.target.value)}
-              className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-sm font-black text-navy-950 outline-none focus:border-navy-brand transition-all placeholder:text-blue-gray/40"
-            />
-            {clientName && (clientDebt > 0 || clientCredit > 0) && (
-              <div className="mt-3 flex gap-2">
-                {clientDebt > 0 && <span className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase">Dette: {store.formatCurrency(clientDebt)}</span>}
-                {clientCredit > 0 && <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase">Crédit: {store.formatCurrency(clientCredit)}</span>}
-              </div>
-            )}
-          </div>
-
-          {/* Cart Items */}
-          <div className="flex-1 glass-card bg-white border border-navy-100 shadow-sm overflow-hidden flex flex-col min-h-0">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest italic flex items-center gap-2">
-                <ShoppingCart className="w-3.5 h-3.5" /> Commande en cours
-              </p>
-              {cart.length > 0 && (
-                <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:underline">
-                  Tout vider
-                </button>
-              )}
-            </div>
-
-            <div className="flex-1 overflow-y-auto scrollbar-hide space-y-2">
-              {cart.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-full opacity-20 py-8">
-                  <ShoppingCart className="w-10 h-10 text-blue-gray mb-2" />
-                  <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest">Panier vide</p>
-                </div>
-              )}
-              {cart.map(item => (
-                <div key={item.product.id} className="flex items-center gap-3 bg-navy-50 rounded-2xl p-3 group hover:bg-navy-100 transition-all">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-black text-navy-950 uppercase text-xs truncate">{item.product.name}</p>
-                    <p className="text-[10px] font-bold text-blue-gray">{store.formatCurrency(item.unitPrice)} / unité</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => updateQty(item.product.id, -1)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-rose-500 hover:text-rose-500 transition-all">
-                      <Minus className="w-3 h-3" />
-                    </button>
-                    <span className="w-6 text-center font-black text-sm text-navy-950">{item.qty}</span>
-                    <button onClick={() => updateQty(item.product.id, 1)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-emerald-500 hover:text-emerald-500 transition-all">
-                      <Plus className="w-3 h-3" />
-                    </button>
-                    <button onClick={() => removeFromCart(item.product.id)} className="w-7 h-7 bg-white rounded-lg flex items-center justify-center border border-navy-100 hover:border-rose-500 hover:bg-rose-500 hover:text-white transition-all ml-1">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                  <p className="font-black text-navy-brand text-sm w-16 text-right">{store.formatCurrency(item.qty * item.unitPrice)}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Totals */}
-            {cart.length > 0 && (
-              <div className="border-t border-navy-100 pt-3 mt-3 space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest">Total Commande</p>
-                  <p className="text-xl font-black text-navy-950">{store.formatCurrency(cartTotal)}</p>
-                </div>
-
-                {/* Payment input */}
-                <div className="flex items-center gap-2 bg-navy-50 rounded-xl px-4 py-3 border border-transparent focus-within:border-navy-brand transition-all">
-                  <CreditCard className="w-4 h-4 text-blue-gray flex-shrink-0" />
-                  <input
-                    type="number"
-                    placeholder="Montant reçu..."
-                    value={amountPaid}
-                    onChange={e => setAmountPaid(e.target.value)}
-                    className="flex-1 bg-transparent outline-none text-sm font-black text-navy-950 placeholder:text-blue-gray/40"
-                  />
-                </div>
-
-                {paid > 0 && (
-                  <div className={`flex items-center justify-between px-4 py-2.5 rounded-xl ${
-                    change >= 0 ? 'bg-emerald-50 border border-emerald-100' : 'bg-rose-50 border border-rose-100'
-                  }`}>
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${change >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {change >= 0 ? 'Monnaie à rendre' : 'Reste à payer'}
-                    </p>
-                    <p className={`font-black text-lg ${change >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                      {store.formatCurrency(Math.abs(change))}
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Checkout Button */}
-          <button
-            onClick={handleCheckout}
-            disabled={cart.length === 0 || isProcessing}
-            className={`w-full py-5 rounded-2xl font-black uppercase tracking-widest text-sm flex items-center justify-center gap-3 transition-all shadow-2xl ${
-              cart.length === 0
-                ? 'bg-navy-100 text-blue-gray cursor-not-allowed'
-                : isProcessing
-                ? 'bg-navy-brand text-white animate-pulse'
-                : 'bg-navy-950 text-white hover:bg-navy-brand active:scale-95 shadow-navy-950/30'
-            }`}
-          >
-            {isProcessing ? (
-              <><Clock className="w-5 h-5 animate-spin" /> Traitement...</>
-            ) : (
-              <><Zap className="w-5 h-5" /> Valider la Vente — {cart.length > 0 ? store.formatCurrency(cartTotal) : '—'}</>
-            )}
-          </button>
-        </div>
       </div>
+
     </div>
   );
 }
