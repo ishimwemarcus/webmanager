@@ -15,8 +15,12 @@ import {
   AlertCircle,
   Cpu,
   Layers,
-  Wallet
+  Wallet,
+  FileText,
+  MessageSquare,
+  Printer
 } from 'lucide-react';
+import { generateDailySummary, shareDailyReport, printThermalReport } from '../utils/Reporter';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export default function Dashboard() {
@@ -74,15 +78,35 @@ export default function Dashboard() {
            </p>
         </div>
 
-        <div className="w-full lg:w-auto glass-card !p-4 bg-white border-emerald-100 flex items-center justify-between gap-8 group hover:border-emerald-500 transition-all shadow-sm">
-           <div className="space-y-0.5">
-              <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest italic">Target Link (IP or Domain)</p>
-              <p className="text-xs font-black text-navy-950 tracking-tighter">10.166.75.218</p>
-           </div>
-           <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
-              <Globe className="w-4 h-4" />
-           </div>
-        </div>
+         <div className="flex items-center gap-3">
+            <button 
+               onClick={() => {
+                  const summary = generateDailySummary(sales, store.getExpenses(), store.getLedgerManual(), losses);
+                  printThermalReport(summary.raw, store.formatCurrency);
+               }}
+               className="flex items-center gap-2 px-6 py-4 bg-white border border-emerald-200 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-xl active:scale-95"
+            >
+               <Printer className="w-4 h-4" /> Print Summary
+            </button>
+            <button 
+               onClick={() => {
+                  const summary = generateDailySummary(sales, store.getExpenses(), store.getLedgerManual(), losses);
+                  shareDailyReport(summary.raw, store.formatCurrency);
+               }}
+               className="flex items-center gap-2 px-6 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
+            >
+               <MessageSquare className="w-4 h-4" /> WhatsApp Report
+            </button>
+            <div className="hidden lg:flex items-center gap-8 glass-card !p-4 bg-white border-emerald-100 group hover:border-emerald-500 transition-all shadow-sm">
+               <div className="space-y-0.5">
+                  <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest italic">Target Link (IP or Domain)</p>
+                  <p className="text-xs font-black text-navy-950 tracking-tighter">10.166.75.218</p>
+               </div>
+               <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
+                  <Globe className="w-4 h-4" />
+               </div>
+            </div>
+         </div>
       </div>
 
       <div className="space-y-2">

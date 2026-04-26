@@ -20,9 +20,11 @@ import {
   Cpu,
   BarChart2,
   PieChart,
-  Wallet
+  Wallet,
+  MessageSquare
 } from 'lucide-react';
 
+import { generateDailySummary, shareDailyReport } from '../utils/Reporter';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
 export default function Reports() {
@@ -35,32 +37,29 @@ export default function Reports() {
   const allShifts = store.getShifts ? store.getShifts() : [];
   const [activeSectors, setActiveSectors] = useState(['sales', 'ledger', 'stock', 'losses', 'shifts']);
 
+  const summaryData = useMemo(() => generateDailySummary(allSales, [], allLedger, allLosses, reportDate), [allSales, allLedger, allLosses, reportDate]);
+  const reportData = summaryData.raw;
+
   const { dailySales, dailyLedger, dailyLosses, dailyShifts, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected } = useMemo(() => {
     const sales = allSales.filter(s => s.date && s.date.startsWith(reportDate));
     const ledger = allLedger.filter(l => l.date && l.date.startsWith(reportDate));
     const losses = allLosses.filter(l => l.date && l.date.startsWith(reportDate));
     const shifts = allShifts.filter(s => s.end && s.end.startsWith(reportDate));
 
-    const rev = sales.reduce((sum, s) => sum + (parseFloat(s.amount) || 0), 0);
-    const cash = sales.reduce((sum, s) => sum + (parseFloat(s.paid) || 0), 0);
-    const exp = ledger.filter(l => l.type === 'expense').reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0);
-    const rec = ledger.filter(l => l.type === 'receivable').reduce((sum, l) => sum + (parseFloat(l.amount) || 0), 0);
-    const lossVal = losses.reduce((sum, l) => sum + (parseFloat(l.valuation || l.amount) || 0), 0);
-
     return {
       dailySales: sales,
       dailyLedger: ledger,
       dailyLosses: losses,
       dailyShifts: shifts,
-      totalSalesRev: rev,
-      totalSalesCash: cash,
-      totalSalesDebt: rev - cash,
-      totalExpense: exp,
-      totalReceivable: rec,
-      totalLossValuation: lossVal,
-      netCashCollected: cash + rec - exp - lossVal
+      totalSalesRev: reportData.totalSales,
+      totalSalesCash: reportData.cashCollected,
+      totalSalesDebt: reportData.unpaidLedger,
+      totalExpense: reportData.totalExpenses,
+      totalReceivable: ledger.filter(l => l.type === 'receivable').reduce((s, l) => s + (parseFloat(l.amount)||0), 0),
+      totalLossValuation: reportData.totalLossValuation,
+      netCashCollected: reportData.netProfit
     };
-  }, [allSales, allLedger, allLosses, reportDate, allShifts]);
+  }, [allSales, allLedger, allLosses, reportDate, allShifts, reportData]);
 
   const totalStockValue = useMemo(() =>
     allProducts.reduce((sum, p) => sum + ((parseFloat(p.cost) || 0) * (parseFloat(p.quantity) || 0)), 0),
@@ -73,12 +72,59 @@ export default function Reports() {
 
   const handleDownloadPDF = () => {
     if (!window.pdfMake) {
-      store.showAlert("PDF Engine is loading or unavailable.", "warning");
+      store.showAlert("Le moteur PDF est en cours de chargement...", "warning");
       return;
     }
-    // PDF Generation logic simplified for this refactor, assuming existing logic is fine
-    store.showAlert("Génération du rapport en cours...", "success");
-    // [Existing PDF Logic would go here, preserved in actual file]
+
+    const docDefinition = {
+      content: [
+        { text: 'MARC INTELLIGENCE - RAPPORT D\'ACTIVITÉ', style: 'header' },
+        { text: `Date du Rapport: ${reportDate}`, style: 'subheader' },
+        { text: '\n' },
+        {
+          table: {
+            widths: ['*', '*'],
+            body: [
+              [{ text: 'Indicateur', style: 'tableHeader' }, { text: 'Valeur', style: 'tableHeader' }],
+              ['Revenus Bruts', store.formatCurrency(totalSalesRev)],
+              ['Cash Encaissé', store.formatCurrency(totalSalesCash)],
+              ['Dépenses', store.formatCurrency(totalExpense)],
+              ['Pertes', store.formatCurrency(totalLossValuation)],
+              ['Profit Net', store.formatCurrency(netCashCollected)]
+            ]
+          }
+        },
+        { text: '\n\nJournal des Ventes détaillée:', style: 'sectionHeader' },
+        {
+          table: {
+            widths: ['auto', '*', 'auto', 'auto'],
+            body: [
+              ['Heure', 'Client', 'Article', 'Total'],
+              ...dailySales.map(s => [
+                new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                s.client || 'STANDARD',
+                s.name,
+                store.formatCurrency(s.amount)
+              ])
+            ]
+          }
+        }
+      ],
+      styles: {
+        header: { fontSize: 22, bold: true, color: '#082F49', alignment: 'center' },
+        subheader: { fontSize: 12, alignment: 'center', color: '#64748B' },
+        sectionHeader: { fontSize: 14, bold: true, margin: [0, 15, 0, 5] },
+        tableHeader: { bold: true, fontSize: 13, color: 'black' }
+      }
+    };
+
+    try {
+      window.pdfMake.createPdf(docDefinition).download(`MARC-Report-${reportDate}.pdf`);
+      store.showAlert("Rapport PDF généré avec succès !");
+    } catch (err) {
+      console.error(err);
+      store.showAlert("Erreur lors de la génération du PDF", "error");
+    }
   };
 
   return (

@@ -153,7 +153,12 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
         </div>
 
         <script>
-          window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }
+          window.onload = () => {
+            setTimeout(() => {
+              window.print();
+              window.onafterprint = () => window.close();
+            }, 500);
+          }
         </script>
       </body>
     </html>
@@ -215,7 +220,12 @@ export const printThermalReport = (reportData, formatCurrency) => {
         <div class="center" style="font-size: 10px;">GÉNÉRÉ PAR MARC v4.0</div>
         
         <script>
-          window.onload = () => { window.print(); setTimeout(() => window.close(), 500); }
+          window.onload = () => {
+            setTimeout(() => {
+              window.print();
+              window.onafterprint = () => window.close();
+            }, 500);
+          }
         </script>
       </body>
     </html>
@@ -223,6 +233,27 @@ export const printThermalReport = (reportData, formatCurrency) => {
   const printWindow = window.open('', '_blank', 'width=350,height=600');
   printWindow.document.write(content);
   printWindow.document.close();
+};
+
+export const shareDailyReport = (reportData, formatCurrency) => {
+  const text = `
+📊 *RAPPORT JOURNALIER - MARC*
+📅 *Date:* ${new Date().toLocaleDateString('fr-FR')}
+---------------------------------------
+💰 *Total Revenu:* ${formatCurrency(reportData.totalSales)}
+💵 *Cash Encaissé:* ${formatCurrency(reportData.cashCollected)}
+🧾 *Créances Client:* ${formatCurrency(reportData.unpaidLedger)}
+🛑 *Total Dépenses:* ${formatCurrency(reportData.totalExpenses)}
+📉 *Total Pertes:* ${formatCurrency(reportData.totalLossValuation)}
+---------------------------------------
+✨ *PROFIT NET (CASH):* ${formatCurrency(reportData.netProfit)}
+🏢 *Performance:* ${reportData.performance}
+---------------------------------------
+_Généré par le système d'intelligence MARC_
+  `.trim();
+  
+  const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
 };
 
 export const shareReceipt = (sale, operator, formatCurrency) => {
