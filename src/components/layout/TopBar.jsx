@@ -98,36 +98,29 @@ export default function TopBar({ onToggleSidebar }) {
             <input
               type="text"
               value={currency}
-              onChange={e => setCurrency(e.target.value)}
-              className="w-8 md:w-10 bg-transparent text-white font-black text-xs text-center border-b border-white/20 focus:border-[#BEF264] outline-none transition-all uppercase"
-              maxLength={4}
-              title="Change System Currency"
+              onChange={(e) => setCurrency(e.target.value)}
+              className="w-10 md:w-12 bg-transparent border-none text-white font-black text-xs md:text-sm p-0 focus:ring-0 text-center uppercase"
             />
-          </div>
-
-          <div className="group relative">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-white/5 rounded-xl border border-white/10 p-1 shadow-lg hover:scale-110 hover:bg-gold/20 hover:border-gold/50 transition-all duration-700 cursor-pointer overflow-hidden opacity-10 hover:opacity-100 backdrop-blur-sm hover:backdrop-blur-none group">
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&color=BEF264&bgcolor=050A09&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/')}`}
-                alt="System Link"
-                className="w-full h-full object-contain grayscale group-hover:grayscale-0 transition-all duration-700"
-              />
-            </div>
-            {/* Tooltip/Hover Effect */}
-            <div className="absolute top-full right-0 mt-4 w-48 bg-navy-950/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 translate-y-2 transition-all duration-500 z-[110] shadow-2xl">
-              <p className="text-xs font-black uppercase tracking-widest text-white mb-2 italic">Global Network Link</p>
-              <div className="w-full aspect-square bg-white rounded-lg p-2 mb-2">
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/')}`}
-                  alt="System Link"
-                  className="w-full h-full object-contain"
-                />
-            </div>
-              <p className="text-xs md:text-sm md:text-xs text-white/50 font-bold uppercase tracking-tight leading-relaxed">Scan to access the platform across distributed nodes.</p>
-            </div>
           </div>
         </div>
       </div>
+
+      {showQR && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowQR(false)}>
+          <div className="bg-white p-10 rounded-[40px] shadow-2xl relative scale-in max-w-sm w-full text-center" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setShowQR(false)} className="absolute top-6 right-6 p-2 hover:bg-navy-50 rounded-full transition-all"><X className="w-6 h-6" /></button>
+            <div className="w-20 h-20 bg-navy-brand rounded-3xl mx-auto flex items-center justify-center text-white mb-6">
+              <QrCode className="w-10 h-10" />
+            </div>
+            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">Accès Mobile</h3>
+            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">Scannez pour synchroniser ce terminal avec votre smartphone.</p>
+            <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200">
+              <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://guardian-business.surge.sh" alt="QR Code" className="w-full h-auto rounded-xl" />
+            </div>
+            <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">Guardian Protocol v4.0 Active</p>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
