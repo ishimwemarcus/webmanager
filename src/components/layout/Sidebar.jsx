@@ -12,8 +12,7 @@ import {
   AlertTriangle,
   Calculator,
   Cpu,
-  LogOut,
-  Wallet
+  LogOut
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
@@ -28,14 +27,15 @@ export default function Sidebar({ className }) {
 
   const navItems = [
     { to: '/', icon: LayoutDashboard, label: 'PERFORMANCE' },
-    { to: '/commander', icon: Cpu, label: 'COMMANDER' },
-    { to: '/stock', icon: Package, label: 'INVENTORY' },
+    { to: '/commander', icon: Cpu, label: 'PRENDRE COMMANDE' },
+    { to: '/stock', icon: Package, label: 'INVENTAIRE' },
     { to: '/sales', icon: ShoppingCart, label: 'TRANSACTIONS' },
-    { to: '/wait', icon: Clock, label: 'CREDITS' },
-    { to: '/reports', icon: BarChart2, label: 'REPORTS' },
-    { to: '/clients', icon: Users, label: 'CLIENTS VIP' },
-    { to: '/spoilage', icon: AlertTriangle, label: 'PERTES' },
-    { to: '/cloture', icon: Calculator, label: 'CAISSE' }
+    { to: '/wait', icon: Clock, label: 'CRÉDITS CLIENTS' },
+    { to: '/reports', icon: BarChart2, label: 'INTELLIGENCE' },
+    { to: '/clients', icon: Users, label: 'BASE CLIENTS' },
+    { to: '/shifts', icon: Clock, label: 'JOURNAL DES POSTES' },
+    { to: '/spoilage', icon: AlertTriangle, label: 'PERTES (AVARIES)' },
+    { to: '/cloture', icon: Calculator, label: 'CLÔTURE CAISSE' }
   ];
 
   return (
@@ -88,7 +88,7 @@ export default function Sidebar({ className }) {
               `}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-[11px] font-black uppercase tracking-widest">{item.label}</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
               <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
             </NavLink>
           ))}
