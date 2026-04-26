@@ -30,7 +30,7 @@ export default function Sidebar({ className }) {
     { to: '/commander', icon: Cpu, label: 'PRENDRE COMMANDE' },
     { to: '/stock', icon: Package, label: 'INVENTAIRE' },
     { to: '/sales', icon: ShoppingCart, label: 'TRANSACTIONS' },
-    { to: '/wait', icon: Clock, label: 'CRÉDITS CLIENTS' },
+    { to: '/wait', icon: Clock, label: 'GRAND LIVRE' },
     { to: '/reports', icon: BarChart2, label: 'INTELLIGENCE' },
     { to: '/clients', icon: Users, label: 'BASE CLIENTS' },
     { to: '/shifts', icon: Clock, label: 'JOURNAL DES POSTES' },
