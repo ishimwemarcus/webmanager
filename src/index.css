@@ -1,27 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* Eco-Crystalline: Slate Sky (Background), Grass Green & Royal Blue (Accents) */
-  --color-navy-brand: #0369A1; /* Royal Blue */
-  --color-accent-green: #22C55E; /* Grass Green */
-  --color-bg-soft: #F8FAFC; /* Slate Sky Background */
+  /* Guardian Elite: Deep Midnight & Gold Accents */
+  --color-navy-brand: #0369A1;
+  --color-accent-green: #22C55E;
+  --color-bg-soft: #F8FAFC;
 
-  --color-gold: #BEF264; /* Greenlighter Lime */
-  --color-gold-dark: #A3D94E;
+  --color-gold: #F59E0B;
+  --color-gold-dark: #D97706;
 
-  --color-highlight: #0EA5E9; /* Sky Blue */
+  --color-highlight: #0EA5E9;
   --color-success-pro: #22C55E;
   --color-warning-pro: #F59E0B;
   --color-danger-pro: #EF4444;
   
-  --gradient-horizon: linear-gradient(135deg, #22C55E 0%, #3B82F6 100%);
-  --glow-horizon: 0 0 20px rgba(34, 197, 94, 0.4);
+  --gradient-horizon: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
 
   --color-charcoal: #0F172A;
-  --color-pure-black: #0F172A; /* Midnight Navy Authority */
+  --color-pure-black: #0F172A;
   --color-blue-gray: #64748B;
 
-  /* Eco Theme Shades */
   --color-navy-50: #F0F9FF;
   --color-navy-100: #E0F2FE;
   --color-navy-200: #BAE6FD;
@@ -45,140 +43,24 @@
   html,
   body {
     height: 100%;
-    height: 100dvh;
     margin: 0;
     font-family: 'Outfit', 'Inter', sans-serif;
-    font-size: 12px;
-    background-color: #F0FDF4 !important; /* Luminous Clean Mint Baseline */
-    color: #0F172A !important; /* Midnight Navy Visibility */
-    background-attachment: fixed !important;
-    transition: background 0.5s ease, filter 0.5s ease;
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
+    background-color: #F8FAFC !important;
+    color: #0F172A !important;
+    transition: background 0.5s ease;
   }
 
-  /* Photophobia / Eye Sickness Comfort Mode */
-  html.eye-care-mode {
-    filter: invert(0.9) hue-rotate(180deg) brightness(1.1) contrast(0.85);
-    background-color: #111 !important;
-  }
-
-  html.eye-care-mode img,
-  html.eye-care-mode video,
-  html.eye-care-mode canvas {
-    filter: invert(1) hue-rotate(180deg);
-  }
-
-  h1, h2, h3, h4, .font-display {
+  h1, h2, h3, h4 {
     font-family: 'Outfit', sans-serif;
-    letter-spacing: -0.04em;
     font-weight: 900 !important;
     text-transform: uppercase;
   }
 
-  /* Hide number input spin buttons globally */
-  input::-webkit-outer-spin-button,
-  input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  input[type=number] {
-    -moz-appearance: textfield;
-  }
-
-  h1 { font-size: clamp(2.5rem, 8vw, 4rem); line-height: 0.9; }
-  h2 { font-size: clamp(1.5rem, 5vw, 2.5rem); line-height: 1; }
-
-  input, select, textarea {
-    background: #FFFFFF;
-    border: 1.5px solid #E2E8F0;
-    color: #0F172A;
-    font-weight: 700;
-    border-radius: 1rem;
-    padding: 1rem 1.5rem;
-    transition: all 0.3s ease;
-  }
-
-  input:focus, select:focus, textarea:focus {
-    outline: none;
-    border-color: var(--color-navy-brand);
-    box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.1);
-  }
-}
-
-@layer components {
   .glass-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-    border-radius: 2rem;
-    padding: 2rem;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .glass-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-  }
-
-  .premium-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-  }
-
-  .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  }
-
-  .premium-table th {
-    padding: 1.5rem;
-    background: #F8FAFC;
-    color: #64748B;
-    font-size: 10px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
-    border-bottom: 2px solid #F1F5F9;
-    text-align: left;
-  }
-
-  .premium-table td {
-    padding: 1.5rem;
-    border-bottom: 1px solid #F1F5F9;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #0F172A;
-  }
-
-  .btn-premium {
-    background: var(--color-navy-brand);
-    color: #FFFFFF;
-    padding: 1rem 2rem;
-    border-radius: 1rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    border: none;
-    box-shadow: 0 10px 20px -5px rgba(3, 105, 161, 0.3);
-  }
-
-  .btn-premium:hover {
-    background: #0C4A6E;
-    transform: translateY(-2px);
-    box-shadow: 0 15px 30px -5px rgba(3, 105, 161, 0.4);
-  }
-
-  .premium-shadow {
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
   }
 
   .fade-in-up {
@@ -186,14 +68,8 @@
   }
 
   @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .scale-in {
@@ -201,60 +77,7 @@
   }
 
   @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
   }
-
-  .hover-elevate {
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .hover-elevate:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
-  }
-
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 4px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
-    border-radius: 10px;
-  }
-}
-
-@layer utilities {
-  .no-print {
-    @media print {
-      display: none !important;
-    }
-  }
-}
-
-/* Base Styles Overrides for Premium Look */
-.premium-table thead th {
-  background: #F8FAFC;
-  text-transform: uppercase;
-  font-size: 0.7rem;
-  letter-spacing: 0.1em;
-  font-weight: 900;
-  color: #64748B;
-  border-bottom: 1px solid #E2E8F0;
-  padding: 1.5rem 2rem;
-}
-
-.premium-table tbody td {
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid #F1F5F9;
-  font-weight: 700;
-  color: #1E293B;
-}
-
-.premium-table tbody tr:hover {
-  background: #F8FAFC;
 }
