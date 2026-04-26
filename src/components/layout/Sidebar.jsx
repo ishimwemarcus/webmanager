@@ -49,8 +49,8 @@ export default function Sidebar({ className }) {
             <svg viewBox="0 0 100 100" className="w-14 h-14 group-hover:scale-110 transition-transform duration-700 animate-bounce-gentle">
               <defs>
                 <linearGradient id="sidebar-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#F59E0B' }} />
-                  <stop offset="100%" style={{ stopColor: '#D97706' }} />
+                  <stop offset="0%" style={{ stopColor: '#10B981' }} />
+                  <stop offset="100%" style={{ stopColor: '#059669' }} />
                 </linearGradient>
               </defs>
               <path
@@ -67,7 +67,7 @@ export default function Sidebar({ className }) {
             <h1 className="text-3xl font-black tracking-[-0.05em] text-white uppercase leading-none">
               MARC
             </h1>
-            <div className="h-1.5 w-12 bg-[#F59E0B] mx-auto mt-3 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]"></div>
+            <div className="h-1.5 w-12 bg-[#10B981] mx-auto mt-3 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
           </div>
         </div>
       </div>
@@ -82,7 +82,7 @@ export default function Sidebar({ className }) {
               className={({ isActive }) => `
                 flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-500 group relative
                 ${isActive 
-                  ? 'bg-[#F59E0B] text-black shadow-[0_10px_20px_rgba(245,158,11,0.3)] translate-x-1' 
+                  ? 'bg-[#10B981] text-black shadow-[0_10px_20px_rgba(16,185,129,0.3)] translate-x-1' 
                   : 'hover:bg-white/5 text-white/40 hover:text-white hover:translate-x-1'}
                 active:scale-95
               `}

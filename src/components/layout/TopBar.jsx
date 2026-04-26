@@ -29,7 +29,7 @@ export default function TopBar({ onToggleSidebar }) {
 
 
   return (
-    <header className="h-14 md:h-20 bg-gradient-to-r from-[#064E3B] to-[#0F172A] border-b border-white/10 flex items-center justify-between px-4 md:px-10 z-[100] no-print transition-all duration-500">
+    <header className="h-14 md:h-20 bg-navy-950 border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-[100] no-print transition-all duration-500 shadow-xl">
 
       <div className="flex items-center gap-4 md:gap-6">
         <button
@@ -42,7 +42,7 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="flex flex-col">
             <div className="flex items-center gap-2 md:gap-3">
               <h2 className="text-xs md:text-lg font-black text-white uppercase tracking-tighter">
-                VUE <span className="text-[#F59E0B] hidden xs:inline">CONSOLE DE GESTION</span><span className="text-[#F59E0B] xs:hidden">CONSOLE</span>
+                VUE <span className="text-emerald-500 hidden xs:inline">CONSOLE DE GESTION</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -71,7 +71,7 @@ export default function TopBar({ onToggleSidebar }) {
               className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all"
               title="Click to End Shift"
             >
-              <div className="w-6 h-6 rounded-full bg-[#F59E0B] text-black flex items-center justify-center font-black text-xs md:text-sm">
+              <div className="w-6 h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs md:text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                 {currentOperator.charAt(0).toUpperCase()}
               </div>
               <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
@@ -83,7 +83,7 @@ export default function TopBar({ onToggleSidebar }) {
             onClick={toggleLang}
             className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl text-white transition-all font-black text-xs md:text-sm uppercase tracking-widest group hover:bg-white/10"
           >
-            <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform text-[#F59E0B]" />
+            <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform text-emerald-500" />
             <span>{lang === 'en' ? 'EN' : 'FR'}</span>
           </button>
 

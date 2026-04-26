@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 @theme {
-  /* Guardian Elite: Midnight Navy & Gold Core Identity */
-  --color-navy-brand: #0369A1;
-  --color-accent-green: #22C55E;
-  --color-bg-soft: #F8FAFC;
+  /* MARC Evolution: Mint-Bio & Midnight Navy Core Identity */
+  --color-navy-brand: #10B981;
+  --color-accent-mint: #10B981;
+  --color-bg-soft: #F0F9F6;
 
-  --color-gold: #F59E0B;
-  --color-gold-dark: #D97706;
+  --color-mint-glow: #34D399;
+  --color-mint-dark: #064E3B;
 
-  --color-highlight: #0EA5E9;
-  --color-success-pro: #22C55E;
+  --color-highlight: #10B981;
+  --color-success-pro: #10B981;
   --color-warning-pro: #F59E0B;
   --color-danger-pro: #EF4444;
   
