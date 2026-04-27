@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
+import { useLanguage } from '../context/LanguageContext';
 import { printThermalReport, printFullMasterReport } from '../utils/Reporter';
 import { 
   Download, 
@@ -29,6 +30,7 @@ import { getFormattedQuantity } from '../utils/ProductUtils';
 
 export default function Reports() {
   const store = useStore();
+  const { t, L, lang } = useLanguage();
   const [reportDate, setReportDate] = useState(new Date().toISOString().split('T')[0]);
   const allSales = store.getSales() || [];
   const allLedger = store.getLedgerManual() || [];
@@ -56,7 +58,7 @@ export default function Reports() {
     // Eco Impact (Heuristic: tracking spoilage reduction)
     const spoilagePercentage = reportData.totalSales > 0 ? (reportData.totalLossValuation / reportData.totalSales) * 100 : 0;
     const ecoImpact = {
-       wasteReduced: spoilagePercentage < 2 ? 'Optimal (< 2% Perte)' : 'Attention (> 2% Perte)',
+       wasteReduced: spoilagePercentage < 2 ? L('Optimal (< 2% Loss)', 'Optimal (< 2% Perte)') : L('Warning (> 2% Loss)', 'Attention (> 2% Perte)'),
        isOptimal: spoilagePercentage < 2
     };
 
@@ -76,7 +78,7 @@ export default function Reports() {
       anomalies: { lowStock: lowStockAlerts, unpaidDebt: unpaidDebtAlerts },
       ecoImpact
     };
-  }, [allSales, allLedger, allLosses, reportDate, allShifts, reportData, allProducts]);
+  }, [allSales, allLedger, allLosses, reportDate, allShifts, reportData, allProducts, L]);
 
   const totalStockValue = useMemo(() =>
     allProducts.reduce((sum, p) => sum + ((parseFloat(p.cost) || 0) * (parseFloat(p.quantity) || 0)), 0),
@@ -89,36 +91,36 @@ export default function Reports() {
 
   const handleDownloadPDF = () => {
     if (!window.pdfMake) {
-      store.showAlert("Le moteur PDF est en cours de chargement...", "warning");
+      store.showAlert(L("The PDF engine is loading...", "Le moteur PDF est en cours de chargement..."), "warning");
       return;
     }
 
     const docDefinition = {
       content: [
-        { text: 'ACCOUNTING & OPERATIONS REPORT', style: 'mainHeader' },
-        { text: `Operating Date: ${reportDate}`, style: 'mainSubheader' },
+        { text: L('ACCOUNTING & OPERATIONS REPORT', 'RAPPORT COMPTABLE & OPÉRATIONNEL'), style: 'mainHeader' },
+        { text: `${L('Operating Date', 'Date d\'Opération')}: ${reportDate}`, style: 'mainSubheader' },
         { canvas: [{ type: 'line', x1: 0, y1: 5, x2: 515, y2: 5, lineWidth: 1 }] },
         { text: '\n' },
 
         ...(activeSectors.includes('sales') || activeSectors.includes('ledger') || activeSectors.includes('losses') ? [
-          { text: 'FINANCIAL PERFORMANCE SUMMARY', style: 'sectionHeader' },
+          { text: L('FINANCIAL PERFORMANCE SUMMARY', 'RÉSUMÉ DE LA PERFORMANCE FINANCIÈRE'), style: 'sectionHeader' },
           {
             layout: 'noBorders',
             table: {
               widths: ['*', 'auto'],
               body: [
                 ...(activeSectors.includes('sales') ? [
-                  ['Gross Sales Revenue', { text: store.formatCurrency(totalSalesRev), alignment: 'right' }],
-                  ['Cash Liquid Collected', { text: store.formatCurrency(totalSalesCash), alignment: 'right' }]
+                  [L('Gross Sales Revenue', 'Chiffre d\'Affaires Brut'), { text: store.formatCurrency(totalSalesRev), alignment: 'right' }],
+                  [L('Cash Liquid Collected', 'Liquidité Encaissée'), { text: store.formatCurrency(totalSalesCash), alignment: 'right' }]
                 ] : []),
                 ...(activeSectors.includes('ledger') ? [
-                  [{ text: 'Operating Expenses', color: 'red' }, { text: store.formatCurrency(totalExpense), alignment: 'right', color: 'red' }]
+                  [{ text: L('Operating Expenses', 'Dépenses Opérationnelles'), color: 'red' }, { text: store.formatCurrency(totalExpense), alignment: 'right', color: 'red' }]
                 ] : []),
                 ...(activeSectors.includes('losses') ? [
-                  [{ text: 'Losses (Spoilage)', color: 'red' }, { text: store.formatCurrency(totalLossValuation), alignment: 'right', color: 'red' }]
+                  [{ text: L('Losses (Spoilage)', 'Pertes (Avaries)'), color: 'red' }, { text: store.formatCurrency(totalLossValuation), alignment: 'right', color: 'red' }]
                 ] : []),
                 ['', ''], // spacer
-                [{ text: 'ADJUSTED NET PROFIT', style: 'netProfitLabel' }, { text: store.formatCurrency(netCashCollected), style: 'netProfitValue' }]
+                [{ text: L('ADJUSTED NET PROFIT', 'PROFIT NET AJUSTÉ'), style: 'netProfitLabel' }, { text: store.formatCurrency(netCashCollected), style: 'netProfitValue' }]
               ]
             }
           },
@@ -126,33 +128,33 @@ export default function Reports() {
         ] : []),
 
         // Business Intelligence Section
-        { text: 'BUSINESS INTELLIGENCE & DECISION SUPPORT', style: 'sectionHeader' },
+        { text: L('BUSINESS INTELLIGENCE & DECISION SUPPORT', 'INTELLIGENCE D\'AFFAIRES & SUPPORT DÉCISIONNEL'), style: 'sectionHeader' },
         {
           columns: [
             {
               width: '*',
               text: [
-                { text: 'Top Performing Articles\n', bold: true, color: '#10B981', fontSize: 10 },
-                ...(intelligence.topProducts.length > 0 ? intelligence.topProducts.map(p => `${p.name.toUpperCase()}: ${p.qty} Units Sold\n`) : ['No data\n'])
+                { text: `${L('Top Performing Articles', 'Articles les plus Performants')}\n`, bold: true, color: '#10B981', fontSize: 10 },
+                ...(intelligence.topProducts.length > 0 ? intelligence.topProducts.map(p => `${p.name.toUpperCase()}: ${p.qty} ${L('Units Sold', 'Unités Vendues')}\n`) : [`${L('No data', 'Aucune donnée')}\n`])
               ],
               fontSize: 9
             },
             {
               width: '*',
               text: [
-                { text: 'Operator Efficiency\n', bold: true, color: '#F59E0B', fontSize: 10 },
-                ...(intelligence.topOperators.length > 0 ? intelligence.topOperators.slice(0,3).map(o => `${o.name.toUpperCase()}: ${store.formatCurrency(o.revenue)} (${o.transactions} Tx)\n`) : ['No data\n'])
+                { text: `${L('Operator Efficiency', 'Efficacité des Opérateurs')}\n`, bold: true, color: '#F59E0B', fontSize: 10 },
+                ...(intelligence.topOperators.length > 0 ? intelligence.topOperators.slice(0,3).map(o => `${o.name.toUpperCase()}: ${store.formatCurrency(o.revenue)} (${o.transactions} Tx)\n`) : [`${L('No data', 'Aucune donnée')}\n`])
               ],
               fontSize: 9
             },
             {
               width: '*',
               text: [
-                { text: 'Eco-Impact & Alerts\n', bold: true, color: ecoImpact.isOptimal ? '#10B981' : '#EF4444', fontSize: 10 },
-                `System Status: ${anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 ? 'NOMINAL' : 'ATTENTION REQUIRED'}\n`,
-                `Spoilage Status: ${ecoImpact.wasteReduced}\n`,
-                `Low Stock Alerts: ${anomalies.lowStock.length}\n`,
-                `Active Debts: ${anomalies.unpaidDebt.length}\n`
+                { text: `${L('Eco-Impact & Alerts', 'Impact Éco & Alertes')}\n`, bold: true, color: ecoImpact.isOptimal ? '#10B981' : '#EF4444', fontSize: 10 },
+                `${L('System Status', 'Statut Système')}: ${anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 ? L('NOMINAL', 'NOMINAL') : L('ATTENTION REQUIRED', 'ATTENTION REQUISE')}\n`,
+                `${L('Spoilage Status', 'Statut Avaries')}: ${ecoImpact.wasteReduced}\n`,
+                `${L('Low Stock Alerts', 'Alertes Stock Bas')}: ${anomalies.lowStock.length}\n`,
+                `${L('Active Debts', 'Dettes Actives')}: ${anomalies.unpaidDebt.length}\n`
               ],
               fontSize: 9
             }
@@ -162,28 +164,28 @@ export default function Reports() {
 
         // Dynamic Content Based on Active Sectors
         ...(activeSectors.includes('sales') ? [
-          { text: 'SALES TRANSACTIONS', style: 'sectionHeader' },
+          { text: L('SALES TRANSACTIONS', 'TRANSACTIONS DE VENTE'), style: 'sectionHeader' },
           {
             table: {
               headerRows: 1,
               widths: ['auto', 'auto', 'auto', '*', 'auto', 'auto', 'auto', 'auto'],
               body: [
                 [
-                  { text: 'Time', style: 'tableHeader' },
-                  { text: 'Operator', style: 'tableHeader' },
-                  { text: 'Client', style: 'tableHeader' },
-                  { text: 'Product', style: 'tableHeader' },
-                  { text: 'Qty', style: 'tableHeader', alignment: 'right' },
-                  { text: 'Total', style: 'tableHeader', alignment: 'right' },
-                  { text: 'Paid', style: 'tableHeader', alignment: 'right' },
-                  { text: 'Debt', style: 'tableHeader', alignment: 'right' }
+                  { text: L('Time', 'Heure'), style: 'tableHeader' },
+                  { text: L('Operator', 'Opérateur'), style: 'tableHeader' },
+                  { text: L('Client', 'Client'), style: 'tableHeader' },
+                  { text: L('Product', 'Article'), style: 'tableHeader' },
+                  { text: L('Qty', 'Qté'), style: 'tableHeader', alignment: 'right' },
+                  { text: L('Total', 'Total'), style: 'tableHeader', alignment: 'right' },
+                  { text: L('Paid', 'Payé'), style: 'tableHeader', alignment: 'right' },
+                  { text: L('Debt', 'Dette'), style: 'tableHeader', alignment: 'right' }
                 ],
                 ...dailySales.map(s => {
                   const debt = (parseFloat(s.amount)||0) - (parseFloat(s.paid)||0);
                   return [
-                    new Date(s.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
                     (s.operator || 'ADMIN').toUpperCase(),
-                    (s.client || 'STANDARD').toUpperCase(),
+                    (s.client || L('STANDARD', 'STANDARD')).toUpperCase(),
                     s.name,
                     { text: s.quantity, alignment: 'right' },
                     { text: store.formatCurrency(s.amount), alignment: 'right' },
@@ -199,23 +201,23 @@ export default function Reports() {
         ] : []),
 
         ...(activeSectors.includes('ledger') || activeSectors.includes('losses') ? [
-          { text: 'LEDGER & LOSS LOG', style: 'sectionHeader' },
+          { text: L('LEDGER & LOSS LOG', 'LOG DU GRAND LIVRE & PERTES'), style: 'sectionHeader' },
           {
             table: {
               headerRows: 1,
               widths: ['auto', 'auto', 'auto', '*', 'auto'],
               body: [
                 [
-                  { text: 'Type', style: 'tableHeader' },
-                  { text: 'Time', style: 'tableHeader' },
-                  { text: 'Entity', style: 'tableHeader' },
-                  { text: 'Description', style: 'tableHeader' },
-                  { text: 'Amount', style: 'tableHeader', alignment: 'right' }
+                  { text: L('Type', 'Type'), style: 'tableHeader' },
+                  { text: L('Time', 'Heure'), style: 'tableHeader' },
+                  { text: L('Entity', 'Entité'), style: 'tableHeader' },
+                  { text: L('Description', 'Description'), style: 'tableHeader' },
+                  { text: L('Amount', 'Montant'), style: 'tableHeader', alignment: 'right' }
                 ],
                 ...dailyLedger.map(l => [
-                  { text: l.type.toUpperCase(), color: l.type === 'expense' ? 'red' : '#10B981', bold: true },
-                  new Date(l.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                  (l.client || 'SYSTEM').toUpperCase(),
+                  { text: (l.type === 'expense' ? L('EXPENSE', 'DÉPENSE') : L('RECEIVABLE', 'CRÉANCE')).toUpperCase(), color: l.type === 'expense' ? 'red' : '#10B981', bold: true },
+                  new Date(l.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit' }),
+                  (l.client || L('SYSTEM', 'SYSTÈME')).toUpperCase(),
                   l.name,
                   { text: store.formatCurrency(l.amount), alignment: 'right' }
                 ])
@@ -227,17 +229,17 @@ export default function Reports() {
         ] : []),
 
         ...(activeSectors.includes('stock') ? [
-          { text: 'INVENTORY / ASSET VALUATION', style: 'sectionHeader' },
+          { text: L('INVENTORY / ASSET VALUATION', 'INVENTAIRE / VALORISATION DES ACTIFS'), style: 'sectionHeader' },
           {
             table: {
               headerRows: 1,
               widths: ['*', 'auto', 'auto', 'auto'],
               body: [
                 [
-                  { text: 'Product', style: 'tableHeader' },
-                  { text: 'Qty', style: 'tableHeader', alignment: 'right' },
-                  { text: 'Unit Cost', style: 'tableHeader', alignment: 'right' },
-                  { text: 'Asset Value', style: 'tableHeader', alignment: 'right' }
+                  { text: L('Product', 'Article'), style: 'tableHeader' },
+                  { text: L('Qty', 'Qté'), style: 'tableHeader', alignment: 'right' },
+                  { text: L('Unit Cost', 'Coût Unit'), style: 'tableHeader', alignment: 'right' },
+                  { text: L('Asset Value', 'Valeur Asset'), style: 'tableHeader', alignment: 'right' }
                 ],
                 ...allProducts.map(p => [
                   p.name,
@@ -249,7 +251,7 @@ export default function Reports() {
             },
             layout: 'lightHorizontalLines'
           },
-          { text: `Total Inventory Asset Valuation: ${store.formatCurrency(allProducts.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}`, alignment: 'right', bold: true, margin: [0, 10, 0, 0] }
+          { text: `${L('Total Inventory Asset Valuation', 'Valorisation Totale des Actifs en Stock')}: ${store.formatCurrency(allProducts.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}`, alignment: 'right', bold: true, margin: [0, 10, 0, 0] }
         ] : [])
       ],
       styles: {
@@ -264,10 +266,10 @@ export default function Reports() {
 
     try {
       window.pdfMake.createPdf(docDefinition).download(`MARC-Report-${reportDate}.pdf`);
-      store.showAlert("Rapport PDF généré avec succès !");
+      store.showAlert(L("PDF report generated successfully!", "Rapport PDF généré avec succès !"));
     } catch (err) {
       console.error(err);
-      store.showAlert("Erreur lors de la génération du PDF", "error");
+      store.showAlert(L("Error generating PDF", "Erreur lors de la génération du PDF"), "error");
     }
   };
 
@@ -276,37 +278,37 @@ export default function Reports() {
     
     // 1. Intelligence & Summary Section
     if (activeSectors.includes('sales') || activeSectors.includes('ledger') || activeSectors.includes('losses')) {
-      csvContent += "=== BUSINESS INTELLIGENCE & SUMMARY ===\n";
-      if (activeSectors.includes('sales')) csvContent += `Gross Sales Revenue,${totalSalesRev}\n`;
-      if (activeSectors.includes('sales')) csvContent += `Cash Liquid Collected,${totalSalesCash}\n`;
-      if (activeSectors.includes('ledger')) csvContent += `Operating Expenses,${totalExpense}\n`;
-      if (activeSectors.includes('losses')) csvContent += `Losses (Spoilage),${totalLossValuation}\n`;
-      csvContent += `Adjusted Net Profit,${netCashCollected}\n`;
-      csvContent += `System Status,${anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 ? 'NOMINAL' : 'ATTENTION REQUIRED'}\n`;
-      csvContent += `Eco-Impact (Spoilage),${ecoImpact.wasteReduced}\n\n`;
+      csvContent += `=== ${L('BUSINESS INTELLIGENCE & SUMMARY', 'INTELLIGENCE D\'AFFAIRES & RÉSUMÉ')} ===\n`;
+      if (activeSectors.includes('sales')) csvContent += `${L('Gross Sales Revenue', 'Chiffre d\'Affaires Brut')},${totalSalesRev}\n`;
+      if (activeSectors.includes('sales')) csvContent += `${L('Cash Liquid Collected', 'Liquidité Encaissée')},${totalSalesCash}\n`;
+      if (activeSectors.includes('ledger')) csvContent += `${L('Operating Expenses', 'Dépenses Opérationnelles')},${totalExpense}\n`;
+      if (activeSectors.includes('losses')) csvContent += `${L('Losses (Spoilage)', 'Pertes (Avaries)')},${totalLossValuation}\n`;
+      csvContent += `${L('Adjusted Net Profit', 'Profit Net Ajusté')},${netCashCollected}\n`;
+      csvContent += `${L('System Status', 'Statut Système')},${anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 ? L('NOMINAL', 'NOMINAL') : L('ATTENTION REQUIRED', 'ATTENTION REQUISE')}\n`;
+      csvContent += `${L('Eco-Impact (Spoilage)', 'Impact Éco (Avaries)')},${ecoImpact.wasteReduced}\n\n`;
     }
 
     // 2. Transaction Log
-    csvContent += "=== TRANSACTION LOG ===\n";
-    csvContent += "Type,Date,Operateur,Client,Article,Quantite,Montant,Paye,Dette,Statut\n";
+    csvContent += `=== ${L('TRANSACTION LOG', 'JOURNAL DES TRANSACTIONS')} ===\n`;
+    csvContent += `${L('Type,Date,Operator,Client,Item,Quantity,Amount,Paid,Debt,Status', 'Type,Date,Opérateur,Client,Article,Quantité,Montant,Payé,Dette,Statut')}\n`;
     
     if (activeSectors.includes('sales')) {
       dailySales.forEach(s => {
         const debt = (parseFloat(s.amount)||0) - (parseFloat(s.paid)||0);
-        csvContent += `Vente,${s.date},${s.operator || 'ADMIN'},${s.client || 'STANDARD'},${s.name},${s.quantity},${s.amount},${s.paid},${Math.max(0, debt)},${s.status || 'N/A'}\n`;
+        csvContent += `${L('Sale', 'Vente')},${s.date},${s.operator || 'ADMIN'},${s.client || L('STANDARD', 'STANDARD')},${s.name},${s.quantity},${s.amount},${s.paid},${Math.max(0, debt)},${s.status || 'N/A'}\n`;
       });
     }
 
     if (activeSectors.includes('ledger') || activeSectors.includes('losses')) {
       dailyLedger.forEach(l => {
-        csvContent += `Finance (${l.type}),${l.date},${l.operator || 'ADMIN'},${l.client || 'SYSTEM'},${l.name},,${l.amount},,,${l.type}\n`;
+        csvContent += `${L('Finance', 'Finance')} (${l.type === 'expense' ? L('EXPENSE', 'DÉPENSE') : L('RECEIVABLE', 'CRÉANCE')}),${l.date},${l.operator || 'ADMIN'},${l.client || L('SYSTEM', 'SYSTÈME')},${l.name},,${l.amount},,,${l.type}\n`;
       });
     }
 
     // 3. Inventory Section
     if (activeSectors.includes('stock')) {
-      csvContent += "\n=== INVENTORY & ASSETS ===\n";
-      csvContent += "Product,Qty,Unit Cost,Asset Value\n";
+      csvContent += `\n=== ${L('INVENTORY & ASSETS', 'INVENTAIRE & ACTIFS')} ===\n`;
+      csvContent += `${L('Product,Qty,Unit Cost,Asset Value', 'Article,Qté,Coût Unit,Valeur Asset')}\n`;
       allProducts.forEach(p => {
         csvContent += `${p.name},${p.quantity},${p.cost},${p.quantity * p.cost}\n`;
       });
@@ -319,7 +321,7 @@ export default function Reports() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    store.showAlert("Export CSV terminé avec succès !");
+    store.showAlert(L("CSV export completed successfully!", "Export CSV terminé avec succès !"));
   };
 
 
@@ -330,10 +332,10 @@ export default function Reports() {
       <div className="border-b border-navy-100 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(1.6rem,5vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Intelligence d'Affaires
+            {L('Business Intelligence', 'Intelligence d\'Affaires')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.3em] uppercase italic opacity-60">
-            Audit Analytique — Reporting Haute Fidélité
+            {L('Analytical Audit — High Fidelity Reporting', 'Audit Analytique — Reporting Haute Fidélité')}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -366,13 +368,13 @@ export default function Reports() {
       <div className="glass-card bg-white rounded-[var(--fluid-radius-lg)] border-emerald-100 shadow-xl no-print">
          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
-               <p className="text-[9px] font-black uppercase tracking-widest text-blue-gray italic mr-1">Domaines :</p>
+               <p className="text-[9px] font-black uppercase tracking-widest text-blue-gray italic mr-1">{L('Domains:', 'Domaines :')}</p>
                {[
-                 { id: 'sales', label: 'Ventes' },
-                 { id: 'ledger', label: 'Finance' },
-                 { id: 'stock', label: 'Stock' },
-                 { id: 'losses', label: 'Pertes' },
-                 { id: 'shifts', label: 'Postes' }
+                 { id: 'sales', label: L('Sales', 'Ventes') },
+                 { id: 'ledger', label: L('Finance', 'Finance') },
+                 { id: 'stock', label: L('Stock', 'Stock') },
+                 { id: 'losses', label: L('Losses', 'Pertes') },
+                 { id: 'shifts', label: L('Shifts', 'Postes') }
                ].map(s => (
                  <button
                    key={s.id}
@@ -400,10 +402,10 @@ export default function Reports() {
       {/* Financial Summary Cards */}
       <div className="card-grid">
          {[
-           { icon: TrendingUp, bg: 'bg-emerald-50', color: 'text-emerald-600', border: 'border-emerald-100', label: 'Revenus Bruts', val: totalSalesRev, valColor: 'text-navy-950' },
-           { icon: Wallet, bg: 'bg-navy-50', color: 'text-navy-950', border: 'border-navy-100', label: 'Liquidité Encaissée', val: totalSalesCash, valColor: 'text-navy-950' },
-           { icon: Clock, bg: 'bg-amber-50', color: 'text-amber-600', border: 'border-amber-100', label: 'En Attente', val: dailySales.filter(s => s.status === 'waiting').reduce((acc, s) => acc + (parseFloat(s.amount)||0), 0), valColor: 'text-amber-600' },
-           { icon: TrendingDown, bg: 'bg-rose-50', color: 'text-rose-500', border: 'border-rose-100', label: 'Dépenses', val: totalExpense, valColor: 'text-rose-600' },
+           { icon: TrendingUp, bg: 'bg-emerald-50', color: 'text-emerald-600', border: 'border-emerald-100', label: L('Gross Revenue', 'Revenus Bruts'), val: totalSalesRev, valColor: 'text-navy-950' },
+           { icon: Wallet, bg: 'bg-navy-50', color: 'text-navy-950', border: 'border-navy-100', label: L('Cash Collected', 'Liquidité Encaissée'), val: totalSalesCash, valColor: 'text-navy-950' },
+           { icon: Clock, bg: 'bg-amber-50', color: 'text-amber-600', border: 'border-amber-100', label: L('Pending', 'En Attente'), val: dailySales.filter(s => s.status === 'waiting').reduce((acc, s) => acc + (parseFloat(s.amount)||0), 0), valColor: 'text-amber-600' },
+           { icon: TrendingDown, bg: 'bg-rose-50', color: 'text-rose-500', border: 'border-rose-100', label: L('Expenses', 'Dépenses'), val: totalExpense, valColor: 'text-rose-600' },
          ].map((m, i) => (
            <div key={i} className={`glass-card bg-white border ${m.border} shadow-sm relative overflow-hidden`}>
               <div className={`w-10 h-10 ${m.bg} ${m.color} rounded-xl flex items-center justify-center mb-4 shadow-inner`}>
@@ -420,7 +422,7 @@ export default function Reports() {
             <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center mb-4 border border-white/10">
                <Zap className="w-5 h-5 text-emerald-400" />
             </div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1 italic">Profit Net Ajusté</p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Adjusted Net Profit', 'Profit Net Ajusté')}</p>
             <p className="text-[clamp(1.25rem,3vw,1.875rem)] font-black text-white tracking-tighter">{store.formatCurrency(netCashCollected)}</p>
          </div>
       </div>
@@ -431,21 +433,21 @@ export default function Reports() {
          <div className="lg:col-span-2 glass-card bg-white p-8 rounded-[40px] border-emerald-100 shadow-sm flex flex-col md:flex-row gap-8">
             <div className="flex-1 space-y-4">
                <h3 className="text-xs font-black uppercase text-navy-950 tracking-widest flex items-center gap-2 mb-4">
-                  <TrendingUp className="w-4 h-4 text-emerald-500" /> Articles Populaires
+                  <TrendingUp className="w-4 h-4 text-emerald-500" /> {L('Popular Items', 'Articles Populaires')}
                </h3>
                {intelligence.topProducts.length > 0 ? intelligence.topProducts.map((p, i) => (
                   <div key={i} className="flex items-center justify-between p-4 bg-navy-50 rounded-2xl">
                      <span className="text-sm font-bold text-navy-950 uppercase">{p.name}</span>
-                     <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1 rounded-xl">{p.qty} vendus</span>
+                     <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1 rounded-xl">{p.qty} {L('sold', 'vendus')}</span>
                   </div>
-               )) : <p className="text-xs text-blue-gray italic">Aucune donnée disponible.</p>}
+               )) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
             </div>
             
             <div className="w-px bg-navy-50 hidden md:block"></div>
             
             <div className="flex-1 space-y-4">
                <h3 className="text-xs font-black uppercase text-navy-950 tracking-widest flex items-center gap-2 mb-4">
-                  <Cpu className="w-4 h-4 text-amber-500" /> Performance Équipe
+                  <Cpu className="w-4 h-4 text-amber-500" /> {L('Team Performance', 'Performance Équipe')}
                </h3>
                {intelligence.topOperators.length > 0 ? intelligence.topOperators.slice(0,3).map((op, i) => (
                   <div key={i} className="flex items-center justify-between p-4 bg-amber-50 rounded-2xl">
@@ -455,33 +457,33 @@ export default function Reports() {
                         <p className="text-[9px] font-black uppercase text-amber-500/60 tracking-widest">{op.transactions} Tx</p>
                      </div>
                   </div>
-               )) : <p className="text-xs text-blue-gray italic">Aucune donnée disponible.</p>}
+               )) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
             </div>
          </div>
 
          {/* Anomalies & Eco-Impact */}
          <div className="glass-card bg-navy-950 p-8 rounded-[40px] shadow-sm flex flex-col gap-6 text-white">
             <h3 className="text-xs font-black uppercase text-white tracking-widest flex items-center gap-2">
-               <ShieldCheck className="w-4 h-4 text-emerald-400" /> Analyse & Alertes
+               <ShieldCheck className="w-4 h-4 text-emerald-400" /> {L('Analysis & Alerts', 'Analyse & Alertes')}
             </h3>
             
             {/* Alerts */}
             <div className="space-y-3">
                {anomalies.lowStock.length > 0 && (
                   <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">Stock Critique</span>
-                     <span className="text-xs font-black text-rose-500">{anomalies.lowStock.length} Articles</span>
+                     <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">{L('Critical Stock', 'Stock Critique')}</span>
+                     <span className="text-xs font-black text-rose-500">{anomalies.lowStock.length} {L('Items', 'Articles')}</span>
                   </div>
                )}
                {anomalies.unpaidDebt.length > 0 && (
                   <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">Dettes en Cours</span>
-                     <span className="text-xs font-black text-amber-500">{anomalies.unpaidDebt.length} Dossiers</span>
+                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">{L('Pending Debts', 'Dettes en Cours')}</span>
+                     <span className="text-xs font-black text-amber-500">{anomalies.unpaidDebt.length} {L('Files', 'Dossiers')}</span>
                   </div>
                )}
                {anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 && (
                   <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Statut Opérationnel</span>
+                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{L('Operational Status', 'Statut Opérationnel')}</span>
                      <span className="text-xs font-black text-emerald-500">OPTIMAL</span>
                   </div>
                )}
@@ -489,7 +491,7 @@ export default function Reports() {
 
             {/* Eco Impact */}
             <div className={`mt-auto p-5 rounded-2xl border ${ecoImpact.isOptimal ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-rose-500/20 border-rose-500/30'}`}>
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 mb-1">Impact Éco (Pertes)</p>
+               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 mb-1">{L('Eco Impact (Losses)', 'Impact Éco (Pertes)')}</p>
                <p className={`text-sm font-black uppercase ${ecoImpact.isOptimal ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {ecoImpact.wasteReduced}
                </p>
@@ -507,8 +509,8 @@ export default function Reports() {
                         <BarChart2 className="w-7 h-7" />
                      </div>
                      <div>
-                        <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">Journal des Ventes</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">Transactions Opérationnelles</p>
+                        <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">{L('Sales Log', 'Journal des Ventes')}</h3>
+                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Operational Transactions', 'Transactions Opérationnelles')}</p>
                      </div>
                   </div>
                   <div className="text-right">
@@ -521,21 +523,21 @@ export default function Reports() {
                   <table className="w-full text-left">
                      <thead>
                         <tr className="bg-navy-50/50 text-[9px] font-black uppercase tracking-widest text-blue-gray">
-                           <th className="p-5">Heure</th>
-                           <th className="p-5">Opérateur</th>
-                           <th className="p-5">Client</th>
-                           <th className="p-5">Article</th>
-                           <th className="p-5 text-right">Vol.</th>
-                           <th className="p-5 text-right">Total</th>
-                           <th className="p-5 text-center">Status</th>
+                           <th className="p-5">{L('Time', 'Heure')}</th>
+                           <th className="p-5">{L('Operator', 'Opérateur')}</th>
+                           <th className="p-5">{L('Client', 'Client')}</th>
+                           <th className="p-5">{L('Item', 'Article')}</th>
+                           <th className="p-5 text-right">{L('Vol.', 'Vol.')}</th>
+                           <th className="p-5 text-right">{L('Total', 'Total')}</th>
+                           <th className="p-5 text-center">{L('Status', 'Statut')}</th>
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-navy-50">
                         {dailySales.map((s, i) => (
                            <tr key={i} className="hover:bg-navy-50/20 transition-colors">
-                              <td className="p-5 text-[10px] font-black text-navy-950">{new Date(s.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</td>
+                              <td className="p-5 text-[10px] font-black text-navy-950">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</td>
                               <td className="p-5 text-[9px] font-black text-blue-gray uppercase">{s.operator || 'ADMIN'}</td>
-                              <td className="p-5 text-[9px] font-black text-navy-950 uppercase">{s.client || 'STANDARD'}</td>
+                              <td className="p-5 text-[9px] font-black text-navy-950 uppercase">{s.client || L('STANDARD', 'STANDARD')}</td>
                               <td className="p-5 text-[9px] font-black text-navy-950 uppercase">{s.name}</td>
                               <td className="p-5 text-right text-[10px] font-black text-navy-950">{s.quantity}</td>
                               <td className="p-5 text-right text-[10px] font-black text-navy-950">{store.formatCurrency(s.amount)}</td>
@@ -548,7 +550,7 @@ export default function Reports() {
                               </td>
                            </tr>
                         ))}
-                        {dailySales.length === 0 && <tr><td colSpan="7" className="p-20 text-center text-blue-gray/20 font-black uppercase tracking-[0.5em] italic">Aucune donnée de vente pour cette période</td></tr>}
+                        {dailySales.length === 0 && <tr><td colSpan="7" className="p-20 text-center text-blue-gray/20 font-black uppercase tracking-[0.5em] italic">{L('No sales data for this period', 'Aucune donnée de vente pour cette période')}</td></tr>}
                      </tbody>
                   </table>
                </div>
@@ -564,13 +566,13 @@ export default function Reports() {
                         <Package className="w-7 h-7" />
                      </div>
                      <div>
-                        <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">Valorisation des Actifs</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">Audit du Stock Initial</p>
+                        <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">{L('Asset Valuation', 'Valorisation des Actifs')}</h3>
+                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Initial Stock Audit', 'Audit du Stock Initial')}</p>
                      </div>
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-emerald-600">{store.formatCurrency(totalStockValue)}</p>
-                     <p className="text-[9px] font-black uppercase text-blue-gray">Valeur Asset Totale</p>
+                     <p className="text-[9px] font-black uppercase text-blue-gray">{L('Total Asset Value', 'Valeur Asset Totale')}</p>
                   </div>
                </div>
 
@@ -578,18 +580,18 @@ export default function Reports() {
                   <table className="w-full text-left">
                      <thead>
                         <tr className="bg-navy-50/50 text-[9px] font-black uppercase tracking-widest text-blue-gray">
-                           <th className="p-5">Article</th>
-                           <th className="p-5">Secteur</th>
-                           <th className="p-5 text-right">Qty</th>
-                           <th className="p-5 text-right">P.A Unit</th>
-                           <th className="p-5 text-right">Valorisation</th>
+                           <th className="p-5">{L('Item', 'Article')}</th>
+                           <th className="p-5">{L('Sector', 'Secteur')}</th>
+                           <th className="p-5 text-right">{L('Qty', 'Qté')}</th>
+                           <th className="p-5 text-right">{L('Unit Cost', 'P.A Unit')}</th>
+                           <th className="p-5 text-right">{L('Valuation', 'Valorisation')}</th>
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-navy-50">
                         {allProducts.map((p, i) => (
                            <tr key={i} className="hover:bg-navy-50/20 transition-colors">
                               <td className="p-5 text-[10px] font-black text-navy-950 uppercase">{p.name}</td>
-                              <td className="p-5 text-[9px] font-black text-blue-gray uppercase">{p.category || 'GENERAL'}</td>
+                              <td className="p-5 text-[9px] font-black text-blue-gray uppercase">{p.category || L('GENERAL', 'GENERAL')}</td>
                               <td className="p-5 text-right text-[10px] font-black text-navy-950">{p.quantity}</td>
                               <td className="p-5 text-right text-[10px] font-black text-navy-950">{store.formatCurrency(p.cost)}</td>
                               <td className="p-5 text-right text-[10px] font-black text-emerald-600">{store.formatCurrency(p.quantity * p.cost)}</td>

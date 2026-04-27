@@ -1,9 +1,11 @@
 import React from 'react';
 import { QrCode, X } from 'lucide-react';
 import { useStore } from '../../context/StoreContext';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function QRModal() {
   const { showQRModal, setShowQRModal } = useStore();
+  const { L } = useLanguage();
 
   if (!showQRModal) return null;
 
@@ -23,9 +25,9 @@ export default function QRModal() {
           <QrCode className="w-8 h-8" />
         </div>
         
-        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1 text-center mt-4 md:mt-0">Portail Client</h2>
+        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1 text-center mt-4 md:mt-0">{L('Client Portal', 'Portail Client')}</h2>
         <p className="text-xs md:text-xs md:text-sm text-navy-400 text-center font-bold mb-4 md:mb-8 uppercase tracking-widest leading-relaxed max-w-[200px] md:max-w-none">
-          Scannez pour suivre vos transactions.
+          {L('Scan to track your transactions.', 'Scannez pour suivre vos transactions.')}
         </p>
         
         <div className="relative bg-white p-4 rounded-[32px] shadow-[0_0_60px_rgba(59,130,246,0.4)] border-8 border-white/10 hover:scale-105 transition-transform duration-500 group">
@@ -66,9 +68,9 @@ export default function QRModal() {
                   });
                 }
               }
-              alert("SUCCESS: Master Data Injected to Global Network!");
+              alert(L("SUCCESS: Master Data Injected to Global Network!", "SUCCÈS : Données Master injectées dans le réseau global !"));
             } catch (e) {
-              alert("ERROR: Connection failed. Ensure Master PC is online.");
+              alert(L("ERROR: Connection failed. Ensure Master PC is online.", "ERREUR : Échec de connexion. Vérifiez que le PC Master est en ligne."));
             } finally {
               if (btn) btn.disabled = false;
             }
@@ -76,7 +78,7 @@ export default function QRModal() {
           id="sync-btn-global"
           className="mt-8 w-full md:w-auto px-6 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all disabled:opacity-50"
         >
-          Sync PC to Global Network
+          {L('Sync PC to Global Network', 'Sync PC vers Réseau Global')}
         </button>
       </div>
     </div>

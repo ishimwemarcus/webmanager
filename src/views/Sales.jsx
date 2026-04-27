@@ -36,7 +36,7 @@ import { getFormattedQuantity } from '../utils/ProductUtils';
 
 export default function Sales() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { t, L } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showPayModal, setShowPayModal] = useState(null);
   const [payAmount, setPayAmount] = useState('');
@@ -121,7 +121,7 @@ export default function Sales() {
     if (!newSale.isAccepted) {
        // Step 1: Acceptance
        if (product.quantity < newSale.quantity) {
-          store.showAlert('Unité de stock insuffisante.');
+          store.showAlert(L('Insufficient stock unit.', 'Unité de stock insuffisante.'));
           return;
        }
        if (!newSale.client.trim()) {
@@ -130,7 +130,7 @@ export default function Sales() {
        }
        
        setNewSale(prev => ({ ...prev, isAccepted: true }));
-       store.showAlert("Offre acceptée par le client. Prêt pour finalisation.", "warning");
+       store.showAlert(L("Offer accepted by the client. Ready for finalization.", "Offre acceptée par le client. Prêt pour finalisation."), "warning");
        return;
     }
 
@@ -184,12 +184,12 @@ export default function Sales() {
         client: newSale.client,
         phone: newSale.phone,
         date: new Date().toISOString(),
-        note: `Pourboire reçu sur vente de ${product.name}`
+        note: L(`Tip received on sale of ${product.name}`, `Pourboire reçu sur vente de ${product.name}`)
       });
-      store.showAlert(`Pourboire de ${store.formatCurrency(overpay)} enregistré pour ${store.currentOperator} !`, 'success');
+      store.showAlert(L(`Tip of ${store.formatCurrency(overpay)} recorded for ${store.currentOperator}!`, `Pourboire de ${store.formatCurrency(overpay)} enregistré pour ${store.currentOperator} !`), 'success');
     } else if (overpay > 0 && overpayChoice === 'credit') {
       // Registered as wait credit by processSmartTransaction automatically
-      store.showAlert(`${store.formatCurrency(overpay)} ajouté en Crédit Client pour ${newSale.client}.`, 'success');
+      store.showAlert(L(`${store.formatCurrency(overpay)} added as Client Credit for ${newSale.client}.`, `${store.formatCurrency(overpay)} ajouté en Crédit Client pour ${newSale.client}.`), 'success');
     }
 
     setLastSaleRecord(finalSale);
@@ -274,9 +274,9 @@ export default function Sales() {
           date: new Date().toISOString()
        });
        
-       store.showAlert(`Dette soldée. ${store.formatCurrency(overpayment)} ajouté en crédit d'attente.`);
+       store.showAlert(L(`Debt cleared. ${store.formatCurrency(overpayment)} added as wait credit.`, `Dette soldée. ${store.formatCurrency(overpayment)} ajouté en crédit d'attente.`));
     } else {
-       store.showAlert(`Règlement de ${store.formatCurrency(payment)} enregistré !`);
+       store.showAlert(L(`Payment of ${store.formatCurrency(payment)} recorded!`, `Règlement de ${store.formatCurrency(payment)} enregistré !`));
     }
     
     // Determine new status
@@ -294,7 +294,7 @@ export default function Sales() {
   };
 
   const handleDeleteSale = (sale) => {
-    store.showConfirm(`Supprimer cette vente de ${sale.name} ?`, () => {
+    store.showConfirm(L(`Delete this sale of ${sale.name}?`, `Supprimer cette vente de ${sale.name} ?`), () => {
       store.deleteRecord(sale);
     });
   };
@@ -306,10 +306,10 @@ export default function Sales() {
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Opérations de Vente
+            {L('Sales Operations', 'Opérations de Vente')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
-            Flux de Revenus — Archivage Temps Réel
+            {L('Revenue Flow — Real-Time Archiving', 'Flux de Revenus — Archivage Temps Réel')}
           </p>
         </div>
         <button
@@ -366,7 +366,7 @@ export default function Sales() {
             className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
           >
             <Clock className="w-3.5 h-3.5" />
-            {filterShift ? 'Mon Poste' : 'Tous les Postes'}
+            {filterShift ? L('My Shift', 'Mon Poste') : L('All Shifts', 'Tous les Postes')}
           </button>
           
           <div className="w-px h-6 bg-emerald-100 mx-1 flex-shrink-0"></div>
@@ -392,7 +392,7 @@ export default function Sales() {
       {/* Success Notification */}
       {showSuccess && (
          <div className="bg-emerald-500 text-white p-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce-gentle font-black text-xs uppercase tracking-widest no-print">
-            <CheckCircle2 className="w-5 h-5" /> Vente enregistrée avec succès !
+            <CheckCircle2 className="w-5 h-5" /> {L('Sale recorded successfully!', 'Vente enregistrée avec succès !')}
          </div>
       )}
 
@@ -483,7 +483,7 @@ export default function Sales() {
 
           <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-30">
              <ShoppingCart className="w-20 h-20 mx-auto text-blue-gray mb-6" />
-             <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucune transaction enregistrée</p>
+             <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No transactions recorded', 'Aucune transaction enregistrée')}</p>
           </div>
         )}
       </div>
@@ -493,21 +493,21 @@ export default function Sales() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in">
           <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-8 border-b border-navy-50 flex items-center justify-between bg-navy-50/50">
-               <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{editingSale ? 'Modifier la Vente' : 'Nouvelle Vente'}</h2>
+               <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{editingSale ? L('Edit Sale', 'Modifier la Vente') : L('New Sale', 'Nouvelle Vente')}</h2>
                <button onClick={closeAll} className="p-2 hover:bg-navy-100 rounded-xl transition-all"><X className="w-5 h-5" /></button>
             </div>
             
             <form onSubmit={handleSalePreSubmit} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
                {/* Product Selection */}
                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Produit</label>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Product', 'Produit')}</label>
                   <select
                     required
                     value={newSale.product_id}
                     onChange={e => setNewSale({...newSale, product_id: e.target.value})}
                     className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all"
                   >
-                    <option value="">Sélectionner un produit</option>
+                    <option value="">{L('Select a product', 'Sélectionner un produit')}</option>
                     {products.map(p => (
                       <option key={p.id} value={p.id} disabled={newSale.isAccepted}>{p.name.toUpperCase()} ({p.quantity} en stock)</option>
                     ))}
@@ -516,7 +516,7 @@ export default function Sales() {
 
                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Quantité</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Quantity', 'Quantité')}</label>
                     <input
                       type="number"
                       required
@@ -528,7 +528,7 @@ export default function Sales() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Mode Paiement</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Payment Method', 'Mode Paiement')}</label>
                     <select
                       value={newSale.paymentMethod}
                       onChange={e => setNewSale({...newSale, paymentMethod: e.target.value})}
@@ -543,7 +543,7 @@ export default function Sales() {
 
                <div className="grid grid-cols-2 gap-6">
                   <div>
-                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Client</label>
+                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Client', 'Client')}</label>
                      <input
                        type="text"
                        placeholder="Nom..."
@@ -554,7 +554,7 @@ export default function Sales() {
                      />
                   </div>
                   <div>
-                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Téléphone</label>
+                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Phone', 'Téléphone')}</label>
                      <input
                        type="text"
                        placeholder="07..."
@@ -573,14 +573,14 @@ export default function Sales() {
                      <p className="text-sm font-black">{store.formatCurrency(newSale.amount)}</p>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Total à Payer</p>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{L('Total Due', 'Total à Payer')}</p>
                      <p className="text-2xl font-black">{store.formatCurrency(newSale.amount)}</p>
                   </div>
                </div>
 
                {newSale.isAccepted && (
                   <div className="space-y-3 animate-scale-in">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 block italic">Encaissement (Montant Reçu)</label>
+                     <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 block italic">{L('Payment (Amount Received)', 'Encaissement (Montant Reçu)')}</label>
                      <div className="relative group">
                         <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
                         <input
@@ -596,7 +596,7 @@ export default function Sales() {
                      </div>
                      {(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0)) > 0 && (
                         <div className="flex justify-between items-center px-4 py-2 bg-rose-50 rounded-xl">
-                           <p className="text-[8px] font-black uppercase text-rose-500 tracking-widest">Reste à payer (Dette)</p>
+                           <p className="text-[8px] font-black uppercase text-rose-500 tracking-widest">{L('Remaining (Debt)', 'Reste à payer (Dette)')}</p>
                            <p className="text-xs font-black text-rose-600">{store.formatCurrency(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0))}</p>
                         </div>
                      )}
@@ -609,7 +609,7 @@ export default function Sales() {
                 >
                   <span className="flex items-center gap-3">
                      {newSale.isAccepted ? <Check className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
-                     <span>{newSale.isAccepted ? 'Enregistrer Transaction' : 'Le Client a Accepté'}</span>
+                     <span>{newSale.isAccepted ? L('Record Transaction', 'Enregistrer Transaction') : L('Client Accepted', 'Le Client a Accepté')}</span>
                   </span>
                 </button>
 
@@ -619,7 +619,7 @@ export default function Sales() {
                     onClick={() => setNewSale(prev => ({ ...prev, isAccepted: false }))}
                     className="w-full py-2 text-[9px] font-black uppercase text-blue-gray hover:text-rose-500 transition-all"
                   >
-                     Modifier la commande
+                     {L('Modify order', 'Modifier la commande')}
                   </button>
                )}
             </form>
@@ -634,14 +634,14 @@ export default function Sales() {
             <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full mx-auto flex items-center justify-center mb-4">
               <Banknote className="w-10 h-10" />
             </div>
-            <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-1">Trop-Perçu Détecté</h3>
-            <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-2 opacity-60">Le client a payé plus que le montant dû</p>
+            <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-1">{L('Overpayment Detected', 'Trop-Perçu Détecté')}</h3>
+            <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-2 opacity-60">{L('Client paid more than amount due', 'Le client a payé plus que le montant dû')}</p>
             <div className="my-4 py-4 px-6 bg-amber-50 rounded-2xl border border-amber-100">
-              <p className="text-[10px] font-black uppercase text-amber-600 tracking-widest mb-1">Excédent</p>
+              <p className="text-[10px] font-black uppercase text-amber-600 tracking-widest mb-1">{L('Surplus', 'Excédent')}</p>
               <p className="text-3xl font-black text-amber-600">{store.formatCurrency(pendingOverpay)}</p>
             </div>
             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-6 leading-relaxed opacity-60">
-              Classer cet excédent comme :
+              {L('Classify this surplus as:', 'Classer cet excédent comme :')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button
@@ -649,20 +649,20 @@ export default function Sales() {
                 className="flex flex-col items-center gap-2 py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-amber-500/30 active:scale-95"
               >
                 <Star className="w-6 h-6" />
-                Pourboire
-                <span className="text-[8px] opacity-70 normal-case font-bold">Offert à l'opérateur</span>
+                {L('Tip', 'Pourboire')}
+                <span className="text-[8px] opacity-70 normal-case font-bold">{L('Given to operator', 'Offert à l\'opérateur')}</span>
               </button>
               <button
                 onClick={() => { setShowOverpayModal(false); registerSale('credit'); }}
                 className="flex flex-col items-center gap-2 py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-emerald-500/30 active:scale-95"
               >
                 <Wallet className="w-6 h-6" />
-                Crédit Client
-                <span className="text-[8px] opacity-70 normal-case font-bold">Réservé au prochain achat</span>
+                {L('Client Credit', 'Crédit Client')}
+                <span className="text-[8px] opacity-70 normal-case font-bold">{L('Reserved for next purchase', 'Réservé au prochain achat')}</span>
               </button>
             </div>
             <button onClick={() => setShowOverpayModal(false)} className="mt-4 text-[9px] font-black uppercase text-blue-gray tracking-widest opacity-40 hover:opacity-70 transition-all">
-              Annuler
+              {L('Cancel', 'Annuler')}
             </button>
           </div>
         </div>
@@ -675,12 +675,12 @@ export default function Sales() {
                <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full mx-auto flex items-center justify-center mb-6">
                   <CheckCircle2 className="w-10 h-10" />
                </div>
-               <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{editingSale ? 'Confirmer Modification' : 'Confirmer Vente'}</h3>
-               <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">Voulez-vous finaliser l'enregistrement de cette opération de {store.formatCurrency(newSale.amount)} ?</p>
+               <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{editingSale ? L('Confirm Edit', 'Confirmer Modification') : L('Confirm Sale', 'Confirmer Vente')}</h3>
+               <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">{L(`Finalize this ${store.formatCurrency(newSale.amount)} operation?`, `Voulez-vous finaliser l'enregistrement de cette opération de ${store.formatCurrency(newSale.amount)} ?`)}</p>
                
                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => handlePopConfirm(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">Annuler</button>
-                  <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">Confirmer</button>
+                  <button onClick={() => handlePopConfirm(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                  <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Confirm', 'Confirmer')}</button>
                </div>
             </div>
          </div>
@@ -691,12 +691,12 @@ export default function Sales() {
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in" onClick={() => setShowPayModal(null)}>
            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
               <div className="text-center space-y-2 mb-10">
-                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">Règlement de Dette</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">Solder l'Obligation Financière</p>
+                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Debt Settlement', 'Règlement de Dette')}</h3>
+                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Clear Financial Obligation', 'Solder l\'Obligation Financière')}</p>
               </div>
 
               <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
-                 <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">Reste à payer</p>
+                 <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">{L('Remaining', 'Reste à payer')}</p>
                  <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
               </div>
 
@@ -730,7 +730,7 @@ export default function Sales() {
                  </div>
 
                  <button type="submit" className="w-full py-8 bg-emerald-500 text-white rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-2xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-[0.98]">
-                    Valider le Règlement <CheckCircle2 className="w-6 h-6" />
+                    {L('Validate Payment', 'Valider le Règlement')} <CheckCircle2 className="w-6 h-6" />
                  </button>
               </form>
            </div>

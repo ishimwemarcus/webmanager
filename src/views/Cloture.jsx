@@ -210,12 +210,12 @@ export default function Cloture() {
                      <div className="space-y-1">
                         <div className="flex items-center gap-3">
                            <p className="text-xs font-black text-navy-950 uppercase tracking-tighter">
-                              {new Date(r.date).toLocaleDateString()}
+                              {new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
                            </p>
                            <span className="w-1 h-1 rounded-full bg-blue-gray/30"></span>
-                           <p className="text-[10px] font-black text-blue-gray uppercase">{new Date(r.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</p>
+                           <p className="text-[10px] font-black text-blue-gray uppercase">{new Date(r.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</p>
                         </div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{r.operator || 'SYSTEM ADMIN'}</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{r.operator || L('SYSTEM ADMIN', 'SYSTEM ADMIN')}</p>
                         {r.note && <p className="text-[10px] text-blue-gray italic font-bold mt-3 leading-relaxed border-l-2 border-navy-50 pl-4">"{r.note}"</p>}
                      </div>
                      

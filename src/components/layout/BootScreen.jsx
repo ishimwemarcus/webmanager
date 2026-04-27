@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, Database, LayoutGrid } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
 export default function BootScreen({ onComplete }) {
   const [phase, setPhase] = useState(0);
+  const { L } = useLanguage();
 
   useEffect(() => {
     const sequence = [
@@ -42,7 +44,7 @@ export default function BootScreen({ onComplete }) {
           <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter shadow-black drop-shadow-2xl">
             MARC
           </h1>
-          <p className="text-sm font-black uppercase tracking-[1em] text-[#2563eb]">Enterprise Management System</p>
+          <p className="text-sm font-black uppercase tracking-[1em] text-[#2563eb]">{L('Enterprise Management System', 'Système de Gestion d\'Entreprise')}</p>
         </div>
 
         {/* Loading Metrics Video Effect */}
@@ -51,8 +53,8 @@ export default function BootScreen({ onComplete }) {
             <div className={`absolute top-0 left-0 h-full bg-gradient-to-r from-transparent via-[#2563eb] to-white transition-all duration-[3000ms] ease-out ${phase >= 1 ? 'w-full' : 'w-0'}`}></div>
           </div>
           <div className="flex justify-between mt-3 text-xs md:text-sm font-black uppercase tracking-widest text-white/50">
-            <span className={`${phase >= 3 ? 'text-[#2563eb]' : ''} transition-colors duration-300`}>Sys. Boot</span>
-            <span className={`${phase >= 3 ? 'text-white' : ''} transition-colors duration-300`}>{phase >= 3 ? 'COMPLETE' : 'INITIALIZING'}</span>
+            <span className={`${phase >= 3 ? 'text-[#2563eb]' : ''} transition-colors duration-300`}>{L('Sys. Boot', 'Boot Sys.')}</span>
+            <span className={`${phase >= 3 ? 'text-white' : ''} transition-colors duration-300`}>{phase >= 3 ? L('COMPLETE', 'TERMINÉ') : L('INITIALIZING', 'INITIALISATION')}</span>
           </div>
         </div>
 
@@ -62,19 +64,19 @@ export default function BootScreen({ onComplete }) {
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse">
               <Database className="w-5 h-5" />
             </div>
-            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Ledger Linked</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">{L('Ledger Linked', 'Ledger Couplé')}</span>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse delay-75">
               <LayoutGrid className="w-5 h-5" />
             </div>
-            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Stock Mounted</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">{L('Stock Mounted', 'Stock Indexé')}</span>
           </div>
           <div className="flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-success-pro animate-pulse delay-150">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <span className="text-xs uppercase tracking-widest text-white/60 font-black">Secured</span>
+            <span className="text-xs uppercase tracking-widest text-white/60 font-black">{L('Secured', 'Sécurisé')}</span>
           </div>
         </div>
       </div>

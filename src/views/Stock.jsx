@@ -24,7 +24,7 @@ import { getFormattedQuantity } from '../utils/ProductUtils';
 
 export default function Stock() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { t, L } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
@@ -78,7 +78,7 @@ export default function Stock() {
   };
 
   const handleBulkDelete = () => {
-    store.showConfirm(`PURGER ${selectedIds.length} ACTIFS? Cette action supprimera définitivement les éléments du registre.`, () => {
+    store.showConfirm(L(`PURGE ${selectedIds.length} ASSETS? This will permanently delete them from the registry.`, `PURGER ${selectedIds.length} ACTIFS? Cette action supprimera définitivement les éléments du registre.`), () => {
       selectedIds.forEach(id => {
         const prod = products.find(p => p.id === id);
         if (prod) store.deleteRecord(prod);
@@ -116,7 +116,7 @@ export default function Stock() {
   };
 
   const confirmDelete = (product) => {
-    store.showConfirm(`SUPPRIMER ${product.name.toUpperCase()}?`, () => {
+    store.showConfirm(L(`DELETE ${product.name.toUpperCase()}?`, `SUPPRIMER ${product.name.toUpperCase()}?`), () => {
       store.deleteRecord(product);
     });
   };
@@ -128,10 +128,10 @@ export default function Stock() {
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Inventaire Stock
+            {L('Stock Inventory', 'Inventaire Stock')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
-            Gestion des Actifs — Registre Centralisé
+            {L('Asset Management — Centralized Registry', 'Gestion des Actifs — Registre Centralisé')}
           </p>
         </div>
 
@@ -141,14 +141,14 @@ export default function Stock() {
               onClick={handleBulkDelete}
               className="bg-rose-500 text-white px-8 py-4 rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 flex items-center gap-2 hover:bg-rose-600 transition-all active:scale-95"
             >
-              <Trash2 className="w-5 h-5" /> Supprimer {selectedIds.length} Articles
+              <Trash2 className="w-5 h-5" /> {L(`Delete ${selectedIds.length} Items`, `Supprimer ${selectedIds.length} Articles`)}
             </button>
           )}
           <button
             onClick={() => setShowModal(true)}
             className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
           >
-            <Plus className="w-5 h-5 text-emerald-400" /> Ajouter un Actif
+            <Plus className="w-5 h-5 text-emerald-400" /> {L('Add an Asset', 'Ajouter un Actif')}
           </button>
         </div>
       </div>
@@ -160,7 +160,7 @@ export default function Stock() {
             <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Évaluation Totale</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Total Valuation', 'Évaluation Totale')}</p>
             <p className="text-4xl font-black text-navy-950 tracking-tighter">
               {store.formatCurrency(totalValuation)}
             </p>
@@ -172,9 +172,9 @@ export default function Stock() {
             <Layers className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Actifs Opérationnels</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Operational Assets', 'Actifs Opérationnels')}</p>
             <p className="text-4xl font-black text-navy-950 tracking-tighter">
-              {products.length} <span className="text-xs text-blue-gray opacity-40 font-black">Lignes</span>
+              {products.length} <span className="text-xs text-blue-gray opacity-40 font-black">{L('Lines', 'Lignes')}</span>
             </p>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function Stock() {
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
           <input
             type="text"
-            placeholder="Rechercher dans l'inventaire..."
+            placeholder={L('Search inventory...', 'Rechercher dans l\'inventaire...')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-emerald-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
@@ -197,7 +197,7 @@ export default function Stock() {
             onClick={() => setSelectedCategory(null)} 
             className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
           >
-            <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> Retour aux Secteurs
+            <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> {L('Back to Sectors', 'Retour aux Secteurs')}
           </button>
         )}
       </div>
@@ -220,10 +220,10 @@ export default function Stock() {
                 <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
                    <Box className="w-8 h-8" />
                 </div>
-                <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">Secteur {cat.name}</h4>
-                <p className="text-[10px] font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} Articles</p>
+                <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">{L('Sector', 'Secteur')} {cat.name}</h4>
+                <p className="text-[10px] font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} {L('Items', 'Articles')}</p>
                 <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-navy-950">
-                   <span>Valeur Estimée</span>
+                   <span>{L('Estimated Value', 'Valeur Estimée')}</span>
                    <span className="text-emerald-600">{store.formatCurrency(catValue)}</span>
                 </div>
               </div>
@@ -238,7 +238,7 @@ export default function Stock() {
            <div className="flex items-center gap-3 mb-6">
               <Filter className="w-5 h-5 text-emerald-500" />
               <h3 className="text-sm font-black text-navy-950 uppercase tracking-widest">
-                 {selectedCategory ? `Manifeste Secteur : ${selectedCategory}` : 'Résultats de Recherche'}
+                 {selectedCategory ? `${L('Sector Manifest', 'Manifeste Secteur')} : ${selectedCategory}` : L('Search Results', 'Résultats de Recherche')}
               </h3>
            </div>
 
@@ -254,26 +254,26 @@ export default function Stock() {
                        </div>
                        <div className="flex-1 min-w-0">
                           <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{p.name}</h4>
-                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || 'Général'}</p>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || L('General', 'Général')}</p>
                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1 text-center md:text-left">
                        <div>
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Stock Disponible</p>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Available Stock', 'Stock Disponible')}</p>
                           <div className="flex items-center justify-center md:justify-start gap-2">
                              <span className="text-xs font-black text-navy-950">{p.quantity}</span>
                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
-                                {p.quantity <= 5 ? 'Bas' : 'Optimal'}
+                                {p.quantity <= 5 ? L('Low', 'Bas') : L('Optimal', 'Optimal')}
                              </span>
                           </div>
                        </div>
                        <div>
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Prix Unitaire</p>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Unit Price', 'Prix Unitaire')}</p>
                           <p className="text-xs font-black text-navy-950">{store.formatCurrency(p.price)}</p>
                        </div>
                        <div className="hidden md:block">
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Valeur Assets</p>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Asset Value', 'Valeur Assets')}</p>
                           <p className="text-xs font-black text-emerald-600">{store.formatCurrency(p.quantity * p.price)}</p>
                        </div>
                     </div>
@@ -293,7 +293,7 @@ export default function Stock() {
            {filteredProducts.length === 0 && (
               <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-20">
                  <Database className="w-20 h-20 mx-auto text-blue-gray mb-6" />
-                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucun article trouvé dans ce secteur</p>
+                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No items found in this sector', 'Aucun article trouvé dans ce secteur')}</p>
               </div>
            )}
         </div>
@@ -305,18 +305,18 @@ export default function Stock() {
            <div className="bg-white w-full max-w-lg rounded-[40px] shadow-2xl relative overflow-hidden flex flex-col max-h-[90vh]">
               <div className="p-8 border-b border-navy-50 flex items-center justify-between bg-navy-50/50">
                  <h2 className="text-xl font-black text-navy-950 uppercase tracking-tighter">
-                    {editProduct ? 'Modifier Actif' : 'Nouvel Enregistrement'}
+                    {editProduct ? L('Modify Asset', 'Modifier Actif') : L('New Record', 'Nouvel Enregistrement')}
                  </h2>
                  <button onClick={() => {setShowModal(false); setEditProduct(null);}} className="p-2 hover:bg-navy-100 rounded-xl transition-all"><X className="w-5 h-5" /></button>
               </div>
 
               <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
                  <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Nom de l'article</label>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Item Name', 'Nom de l\'article')}</label>
                     <input
                       required
                       type="text"
-                      placeholder="Désignation de l'actif..."
+                      placeholder={L('Asset designation...', 'Désignation de l\'actif...')}
                       value={editProduct ? editProduct.name : newProduct.name}
                       onChange={e => editProduct ? setEditProduct({...editProduct, name: e.target.value}) : setNewProduct({...newProduct, name: e.target.value})}
                       className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
@@ -325,19 +325,19 @@ export default function Stock() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Secteur / Catégorie</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Sector / Category', 'Secteur / Catégorie')}</label>
                       <select
                         required
                         value={editProduct ? editProduct.category : newProduct.category}
                         onChange={e => editProduct ? setEditProduct({...editProduct, category: e.target.value}) : setNewProduct({...newProduct, category: e.target.value})}
                         className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all"
                       >
-                        <option value="">Sélectionner</option>
+                        <option value="">{L('Select', 'Sélectionner')}</option>
                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Stock Initial</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Initial Stock', 'Stock Initial')}</label>
                       <input
                         required
                         type="number"
@@ -350,7 +350,7 @@ export default function Stock() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Prix d'Achat (Unit)</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Purchase Price (Unit)', 'Prix d\'Achat (Unit)')}</label>
                       <input
                         required
                         type="number"
@@ -360,7 +360,7 @@ export default function Stock() {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">Prix de Vente (Unit)</label>
+                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Selling Price (Unit)', 'Prix de Vente (Unit)')}</label>
                       <input
                         required
                         type="number"
@@ -375,7 +375,7 @@ export default function Stock() {
                    type="submit"
                    className="w-full py-5 bg-emerald-500 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-3"
                  >
-                   <ShieldCheck className="w-5 h-5" /> {editProduct ? 'Sauvegarder Changements' : 'Inscrire au Registre'}
+                   <ShieldCheck className="w-5 h-5" /> {editProduct ? L('Save Changes', 'Sauvegarder Changements') : L('Register Asset', 'Inscrire au Registre')}
                  </button>
               </form>
            </div>

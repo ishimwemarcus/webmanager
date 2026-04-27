@@ -5,7 +5,7 @@ import { Clock, User, TrendingUp, ShoppingBag, History, Calendar, Trash2 } from 
 
 export default function Shifts() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { t, L, lang } = useLanguage();
   const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]);
   const [showAll, setShowAll] = useState(false);
   
@@ -27,8 +27,12 @@ export default function Shifts() {
     <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div>
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">Journal des Postes</h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">Suivi des Performances Employés</h2>
+          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+            {L('Shift Journal', 'Journal des Postes')}
+          </h1>
+          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">
+            {L('Employee Performance Tracking', 'Suivi des Performances Employés')}
+          </h2>
         </div>
         
         <div className="flex items-center gap-4">
@@ -45,7 +49,7 @@ export default function Shifts() {
             onClick={() => setShowAll(!showAll)}
             className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all shadow-xl ${showAll ? 'bg-navy-950 text-white border-navy-950' : 'bg-white text-navy-950 border-navy-100 hover:border-navy-brand'}`}
           >
-            {showAll ? 'Voir par Date' : 'Voir Tout Historique'}
+            {showAll ? L('View by Date', 'Voir par Date') : L('View All History', 'Voir Tout Historique')}
           </button>
         </div>
       </div>
@@ -56,7 +60,7 @@ export default function Shifts() {
             <TrendingUp className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">Chiffre d'Affaires Global</p>
+            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Global Revenue', 'Chiffre d\'Affaires Global')}</p>
             <p className="text-3xl font-black text-navy-950">{store.formatCurrency(stats.totalRevenue)}</p>
           </div>
         </div>
@@ -65,8 +69,8 @@ export default function Shifts() {
             <ShoppingBag className="w-8 h-8" />
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">Total Transactions</p>
-            <p className="text-3xl font-black text-navy-950">{stats.totalTransactions} <span className="text-sm">Ventes</span></p>
+            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Total Transactions', 'Total Transactions')}</p>
+            <p className="text-3xl font-black text-navy-950">{stats.totalTransactions} <span className="text-sm">{L('Sales', 'Ventes')}</span></p>
           </div>
         </div>
       </div>
@@ -85,13 +89,13 @@ export default function Shifts() {
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
                     <p className="text-xs font-bold text-blue-gray flex items-center gap-1.5">
                        <Clock className="w-3.5 h-3.5" /> 
-                       {new Date(shift.start).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} 
+                       {new Date(shift.start).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour: '2-digit', minute:'2-digit'})} 
                        <span className="opacity-30">→</span> 
-                       {shift.end ? new Date(shift.end).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : <span className="text-emerald-500 animate-pulse">EN COURS</span>}
+                       {shift.end ? new Date(shift.end).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour: '2-digit', minute:'2-digit'}) : <span className="text-emerald-500 animate-pulse">{L('IN PROGRESS', 'EN COURS')}</span>}
                     </p>
                     <p className="text-xs font-bold text-blue-gray flex items-center gap-1.5">
                        <Calendar className="w-3.5 h-3.5" />
-                       {new Date(shift.end).toLocaleDateString()}
+                       {new Date(shift.end || shift.start).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
                     </p>
                   </div>
                 </div>
@@ -99,19 +103,19 @@ export default function Shifts() {
 
               <div className="flex items-center gap-12">
                 <div className="text-right hidden sm:block">
-                    <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Ventes</p>
+                    <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Sales', 'Ventes')}</p>
                     <p className="text-lg font-black text-navy-950">{store.formatCurrency(shift.revenue)}</p>
                 </div>
                 <div className="text-right hidden sm:block">
-                    <p className="text-[10px] font-black uppercase text-rose-500/60 tracking-widest mb-1 italic">Dépenses</p>
+                    <p className="text-[10px] font-black uppercase text-rose-500/60 tracking-widest mb-1 italic">{L('Expenses', 'Dépenses')}</p>
                     <p className="text-lg font-black text-rose-600">-{store.formatCurrency(shift.expenses || 0)}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-1 italic">Net Caisse</p>
+                    <p className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-1 italic">{L('Net Cash', 'Net Caisse')}</p>
                     <p className="text-2xl font-black text-emerald-600">{store.formatCurrency(shift.net || (shift.revenue - (shift.expenses || 0)))}</p>
                 </div>
                 <button 
-                  onClick={() => store.showConfirm("Supprimer l'archive de ce poste ?", () => store.deleteRecord(shift))}
+                  onClick={() => store.showConfirm(L("Delete this shift archive?", "Supprimer l'archive de ce poste ?"), () => store.deleteRecord(shift))}
                   className="p-3 bg-rose-50 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"
                 >
                   <Trash2 className="w-5 h-5" />
@@ -122,7 +126,7 @@ export default function Shifts() {
             <div className="px-8 pb-8">
                <div className="bg-navy-50/50 rounded-3xl p-4 border border-navy-100/50">
                   <p className="text-[10px] font-black uppercase text-blue-gray mb-3 tracking-widest flex items-center gap-2">
-                    <History className="w-3.5 h-3.5" /> Aperçu des transactions liées à ce poste
+                    <History className="w-3.5 h-3.5" /> {L('Preview of transactions linked to this shift', 'Aperçu des transactions liées à ce poste')}
                   </p>
                    <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto scrollbar-hide py-2">
                     {(shift.sales || allSales.filter(s => s.shiftId === (shift.shiftId || shift.start))).map((s, idx) => (
@@ -130,7 +134,7 @@ export default function Shifts() {
                         <span className="text-navy-brand font-black">{store.formatCurrency(s.amount)}</span>
                         <span className="opacity-30">|</span>
                         <span className="uppercase">{s.name}</span>
-                        <span className="opacity-20 ml-auto">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                        <span className="opacity-20 ml-auto">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour: '2-digit', minute:'2-digit'})}</span>
                       </div>
                     ))}
                   </div>
@@ -140,7 +144,7 @@ export default function Shifts() {
         )) : (
           <div className="p-20 text-center space-y-4 bg-white border-2 border-dashed border-navy-100 rounded-[48px] opacity-40">
              <Clock className="w-16 h-16 mx-auto text-blue-gray" />
-             <p className="text-sm font-black uppercase tracking-[0.4em] text-blue-gray">Aucun poste enregistré ce jour</p>
+             <p className="text-sm font-black uppercase tracking-[0.4em] text-blue-gray">{L('No shifts recorded today', 'Aucun poste enregistré ce jour')}</p>
           </div>
         )}
       </div>

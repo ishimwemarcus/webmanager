@@ -9,7 +9,7 @@ import {
 
 export default function Commander() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { t, L, lang } = useLanguage();
 
   const products = store.getProducts().filter(p => p.quantity > 0);
   
@@ -78,7 +78,7 @@ export default function Commander() {
     if (cart.length === 0) return;
     
     if (!clientName.trim() || !clientPhone.trim()) {
-       store.showAlert("Le nom et le téléphone du client sont obligatoires.", "error");
+       store.showAlert(L("Client name and phone are mandatory.", "Le nom et le téléphone du client sont obligatoires."), "error");
        return;
     }
     
@@ -93,7 +93,7 @@ export default function Commander() {
         paid: 0,
         status: 'waiting',
         quantity: item.qty,
-        client: clientName || 'Comptoir',
+        client: clientName || L('Counter', 'Comptoir'),
         phone: clientPhone || 'none',
         date: new Date().toISOString(),
         product_id: item.product.id || item.product.product_id,
@@ -107,7 +107,7 @@ export default function Commander() {
     setPendingSales(createdSales);
     setCheckoutStep(1);
     setIsProcessing(false);
-    store.showAlert("Commande Acceptée - En attente de paiement", "warning");
+    store.showAlert(L("Order Accepted - Waiting for Payment", "Commande Acceptée - En attente de paiement"), "warning");
   };
 
   // Stage 2: Finalize Payment
@@ -144,7 +144,7 @@ export default function Commander() {
   };
 
   const cancelPending = () => {
-    store.showConfirm("Annuler cette commande acceptée ? Les stocks seront restaurés.", () => {
+    store.showConfirm(L("Cancel this accepted order? Stocks will be restored.", "Annuler cette commande acceptée ? Les stocks seront restaurés."), () => {
        pendingSales.forEach(sale => {
           // 1. Delete the sale record
           store.deleteRecord(sale);
@@ -156,7 +156,7 @@ export default function Commander() {
        });
        setPendingSales([]);
        setCheckoutStep(0);
-       store.showAlert("Commande annulée et stocks restaurés.");
+       store.showAlert(L("Order cancelled and stocks restored.", "Commande annulée et stocks restaurés."));
     });
   };
 
@@ -167,20 +167,20 @@ export default function Commander() {
       <div className="border-b border-navy-100 pb-4 flex items-center justify-between mb-4 no-print">
         <div>
           <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Prendre Commande
+            {L('Take Order', 'Prendre Commande')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
-            Point de Vente Actif — {store.currentOperator}
+            {L('Active POS — ', 'Point de Vente Actif — ')} {store.currentOperator}
           </p>
         </div>
         {success && (
           <div className="flex items-center gap-3">
              <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest animate-bounce-gentle shadow-2xl">
-               <Check className="w-5 h-5" /> Vente Enregistrée avec Succès!
+               <Check className="w-5 h-5" /> {L('Sale Recorded Successfully!', 'Vente Enregistrée avec Succès!')}
              </div>
              <button 
                onClick={() => {
-                  store.showAlert("Recherche du dernier ticket...");
+                  store.showAlert(L("Searching for the last ticket...", "Recherche du dernier ticket..."));
                   // Since Commander clears state, we look for the most recent sale(s)
                   const allSales = store.getSales();
                   if (allSales.length > 0) {
@@ -191,7 +191,7 @@ export default function Commander() {
                className="p-4 bg-navy-950 text-white rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
              >
                 <Printer className="w-5 h-5" />
-                <span className="text-[10px] font-black uppercase">Imprimer Ticket</span>
+                <span className="text-[10px] font-black uppercase">{L('Print Ticket', 'Imprimer Ticket')}</span>
              </button>
           </div>
         )}
@@ -209,7 +209,7 @@ export default function Commander() {
                  <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
                  <input
                    type="text"
-                   placeholder="Rechercher un produit..."
+                   placeholder={L('Search a product...', 'Rechercher un produit...')}
                    value={search}
                    onChange={e => setSearch(e.target.value)}
                    className="w-full bg-white border border-emerald-100 rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-sm outline-none focus:border-emerald-500 transition-all uppercase"
@@ -227,7 +227,7 @@ export default function Commander() {
                           : 'bg-white text-navy-950 border border-emerald-100 hover:border-emerald-500 shadow-sm'
                       }`}
                     >
-                      {cat}
+                      {cat === 'ALL' ? L('ALL', 'TOUT') : cat}
                     </button>
                  ))}
               </div>
@@ -256,7 +256,7 @@ export default function Commander() {
                              <Package className="w-6 h-6" />
                           </div>
                           <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight mb-1 group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
-                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || 'Général'}</p>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || L('General', 'Général')}</p>
                           
                           <div className="flex items-center justify-between mt-auto">
                              <p className="text-sm font-black text-navy-950">{store.formatCurrency(product.price)}</p>
@@ -281,20 +281,20 @@ export default function Commander() {
                  <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center">
                     <User className="w-5 h-5" />
                  </div>
-                 <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Profil Client</p>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">{L('Client Profile', 'Profil Client')}</p>
               </div>
 
               <div className="space-y-4">
                  <input
                    type="text"
-                   placeholder="NOM DU CLIENT..."
+                   placeholder={L('CLIENT NAME...', 'NOM DU CLIENT...')}
                    value={clientName}
                    onChange={e => setClientName(e.target.value)}
                    className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                  />
                  <input
                    type="text"
-                   placeholder="TÉLÉPHONE..."
+                   placeholder={L('PHONE...', 'TÉLÉPHONE...')}
                    value={clientPhone}
                    onChange={e => setClientPhone(e.target.value)}
                    className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
@@ -305,12 +305,12 @@ export default function Commander() {
                  <div className="mt-6 flex flex-wrap gap-2">
                     {clientDebt > 0 && (
                        <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100">
-                          Dette: {store.formatCurrency(clientDebt)}
+                          {L('Debt:', 'Dette:')} {store.formatCurrency(clientDebt)}
                        </div>
                     )}
                     {clientCredit > 0 && (
                        <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100">
-                          Crédit: {store.formatCurrency(clientCredit)}
+                          {L('Credit:', 'Crédit:')} {store.formatCurrency(clientCredit)}
                        </div>
                     )}
                  </div>
@@ -324,10 +324,10 @@ export default function Commander() {
                     <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
                        <ShoppingCart className="w-5 h-5" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">Panier</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">{L('Cart', 'Panier')}</p>
                  </div>
                  {cart.length > 0 && (
-                    <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">Purger</button>
+                    <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">{L('Purge', 'Purger')}</button>
                  )}
               </div>
 
@@ -335,7 +335,7 @@ export default function Commander() {
                  {cart.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center opacity-10 text-center py-10">
                        <ShoppingCart className="w-16 h-16 mb-4" />
-                       <p className="text-xs font-black uppercase tracking-widest">Panier Vide</p>
+                       <p className="text-xs font-black uppercase tracking-widest">{L('Cart Empty', 'Panier Vide')}</p>
                     </div>
                  )}
                  {cart.map(item => (
@@ -360,7 +360,7 @@ export default function Commander() {
 
               <div className="mt-8 pt-8 border-t border-navy-50 space-y-4">
                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray italic">Sous-total</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray italic">{L('Subtotal', 'Sous-total')}</p>
                     <p className="text-2xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(cartTotal)}</p>
                  </div>
 
@@ -368,7 +368,7 @@ export default function Commander() {
                     <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
                     <input
                       type="number"
-                      placeholder="MONTANT REÇU..."
+                      placeholder={L('AMOUNT RECEIVED...', 'MONTANT REÇU...')}
                       value={amountPaid}
                       onChange={e => setAmountPaid(e.target.value)}
                       className="w-full bg-navy-50 border border-transparent rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
@@ -377,7 +377,7 @@ export default function Commander() {
 
                  {paidInput > 0 && (
                     <div className={`p-4 rounded-2xl flex items-center justify-between border ${change >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
-                       <p className="text-[9px] font-black uppercase tracking-widest">{change >= 0 ? 'À rendre' : 'Manquant'}</p>
+                       <p className="text-[9px] font-black uppercase tracking-widest">{change >= 0 ? L('To return', 'À rendre') : L('Missing', 'Manquant')}</p>
                        <p className="text-xl font-black">{store.formatCurrency(Math.abs(change))}</p>
                     </div>
                  )}
@@ -391,13 +391,13 @@ export default function Commander() {
                              className="w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
                            >
                              {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                             <span>{isProcessing ? 'Validation...' : 'Confirmer Paiement & Finaliser'}</span>
+                             <span>{isProcessing ? L('Validating...', 'Validation...') : L('Confirm Payment & Finalize', 'Confirmer Paiement & Finaliser')}</span>
                            </button>
                            <button
                              onClick={cancelPending}
                              className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[9px] text-rose-500 hover:bg-rose-50 transition-all"
                            >
-                              Annuler l'Acceptation
+                               {L('Cancel Acceptance', 'Annuler l\'Acceptation')}
                            </button>
                         </div>
                      ) : (
@@ -412,7 +412,7 @@ export default function Commander() {
                           }`}
                         >
                           {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
-                          <span>{isProcessing ? 'Validation...' : 'Le Client a Accepté'}</span>
+                          <span>{isProcessing ? L('Validating...', 'Validation...') : L('Client Has Accepted', 'Le Client a Accepté')}</span>
                         </button>
                      )}
                   </div>

@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useStore } from '../context/StoreContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Package, 
   TrendingUp, 
@@ -21,6 +22,7 @@ import {
 export default function ClientPortal() {
   const { clientName, phone } = useParams();
   const store = useStore();
+  const { t, L, lang } = useLanguage();
   const decodedName = decodeURIComponent(clientName || '');
   
   const allSales = store.getSales();
@@ -78,25 +80,25 @@ export default function ClientPortal() {
               <ShieldCheck className="w-12 h-12" />
            </div>
            <div>
-              <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">Espace Client</h1>
-              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">Consultation Sécurisée MARC</p>
+              <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Client Space', 'Espace Client')}</h1>
+              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">{L('Secure MARC Consultation', 'Consultation Sécurisée MARC')}</p>
            </div>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-6">
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Nom de Compte</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">{L('Account Name', 'Nom de Compte')}</label>
               <input 
                 type="text" 
                 required
-                placeholder="Votre nom complet..."
+                placeholder={L('Your full name...', 'Votre nom complet...')}
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 className="w-full bg-navy-50/50 border-2 border-transparent rounded-[24px] px-6 py-5 text-navy-950 font-black outline-none focus:border-navy-brand focus:bg-white transition-all shadow-inner uppercase"
               />
            </div>
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">Téléphone (Optionnel)</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">{L('Phone (Optional)', 'Téléphone (Optionnel)')}</label>
               <input 
                 type="text" 
                 placeholder="078..."
@@ -106,7 +108,7 @@ export default function ClientPortal() {
               />
            </div>
            <button type="submit" className="w-full bg-navy-950 text-white font-black py-6 rounded-[24px] shadow-2xl flex items-center justify-center gap-3 hover:bg-navy-brand transition-all uppercase tracking-widest text-xs">
-              Accéder au Registre <Search className="w-4 h-4" />
+              {L('Access Registry', 'Accéder au Registre')} <Search className="w-4 h-4" />
            </button>
         </form>
       </div>
@@ -124,10 +126,10 @@ export default function ClientPortal() {
                  <ShieldCheck className="w-12 h-12" />
               </div>
               <div>
-                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">Client Certifié MARC v4</p>
+                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">{L('MARC v4 Certified Client', 'Client Certifié MARC v4')}</p>
                  <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
                  <p className="text-xs font-bold text-white/40 mt-3 flex items-center gap-2">
-                    <Calendar className="w-4 h-4" /> Membre depuis {clientSales.length > 0 ? new Date(clientSales[clientSales.length-1].date).toLocaleDateString() : 'Aujourd\'hui'}
+                    <Calendar className="w-4 h-4" /> {L('Member since', 'Membre depuis')} {clientSales.length > 0 ? new Date(clientSales[clientSales.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : L('Today', 'Aujourd\'hui')}
                  </p>
               </div>
            </div>
@@ -135,7 +137,7 @@ export default function ClientPortal() {
              onClick={() => window.location.hash = '#/portal'}
              className="px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/10 rounded-2xl flex items-center gap-3 transition-all font-black text-xs uppercase tracking-widest backdrop-blur-md"
            >
-             <ArrowLeft className="w-4 h-4" /> Quitter
+             <ArrowLeft className="w-4 h-4" /> {L('Exit', 'Quitter')}
            </button>
         </div>
       </div>
@@ -144,10 +146,10 @@ export default function ClientPortal() {
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
            {[
-             { label: 'Achats Totaux', val: totalSpent, icon: ShoppingCart, color: 'text-navy-950', bg: 'bg-white' },
-             { label: 'Total Réglé', val: totalPaid, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-             { label: 'Dette Actuelle', val: currentDebt, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
-             { label: 'Solde Créditeur', val: currentCredit, icon: Wallet, color: 'text-navy-brand', bg: 'bg-navy-50' }
+             { label: L('Total Purchases', 'Achats Totaux'), val: totalSpent, icon: ShoppingCart, color: 'text-navy-950', bg: 'bg-white' },
+             { label: L('Total Settled', 'Total Réglé'), val: totalPaid, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+             { label: L('Current Debt', 'Dette Actuelle'), val: currentDebt, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
+             { label: L('Credit Balance', 'Solde Créditeur'), val: currentCredit, icon: Wallet, color: 'text-navy-brand', bg: 'bg-navy-50' }
            ].map((m, i) => (
              <div key={i} className={`glass-card p-8 rounded-[40px] shadow-xl border border-navy-100 ${m.bg} group hover:scale-105 transition-all`}>
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${m.color} bg-current/10`}>
@@ -163,11 +165,11 @@ export default function ClientPortal() {
         <div className="glass-card bg-white rounded-[48px] border border-navy-100 shadow-2xl overflow-hidden">
            <div className="p-10 border-b border-navy-50 flex items-center justify-between">
               <div>
-                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter">Historique des Transactions</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">Registre complet de vos activités</p>
+                 <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter">{L('Transaction History', 'Historique des Transactions')}</h3>
+                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">{L('Complete record of your activities', 'Registre complet de vos activités')}</p>
               </div>
               <span className="px-6 py-2 bg-navy-50 text-navy-950 rounded-full text-xs font-black uppercase tracking-widest border border-navy-100">
-                 {clientSales.length} Opérations
+                 {clientSales.length} {L('Operations', 'Opérations')}
               </span>
            </div>
 
@@ -180,10 +182,10 @@ export default function ClientPortal() {
                       </div>
                       <div>
                          <p className={`font-black uppercase text-lg leading-none ${s.timelineType === 'credit' ? 'text-amber-600' : 'text-navy-950'}`}>
-                            {s.timelineType === 'credit' ? 'Crédit / Trop-perçu' : s.name}
+                            {s.timelineType === 'credit' ? L('Credit / Overpayment', 'Crédit / Trop-perçu') : s.name}
                          </p>
                          <p className="text-xs font-bold text-blue-gray mt-2 flex items-center gap-2">
-                            <Clock className="w-3.5 h-3.5 opacity-40" /> {new Date(s.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'})}
+                            <Clock className="w-3.5 h-3.5 opacity-40" /> {new Date(s.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {day:'numeric', month:'short', year:'numeric'})}
                             {s.timelineType === 'credit' && s.note && <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-[9px]">{s.note}</span>}
                          </p>
                       </div>
@@ -193,14 +195,14 @@ export default function ClientPortal() {
                          {s.timelineType === 'credit' ? '+' : ''}{store.formatCurrency(s.balance || s.amount)}
                       </p>
                       <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${s.timelineType === 'credit' ? 'text-amber-500' : (s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500')}`}>
-                         {s.timelineType === 'credit' ? (s.status === 'used' ? 'Utilisé' : 'Disponible') : (s.paid >= s.amount ? 'Soldé' : `Reste: ${store.formatCurrency(s.amount - s.paid)}`)}
+                         {s.timelineType === 'credit' ? (s.status === 'used' ? L('Used', 'Utilisé') : L('Available', 'Disponible')) : (s.paid >= s.amount ? L('Settled', 'Soldé') : `${L('Remaining:', 'Reste:')} ${store.formatCurrency(s.amount - s.paid)}`)}
                       </p>
                    </div>
                 </div>
               )) : (
                 <div className="p-20 text-center space-y-4 opacity-20">
                    <Clock className="w-16 h-16 mx-auto" />
-                   <p className="text-sm font-black uppercase tracking-widest">Aucun historique détecté</p>
+                   <p className="text-sm font-black uppercase tracking-widest">{L('No history detected', 'Aucun historique détecté')}</p>
                 </div>
               )}
            </div>
@@ -208,7 +210,7 @@ export default function ClientPortal() {
       </div>
       
       <p className="text-center text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-10 italic opacity-40">
-         Plateforme de Transparence Client MARC v4.0
+         {L('MARC v4.0 Client Transparency Platform', 'Plateforme de Transparence Client MARC v4.0')}
       </p>
     </div>
   );

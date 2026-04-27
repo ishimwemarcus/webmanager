@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/StoreContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { ShieldAlert, Check, X } from 'lucide-react';
 
 export default function GlobalAlerts() {
   const store = useStore();
+  const { L } = useLanguage();
   const users = store.getUsers();
   const currentUser = (() => {
     try { return JSON.parse(localStorage.getItem('biztrack_user')); }
@@ -63,25 +65,25 @@ export default function GlobalAlerts() {
             <ShieldAlert className="w-8 h-8" />
           </div>
           
-          <h2 className="font-display text-2xl font-bold text-navy-950 mb-2">Access Request</h2>
+          <h2 className="font-display text-2xl font-bold text-navy-950 mb-2">{L('Access Request', 'Demande d\'Accès')}</h2>
           <p className="text-sm text-navy-500 mb-6 bg-amber-50/50 p-4 rounded-2xl border border-amber-100/50 w-full">
             <strong className="text-navy-900 block text-lg">{pendingUser.name}</strong>
-            <span className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400">System ID: {pendingUser.username}</span>
+            <span className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400">{L('System ID:', 'ID Système :')} {pendingUser.username}</span>
             <br/><br/>
-            This operator has just registered and requires Master clearance to enter the platform.
+            {L('This operator has just registered and requires Master clearance to enter the platform.', 'Cet opérateur vient de s\'enregistrer et nécessite une autorisation Master pour accéder à la plateforme.')}
           </p>
 
           <div className="w-full mb-6 text-left">
-            <label className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400 mb-2 block ml-1">Grant Access Lifespan</label>
+            <label className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-400 mb-2 block ml-1">{L('Grant Access Lifespan', 'Durée de l\'Accès Accordé')}</label>
             <select 
               value={lifespanDays}
               onChange={(e) => setLifespanDays(e.target.value)}
               className="w-full bg-navy-50/50 border border-navy-100 rounded-xl px-4 py-3 text-sm font-bold text-navy-900 focus:outline-none focus:border-amber-400"
             >
-              <option value="1">24 Hours (Temp)</option>
-              <option value="7">7 Days</option>
-              <option value="30">30 Days</option>
-              <option value="permanent">Permanent Access</option>
+              <option value="1">{L('24 Hours (Temp)', '24 Heures (Temp)')}</option>
+              <option value="7">{L('7 Days', '7 Jours')}</option>
+              <option value="30">{L('30 Days', '30 Jours')}</option>
+              <option value="permanent">{L('Permanent Access', 'Accès Permanent')}</option>
             </select>
           </div>
 
@@ -90,13 +92,13 @@ export default function GlobalAlerts() {
               onClick={() => handleDecision('deny')}
               className="flex-1 py-4 rounded-2xl bg-red-50 text-danger font-bold text-xs uppercase tracking-widest hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
             >
-              <X className="w-4 h-4" /> Deny
+              <X className="w-4 h-4" /> {L('Deny', 'Refuser')}
             </button>
             <button 
               onClick={() => handleDecision('approve')}
               className="flex-1 py-4 rounded-2xl bg-accent-500 text-navy-950 font-black text-xs uppercase tracking-widest hover:bg-accent-400 transition-colors shadow-[0_4px_15px_rgba(245,158,11,0.3)] flex items-center justify-center gap-2"
             >
-              <Check className="w-4 h-4" /> Grant
+              <Check className="w-4 h-4" /> {L('Grant', 'Accorder')}
             </button>
           </div>
         </div>

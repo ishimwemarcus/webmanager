@@ -5,7 +5,7 @@ import { useStore } from '../../context/StoreContext';
 
 export default function TopBar({ onToggleSidebar }) {
   const store = useStore();
-  const { lang, toggleLang, t } = useLanguage();
+  const { lang, toggleLang, t, L } = useLanguage();
   const { currency, setCurrency, currentOperator } = store;
   const [showQR, setShowQR] = useState(false);
   const [eyeCare, setEyeCare] = useState(() => localStorage.getItem('biztrack_eyecare') === 'true');
@@ -42,7 +42,7 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="flex flex-col">
             <div className="flex items-center gap-2 md:gap-3">
               <h2 className="text-xs md:text-lg font-black text-white uppercase tracking-tighter">
-                {lang === 'fr' ? 'VUE' : 'VIEW'} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
+                {L('VIEW', 'VUE')} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
@@ -55,7 +55,7 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
               <div className={`w-2 h-2 rounded-full animate-pulse ${store.getSystemStatus() === 'systemWarning' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-white">
-                {store.getSystemStatus() === 'systemWarning' ? (lang === 'fr' ? 'Attention Requise' : 'Attention Required') : (lang === 'fr' ? 'Système Nominal' : 'System Nominal')}
+                {store.getSystemStatus() === 'systemWarning' ? L('Attention Required', 'Attention Requise') : L('System Nominal', 'Système Nominal')}
               </span>
           </div>
         </div>
@@ -78,11 +78,11 @@ export default function TopBar({ onToggleSidebar }) {
               {/* Shift End Button — prominently red */}
               <button
                 onClick={() => store.setIsShiftEndModalOpen(true)}
-                title="Terminer le poste et passer la main"
+                title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
                 className="flex items-center gap-2 px-3 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="hidden md:inline">{lang === 'fr' ? 'Fin Poste' : 'End Shift'}</span>
+                <span className="hidden md:inline">{L('End Shift', 'Fin Poste')}</span>
               </button>
             </div>
           )}
@@ -99,7 +99,7 @@ export default function TopBar({ onToggleSidebar }) {
           {/* Eye Care Toggle */}
           <button
             onClick={() => setEyeCare(!eyeCare)}
-            title="Toggle Eye Care Mode"
+            title={L('Toggle Eye Care Mode', 'Activer le mode confort visuel')}
             className={`flex items-center gap-2 px-3 py-2 border rounded-2xl transition-all font-black group ${eyeCare ? 'bg-[#BEF264]/20 border-[#BEF264] text-[#BEF264]' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
           >
             <Eye className="w-4 h-4" />
@@ -108,7 +108,7 @@ export default function TopBar({ onToggleSidebar }) {
           {/* Portal QR Shortcut */}
           <button
             onClick={() => setShowQR(true)}
-            title="Generate Client Portal QR"
+            title={L('Generate Client Portal QR', 'Générer QR Portail Client')}
             className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
           >
             <QrCode className="w-4 h-4" />
@@ -116,7 +116,7 @@ export default function TopBar({ onToggleSidebar }) {
 
           {/* Currency Input Modifier */}
           <div className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
-            <span className="hidden md:inline text-xs font-black uppercase text-white/40" title="Currency Profile">CUR</span>
+            <span className="hidden md:inline text-xs font-black uppercase text-white/40" title={L('Currency Profile', 'Profil Devise')}>CUR</span>
             <input
               type="text"
               value={currency}
@@ -134,13 +134,13 @@ export default function TopBar({ onToggleSidebar }) {
             <div className="w-20 h-20 bg-navy-brand rounded-3xl mx-auto flex items-center justify-center text-white mb-6">
               <QrCode className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">Accès Mobile</h3>
-            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">Scannez pour synchroniser ce terminal avec votre smartphone.</p>
+            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{L('Mobile Access', 'Accès Mobile')}</h3>
+            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">{L('Scan to sync this terminal with your smartphone.', 'Scannez pour synchroniser ce terminal avec votre smartphone.')}</p>
             <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#/portal')}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
             </div>
-            <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">Guardian Protocol v4.0 Active</p>
+            <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
           </div>
         </div>
       )}

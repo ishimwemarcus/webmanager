@@ -22,7 +22,7 @@ import {
 
 export default function Wait() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { t, L, lang } = useLanguage();
   const [activeTab, setActiveTab] = useState('DEBTS'); // 'CREDITS' or 'DEBTS'
   
   const waitCredits = store.getWaitCredits ? store.getWaitCredits() : [];
@@ -60,7 +60,7 @@ export default function Wait() {
   };
 
   const confirmDelete = (record) => {
-    store.showConfirm("Voulez-vous supprimer cet enregistrement du registre ?", () => {
+    store.showConfirm(L("Do you want to delete this record from the registry?", "Voulez-vous supprimer cet enregistrement du registre ?"), () => {
       store.deleteRecord(record);
     });
   };
@@ -72,10 +72,10 @@ export default function Wait() {
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Grand Livre Clients
+            {L('Client Ledger', 'Grand Livre Clients')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
-            Audit des Soldes — Passifs & Actifs Clients
+            {L('Balance Audit — Client Liabilities & Assets', 'Audit des Soldes — Passifs & Actifs Clients')}
           </p>
         </div>
       </div>
@@ -90,9 +90,9 @@ export default function Wait() {
             <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Crédits (Reliquats)</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Credits (Balances)', 'Crédits (Reliquats)')}</p>
             <p className="text-4xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(totalCreditSum)}</p>
-            <p className="text-[9px] font-black text-emerald-600 uppercase mt-1 tracking-widest">{creditMap.length} Clients Concernés</p>
+            <p className="text-[9px] font-black text-emerald-600 uppercase mt-1 tracking-widest">{creditMap.length} {L('Affected Clients', 'Clients Concernés')}</p>
           </div>
         </button>
 
@@ -104,9 +104,9 @@ export default function Wait() {
             <TrendingDown className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Dettes (Impayés)</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Debts (Unpaid)', 'Dettes (Impayés)')}</p>
             <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalDebtSum)}</p>
-            <p className="text-[9px] font-black text-rose-500 uppercase mt-1 tracking-widest">{debtMap.length} Débiteurs Actifs</p>
+            <p className="text-[9px] font-black text-rose-500 uppercase mt-1 tracking-widest">{debtMap.length} {L('Active Debtors', 'Débiteurs Actifs')}</p>
           </div>
         </button>
       </div>
@@ -115,11 +115,11 @@ export default function Wait() {
       <div className="space-y-6">
         <div className="flex items-center justify-between mb-2">
            <h3 className="text-xs font-black uppercase tracking-[0.4em] text-navy-950 italic">
-              Manifeste des {activeTab === 'CREDITS' ? 'Crédits' : 'Dettes'}
+              {L('Manifest of', 'Manifeste des')} {activeTab === 'CREDITS' ? L('Credits', 'Crédits') : L('Debts', 'Dettes')}
            </h3>
            <div className="flex items-center gap-2 px-4 py-2 bg-navy-50 rounded-xl">
               <Filter className="w-3.5 h-3.5 text-blue-gray" />
-              <span className="text-[9px] font-black uppercase text-blue-gray tracking-widest">Filtrage Intelligent</span>
+              <span className="text-[9px] font-black uppercase text-blue-gray tracking-widest">{L('Intelligent Filtering', 'Filtrage Intelligent')}</span>
            </div>
         </div>
 
@@ -134,11 +134,11 @@ export default function Wait() {
                           </div>
                           <div>
                              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{c.client}</h3>
-                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1">Crédit Indexé</p>
+                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1">{L('Indexed Credit', 'Crédit Indexé')}</p>
                           </div>
                        </div>
                        <div className="text-right">
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Solde Positif</p>
+                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">{L('Positive Balance', 'Solde Positif')}</p>
                           <p className="text-3xl font-black text-emerald-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
                        </div>
                     </div>
@@ -148,8 +148,8 @@ export default function Wait() {
                              <div className="flex items-center gap-4">
                                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg"></div>
                                 <div>
-                                   <p className="text-xs font-black text-navy-950 uppercase">{r.note || 'Reliquat Automatique'}</p>
-                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString()}</p>
+                                   <p className="text-xs font-black text-navy-950 uppercase">{r.note || L('Automatic Balance', 'Reliquat Automatique')}</p>
+                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                                 </div>
                              </div>
                              <p className="text-lg font-black text-emerald-600">{store.formatCurrency(r.balance)}</p>
@@ -160,7 +160,7 @@ export default function Wait() {
               ))
            ) : (
               <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-20">
-                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucun crédit client</p>
+                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No client credits', 'Aucun crédit client')}</p>
               </div>
            )
         ) : (
@@ -174,12 +174,12 @@ export default function Wait() {
                           </div>
                           <div>
                              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{c.client}</h3>
-                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || 'Aucun contact indexé'}</p>
+                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || L('No contact indexed', 'Aucun contact indexé')}</p>
                           </div>
                        </div>
                        <div className="text-right flex flex-col items-end gap-2">
                           <div>
-                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Passif Client</p>
+                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">{L('Client Liability', 'Passif Client')}</p>
                              <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
                           </div>
                           <button 
@@ -187,7 +187,7 @@ export default function Wait() {
                                const summary = {
                                   client: c.client,
                                   phone: c.phone,
-                                  name: "RELEVÉ DE DETTE",
+                                  name: L("DEBT STATEMENT", "RELEVÉ DE DETTE"),
                                   amount: c.total,
                                   paid: 0,
                                   date: new Date().toISOString()
@@ -196,7 +196,7 @@ export default function Wait() {
                             }}
                             className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
                           >
-                             <Printer className="w-3 h-3" /> Imprimer Relevé
+                             <Printer className="w-3 h-3" /> {L('Print Statement', 'Imprimer Relevé')}
                           </button>
                        </div>
                     </div>
@@ -206,12 +206,12 @@ export default function Wait() {
                              <div className="flex items-center gap-4">
                                 <div className="w-3 h-3 rounded-full bg-rose-500 shadow-lg"></div>
                                 <div>
-                                   <p className="text-xs font-black text-navy-950 uppercase">Vente Impayée : {r.name}</p>
-                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString()}</p>
+                                   <p className="text-xs font-black text-navy-950 uppercase">{L('Unpaid Sale', 'Vente Impayée')} : {r.name}</p>
+                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                                 </div>
                              </div>
                              <div className="text-right">
-                                <p className="text-[8px] font-black text-blue-gray uppercase italic">Reste à payer</p>
+                                <p className="text-[8px] font-black text-blue-gray uppercase italic">{L('Remaining to pay', 'Reste à payer')}</p>
                                 <p className="text-lg font-black text-rose-600">{store.formatCurrency((parseFloat(r.amount)||0) - (parseFloat(r.paid)||0))}</p>
                              </div>
                           </div>
@@ -221,7 +221,7 @@ export default function Wait() {
               ))
            ) : (
               <div className="py-32 text-center glass-card border-dashed border-2 border-rose-100 opacity-20">
-                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucune dette active</p>
+                 <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No active debt', 'Aucune dette active')}</p>
               </div>
            )
         )}
@@ -234,9 +234,9 @@ export default function Wait() {
             <Layers className="w-7 h-7 text-emerald-400" />
          </div>
          <div className="relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-1">Architecture de Double Inscription</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-1">{L('Double Entry Architecture', 'Architecture de Double Inscription')}</p>
             <p className="text-[11px] font-bold text-white/40 leading-relaxed max-w-2xl">
-               Le système synchronise les reliquats (Crédits) et les impayés (Dettes) en temps réel. Cette vision bifocale permet une gestion optimale des liquidités et une réduction des risques d'insolvabilité.
+               {L('The system synchronizes balances (Credits) and unpaid items (Debts) in real time. This bifocal vision allows for optimal cash management and reduction of insolvency risks.', 'Le système synchronise les reliquats (Crédits) et les impayés (Dettes) en temps réel. Cette vision bifocale permet une gestion optimale des liquidités et une réduction des risques d\'insolvabilité.')}
             </p>
          </div>
       </div>

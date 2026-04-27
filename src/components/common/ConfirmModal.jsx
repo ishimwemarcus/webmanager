@@ -1,7 +1,9 @@
 import React from 'react';
 import { AlertTriangle, Check, X, ShieldAlert } from 'lucide-react';
+import { useLanguage } from '../../context/LanguageContext';
 
-export default function ConfirmModal({ isOpen, message, onConfirm, onCancel, t }) {
+export default function ConfirmModal({ isOpen, message, onConfirm, onCancel }) {
+  const { t, L } = useLanguage();
   if (!isOpen) return null;
 
   return (

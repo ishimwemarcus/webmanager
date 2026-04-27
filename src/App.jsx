@@ -70,7 +70,6 @@ function App() {
         message={store.confirmState.message}
         onConfirm={store.confirmState.onConfirm}
         onCancel={store.confirmState.onCancel}
-        t={t}
       />
 
       {/* Mobile Backdrop Overlay */}
