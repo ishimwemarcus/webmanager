@@ -15,7 +15,9 @@ import {
   TrendingUp,
   Filter,
   Layers,
-  ChevronDown
+  ChevronDown,
+  Printer,
+  MessageSquare
 } from 'lucide-react';
 
 export default function Wait() {
@@ -175,9 +177,27 @@ export default function Wait() {
                              <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || 'Aucun contact indexé'}</p>
                           </div>
                        </div>
-                       <div className="text-right">
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Passif Client</p>
-                          <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
+                       <div className="text-right flex flex-col items-end gap-2">
+                          <div>
+                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Passif Client</p>
+                             <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
+                          </div>
+                          <button 
+                            onClick={() => {
+                               const summary = {
+                                  client: c.client,
+                                  phone: c.phone,
+                                  name: "RELEVÉ DE DETTE",
+                                  amount: c.total,
+                                  paid: 0,
+                                  date: new Date().toISOString()
+                               };
+                               import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency));
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
+                          >
+                             <Printer className="w-3 h-3" /> Imprimer Relevé
+                          </button>
                        </div>
                     </div>
                     <div className="divide-y divide-navy-50">

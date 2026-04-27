@@ -98,6 +98,44 @@ export const calculateTradingRatio = (grossProfit, netSales) => {
   return (grossProfit / netSales).toFixed(2);
 };
 
+export const generateBusinessIntelligence = (sales) => {
+  // Top Products by Quantity Sold
+  const productSales = {};
+  sales.forEach(s => {
+    productSales[s.name] = (productSales[s.name] || 0) + (parseFloat(s.quantity) || 1);
+  });
+  const topProducts = Object.entries(productSales)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([name, qty]) => ({ name, qty }));
+
+  // Top Clients by Revenue
+  const clientRevenue = {};
+  sales.forEach(s => {
+    const c = (s.client || 'STANDARD').toUpperCase();
+    clientRevenue[c] = (clientRevenue[c] || 0) + (parseFloat(s.amount) || 0);
+  });
+  const topClients = Object.entries(clientRevenue)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([name, revenue]) => ({ name, revenue }));
+
+  // Operator Efficiency
+  const operatorStats = {};
+  sales.forEach(s => {
+    const op = (s.operator || 'ADMIN').toUpperCase();
+    if (!operatorStats[op]) operatorStats[op] = { revenue: 0, transactions: 0 };
+    operatorStats[op].revenue += (parseFloat(s.amount) || 0);
+    operatorStats[op].transactions += 1;
+  });
+  const topOperators = Object.entries(operatorStats)
+    .sort(([, a], [, b]) => b.revenue - a.revenue)
+    .map(([name, stats]) => ({ name, ...stats }));
+
+  return { topProducts, topClients, topOperators };
+};
+
+
 export const printThermalReceipt = (sale, operator, formatCurrency) => {
   const content = `
     <html>
@@ -241,7 +279,8 @@ export const printFullMasterReport = (data, formatCurrency) => {
     sales, 
     ledger, 
     inventory, 
-    shifts 
+    shifts,
+    activeSectors = ['sales', 'ledger', 'stock', 'losses', 'shifts']
   } = data;
 
   const content = `
@@ -249,30 +288,28 @@ export const printFullMasterReport = (data, formatCurrency) => {
       <head>
         <title>Accounting & Operations Report</title>
         <style>
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-          body { font-family: 'Inter', sans-serif; padding: 60px; color: #0f172a; line-height: 1.6; max-width: 1000px; margin: 0 auto; background: white; }
-          .header { text-align: center; margin-bottom: 60px; }
-          .header h1 { font-size: 38px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -1.5px; color: #082f49; }
-          .header p { font-size: 16px; color: #64748b; margin: 8px 0 0; font-weight: 700; }
+          @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+          body { font-family: 'Courier Prime', Courier, monospace; padding: 10px; color: #000; line-height: 1.4; width: 80mm; margin: 0 auto; background: white; font-size: 10px; }
+          .header { text-align: center; margin-bottom: 20px; }
+          .header h1 { font-size: 16px; font-weight: 900; margin: 0; text-transform: uppercase; }
+          .header p { font-size: 10px; margin: 4px 0 0; font-weight: 700; }
           
-          .section { margin-bottom: 50px; }
-          .section-title { font-size: 15px; font-weight: 900; text-transform: uppercase; border-bottom: 3px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 25px; letter-spacing: 1px; color: #0f172a; }
+          .section { margin-bottom: 20px; }
+          .section-title { font-size: 12px; font-weight: 900; text-transform: uppercase; border-bottom: 1px dashed #000; padding-bottom: 5px; margin-bottom: 10px; text-align: center; }
           
-          .metrics-grid { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
-          .metric-row { display: flex; justify-content: space-between; font-size: 16px; font-weight: 600; color: #334155; }
-          .metric-row.red { color: #ef4444; }
-          .metric-row.bold-large { font-size: 24px; font-weight: 900; margin-top: 15px; border-top: 2px solid #e2e8f0; padding-top: 15px; color: #0f172a; }
+          .metrics-grid { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+          .metric-row { display: flex; justify-content: space-between; font-size: 10px; font-weight: 600; }
+          .metric-row.bold-large { font-size: 12px; font-weight: 900; margin-top: 5px; border-top: 1px dashed #000; padding-top: 5px; }
           
-          table { width: 100%; border-collapse: collapse; font-size: 13px; }
-          th { text-align: left; padding: 14px 10px; border-bottom: 2px solid #f1f5f9; color: #64748b; text-transform: uppercase; font-size: 11px; font-weight: 900; letter-spacing: 0.5px; }
-          td { padding: 14px 10px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+          table { width: 100%; border-collapse: collapse; font-size: 9px; }
+          th { text-align: left; padding: 4px 2px; border-bottom: 1px dashed #000; font-size: 8px; text-transform: uppercase; }
+          td { padding: 4px 2px; vertical-align: top; border-bottom: 1px solid #f0f0f0; }
           .text-right { text-align: right; }
           .text-center { text-align: center; }
           
-          .total-footer { text-align: right; margin-top: 25px; font-size: 18px; font-weight: 900; color: #082f49; }
-          
           @media print {
-            body { padding: 20px; }
+            body { padding: 0; margin: 0; }
+            @page { size: 80mm auto; margin: 0; }
             .section { page-break-inside: avoid; }
           }
         </style>
@@ -294,6 +331,7 @@ export const printFullMasterReport = (data, formatCurrency) => {
           </div>
         </div>
 
+        ${activeSectors.includes('sales') ? `
         <div class="section">
           <div class="section-title">SALES TRANSACTIONS</div>
           <table>
@@ -318,7 +356,9 @@ export const printFullMasterReport = (data, formatCurrency) => {
             </tbody>
           </table>
         </div>
+        ` : ''}
 
+        ${(activeSectors.includes('ledger') || activeSectors.includes('losses')) ? `
         <div class="section">
           <div class="section-title">LEDGER & LOSS LOG</div>
           <table>
@@ -342,7 +382,9 @@ export const printFullMasterReport = (data, formatCurrency) => {
             </tbody>
           </table>
         </div>
+        ` : ''}
 
+        ${activeSectors.includes('stock') ? `
         <div class="section">
           <div class="section-title">INVENTORY / ASSET VALUATION</div>
           <table>
@@ -364,7 +406,9 @@ export const printFullMasterReport = (data, formatCurrency) => {
           </table>
           <div class="total-footer">Total Inventory Asset Valuation: ${formatCurrency(inventory.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}</div>
         </div>
+        ` : ''}
 
+        ${activeSectors.includes('shifts') ? `
         <div class="section">
           <div class="section-title">EMPLOYEE SHIFT PERFORMANCE</div>
           <table>
@@ -386,6 +430,7 @@ export const printFullMasterReport = (data, formatCurrency) => {
             </tbody>
           </table>
         </div>
+        ` : ''}
 
         <script>
           window.onload = () => { setTimeout(() => { window.print(); window.onafterprint = () => window.close(); }, 600); }

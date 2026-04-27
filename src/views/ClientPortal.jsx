@@ -44,8 +44,13 @@ export default function ClientPortal() {
     const debt = Math.max(0, spent - paid);
     const credit = w.reduce((acc, curr) => acc + (parseFloat(curr.balance) || 0), 0);
 
+    const history = [
+      ...s.map(sale => ({ ...sale, timelineType: 'sale' })),
+      ...w.map(wait => ({ ...wait, timelineType: 'credit' }))
+    ].sort((a,b) => new Date(b.date) - new Date(a.date));
+
     return {
-      clientSales: s.sort((a,b) => new Date(b.date) - new Date(a.date)),
+      clientSales: history,
       totalSpent: spent,
       totalPaid: paid,
       currentDebt: debt,
@@ -170,20 +175,25 @@ export default function ClientPortal() {
               {clientSales.length > 0 ? clientSales.map((s, idx) => (
                 <div key={idx} className="p-8 flex items-center justify-between hover:bg-navy-50/50 transition-all group">
                    <div className="flex items-center gap-6">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${s.paid >= s.amount ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                         <Package className="w-6 h-6" />
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${s.timelineType === 'credit' ? 'bg-amber-50 text-amber-500' : (s.paid >= s.amount ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600')}`}>
+                         {s.timelineType === 'credit' ? <Wallet className="w-6 h-6" /> : <Package className="w-6 h-6" />}
                       </div>
                       <div>
-                         <p className="font-black text-navy-950 uppercase text-lg leading-none">{s.name}</p>
+                         <p className={`font-black uppercase text-lg leading-none ${s.timelineType === 'credit' ? 'text-amber-600' : 'text-navy-950'}`}>
+                            {s.timelineType === 'credit' ? 'Crédit / Trop-perçu' : s.name}
+                         </p>
                          <p className="text-xs font-bold text-blue-gray mt-2 flex items-center gap-2">
                             <Clock className="w-3.5 h-3.5 opacity-40" /> {new Date(s.date).toLocaleDateString('fr-FR', {day:'numeric', month:'short', year:'numeric'})}
+                            {s.timelineType === 'credit' && s.note && <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-[9px]">{s.note}</span>}
                          </p>
                       </div>
                    </div>
                    <div className="text-right">
-                      <p className="text-xl font-black text-navy-950">{store.formatCurrency(s.amount)}</p>
-                      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500'}`}>
-                         {s.paid >= s.amount ? 'Soldé' : `Reste: ${store.formatCurrency(s.amount - s.paid)}`}
+                      <p className={`text-xl font-black ${s.timelineType === 'credit' ? 'text-amber-500' : 'text-navy-950'}`}>
+                         {s.timelineType === 'credit' ? '+' : ''}{store.formatCurrency(s.balance || s.amount)}
+                      </p>
+                      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${s.timelineType === 'credit' ? 'text-amber-500' : (s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500')}`}>
+                         {s.timelineType === 'credit' ? (s.status === 'used' ? 'Utilisé' : 'Disponible') : (s.paid >= s.amount ? 'Soldé' : `Reste: ${store.formatCurrency(s.amount - s.paid)}`)}
                       </p>
                    </div>
                 </div>

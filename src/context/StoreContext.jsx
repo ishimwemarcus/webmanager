@@ -67,8 +67,14 @@ export const StoreProvider = ({ children }) => {
   const API_URL = 'https://guardianapi.loca.lt/manager/htdocs/manager%20web/api.php';
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
 
-  // Network Sync Engine - Polls the central PHP server
+  // Network Sync Engine - Polls the central PHP server (with circuit breaker)
   useEffect(() => {
+    let failCount = 0;
+    const MAX_FAILS = 3;
+    const RETRY_DELAY = 120000; // 2 min backoff after circuit opens
+    let intervalId = null;
+    let backoffId = null;
+
     const pullFromServer = async () => {
       try {
         const keysList = [
@@ -80,26 +86,48 @@ export const StoreProvider = ({ children }) => {
           { k: 'biztrack_wait', set: setWaitCredits }
         ];
 
+        // Quick reachability check first (single request)
+        const testRes = await fetch(`${API_URL}?action=ping`, { ...FETCH_CONFIG, signal: AbortSignal.timeout(3000) });
+        if (!testRes.ok) throw new Error('API unreachable');
+
+        failCount = 0; // Reset on success
+
         for (const item of keysList) {
           const res = await fetch(`${API_URL}?action=get&key=${item.k}`, FETCH_CONFIG);
           if (!res.ok) continue;
-          
           const serverData = await res.json();
           if (serverData && serverData.length > 0) {
-              item.set(prev => {
-                if (JSON.stringify(prev) !== JSON.stringify(serverData)) return serverData;
-                return prev;
-              });
+            item.set(prev => {
+              if (JSON.stringify(prev) !== JSON.stringify(serverData)) return serverData;
+              return prev;
+            });
           }
         }
       } catch (e) {
-        // Silently fail if server is down / offline
+        failCount++;
+        if (failCount >= MAX_FAILS) {
+          // Circuit open: stop polling, schedule a retry after backoff
+          clearInterval(intervalId);
+          intervalId = null;
+          backoffId = setTimeout(() => {
+            failCount = 0;
+            startPolling(); // Try again after backoff
+          }, RETRY_DELAY);
+        }
       }
     };
 
-    pullFromServer();
-    const intervalId = setInterval(pullFromServer, 4000); // 4 second tick
-    return () => clearInterval(intervalId);
+    const startPolling = () => {
+      pullFromServer();
+      intervalId = setInterval(pullFromServer, 6000); // 6 second tick
+    };
+
+    startPolling();
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      if (backoffId) clearTimeout(backoffId);
+    };
   }, []);
 
 
@@ -158,6 +186,7 @@ export const StoreProvider = ({ children }) => {
   const getShiftTransactions = (shiftId) => ({
     sales: sales.filter(s => s.shiftId === shiftId),
     expenses: ledgerManual.filter(l => l.shiftId === shiftId && l.type === 'expense'),
+    tips: ledgerManual.filter(l => l.shiftId === shiftId && l.type === 'tip'),
     losses: losses.filter(l => l.shiftId === shiftId)
   });
   // Get total wait credit for a specific client name
@@ -262,17 +291,19 @@ export const StoreProvider = ({ children }) => {
     }).catch(()=>{});
 
     if (record.record_type === 'product') { setProducts(prev => [...prev, record]); apiPush('biztrack_products'); }
-    if (record.record_type === 'sale') { setSales(prev => [...prev, record]); apiPush('biztrack_sales'); }
-    if (record.record_type === 'expense') { setExpenses(prev => [...prev, record]); apiPush('biztrack_expenses'); }
-    if (record.record_type === 'user') { setUsers(prev => [...prev, record]); apiPush('biztrack_users'); }
-    if (record.record_type === 'ledger_entry') { setLedgerManual(prev => [...prev, record]); apiPush('biztrack_ledger'); }
-    if (record.record_type === 'wait_credit') { setWaitCredits(prev => [...prev, record]); apiPush('biztrack_wait'); }
+    else if (record.record_type === 'sale') { setSales(prev => [...prev, record]); apiPush('biztrack_sales'); }
+    else if (record.record_type === 'expense') { setExpenses(prev => [...prev, record]); apiPush('biztrack_expenses'); }
+    else if (record.record_type === 'user') { setUsers(prev => [...prev, record]); apiPush('biztrack_users'); }
+    else if (record.record_type === 'ledger_entry') { setLedgerManual(prev => [...prev, record]); apiPush('biztrack_ledger'); }
+    else if (record.record_type === 'wait_credit') { setWaitCredits(prev => [...prev, record]); apiPush('biztrack_wait'); }
     
-    if (record.record_type === 'report') setReportArchive(prev => [...prev, record]);
-    if (record.record_type === 'loss') setLosses(prev => [...prev, record]);
-    if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
-    if (record.record_type === 'category') setCategories(prev => [...prev, record]);
-    if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
+    else if (record.record_type === 'report') setReportArchive(prev => [...prev, record]);
+    else if (record.record_type === 'loss') setLosses(prev => [...prev, record]);
+    else if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
+    else if (record.record_type === 'category') setCategories(prev => [...prev, record]);
+    else if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
+
+    return record;
   };
 
   const updateRecord = (record) => {
@@ -308,8 +339,10 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'ledger_entry') { setLedgerManual(update); apiUpdate('biztrack_ledger'); }
     else if (record.record_type === 'wait_credit') { setWaitCredits(update); apiUpdate('biztrack_wait'); }
     else if (record.record_type === 'category') setCategories(update);
-    else if (record.record_type === 'loss') setLosses(update);
-    else if (record.record_type === 'reconciliation') setReconciliations(update);
+    else if (record.record_type === 'loss') { setLosses(update); apiUpdate('biztrack_losses'); }
+    else if (record.record_type === 'reconciliation') { setReconciliations(update); apiUpdate('biztrack_reconciliations'); }
+    else if (record.record_type === 'shift') { setShifts(update); apiUpdate('biztrack_shifts'); }
+    else if (record.record_type === 'report') { setReportArchive(update); apiUpdate('biztrack_reports'); }
   };
 
   const deleteRecord = (record) => {
@@ -505,7 +538,7 @@ export const StoreProvider = ({ children }) => {
     const searchName = clientName.toLowerCase();
 
     // 1. Register the sale
-    addRecord({
+    const createdSale = addRecord({
       ...saleRecord,
       client: clientName,
       record_type: 'sale',
@@ -515,7 +548,7 @@ export const StoreProvider = ({ children }) => {
     });
 
     // 2. Decrement stock quantity
-    const product = products.find(p => p.product_id === product_id);
+    const product = products.find(p => p.id === product_id || p.product_id === product_id);
     if (product) {
       updateRecord({
         ...product,
@@ -579,6 +612,8 @@ export const StoreProvider = ({ children }) => {
         });
       }
     }
+
+    return createdSale;
   };
 
 

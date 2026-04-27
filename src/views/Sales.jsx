@@ -26,7 +26,11 @@ import {
   ArrowUpRight,
   Zap,
   Edit2,
-  Phone
+  Phone,
+  Check,
+  MessageSquare,
+  Banknote,
+  Star
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -42,6 +46,8 @@ export default function Sales() {
   const [filterShift, setFilterShift] = useState(true);
   const [customDates, setCustomDates] = useState({ start: '', end: '' });
   const [showConfirmPop, setShowConfirmPop] = useState(false);
+  const [showOverpayModal, setShowOverpayModal] = useState(false);
+  const [pendingOverpay, setPendingOverpay] = useState(0);
   const [editingSale, setEditingSale] = useState(null);
 
   const [newSale, setNewSale] = useState({
@@ -53,7 +59,8 @@ export default function Sales() {
     paymentMethod: 'Cash',
     phone: '',
     useCredit: true,
-    overpayType: null
+    overpayType: null,
+    isAccepted: false
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
@@ -110,44 +117,86 @@ export default function Sales() {
     if (e) e.preventDefault();
     const product = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
     if (!product) return;
-    if (product.quantity < newSale.quantity) {
-      store.showAlert('Unité de stock insuffisante.');
+    
+    if (!newSale.isAccepted) {
+       // Step 1: Acceptance
+       if (product.quantity < newSale.quantity) {
+          store.showAlert('Unité de stock insuffisante.');
+          return;
+       }
+       if (!newSale.client.trim()) {
+          store.showAlert("Veuillez entrer le nom du client.");
+          return;
+       }
+       
+       setNewSale(prev => ({ ...prev, isAccepted: true }));
+       store.showAlert("Offre acceptée par le client. Prêt pour finalisation.", "warning");
+       return;
+    }
+
+    const overpay = (parseFloat(newSale.paid) || 0) - (parseFloat(newSale.amount) || 0);
+    if (overpay > 0) {
+      // Intercept: show the overpayment choice modal
+      setPendingOverpay(overpay);
+      setShowOverpayModal(true);
       return;
     }
-    if (!newSale.client.trim()) return;
 
-    if (parseFloat(newSale.paid) > parseFloat(newSale.amount)) {
-      setNewSale(prev => ({ ...prev, overpayType: null }));
-    }
     setShowConfirmPop(true);
   };
 
-  const registerSale = () => {
+  const registerSale = (overpayChoice = null) => {
     const product = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
     const amount = parseFloat(newSale.amount);
     const paid = parseFloat(newSale.paid);
     const totalPayment = paid + (newSale.useCredit ? availableCredit : 0);
+    const overpay = Math.max(0, totalPayment - amount);
+    const effectivePaid = overpayChoice ? amount : totalPayment; // Cap at amount if tip
 
     const finalSale = {
       record_type: 'sale',
       name: product.name,
-      status: totalPayment < amount ? 'partial' : 'paid',
+      status: effectivePaid < amount ? 'partial' : 'paid',
       date: new Date().toISOString(),
       product_id: product.id || product.product_id,
       client: newSale.client,
       quantity: parseFloat(newSale.quantity),
       amount,
-      paid: totalPayment,
+      paid: effectivePaid,
       phone: newSale.phone,
       paymentMethod: newSale.paymentMethod,
-      useCredit: newSale.useCredit
+      useCredit: newSale.useCredit,
+      overpayChoice
     };
 
     store.processSmartTransaction(finalSale);
 
+    // Handle overpayment based on operator choice
+    if (overpay > 0 && overpayChoice === 'tip') {
+      // Register as a tip for the current operator's shift
+      store.addRecord({
+        record_type: 'ledger_entry',
+        type: 'tip',
+        name: `Pourboire — ${newSale.client || 'Client'}`,
+        amount: overpay,
+        operator: store.currentOperator,
+        shiftId: store.shiftStart,
+        client: newSale.client,
+        phone: newSale.phone,
+        date: new Date().toISOString(),
+        note: `Pourboire reçu sur vente de ${product.name}`
+      });
+      store.showAlert(`Pourboire de ${store.formatCurrency(overpay)} enregistré pour ${store.currentOperator} !`, 'success');
+    } else if (overpay > 0 && overpayChoice === 'credit') {
+      // Registered as wait credit by processSmartTransaction automatically
+      store.showAlert(`${store.formatCurrency(overpay)} ajouté en Crédit Client pour ${newSale.client}.`, 'success');
+    }
+
     setLastSaleRecord(finalSale);
     setShowSuccess(true);
     closeAll();
+    setPendingOverpay(0);
+    setShowOverpayModal(false);
     setTimeout(() => setShowSuccess(false), 3000);
   };
 
@@ -197,7 +246,7 @@ export default function Sales() {
     setShowModal(false);
     setShowConfirmPop(false);
     setEditingSale(null);
-    setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null });
+    setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null, isAccepted: false });
   };
 
   const handlePayDebt = (e) => {
@@ -207,7 +256,28 @@ export default function Sales() {
     const payment = parseFloat(payAmount);
     const currentPaid = parseFloat(showPayModal.paid) || 0;
     const totalAmount = parseFloat(showPayModal.amount) || 0;
-    const newPaid = currentPaid + payment;
+    const remainingDebt = totalAmount - currentPaid;
+    
+    let overpayment = 0;
+    let newPaid = currentPaid + payment;
+
+    if (payment > remainingDebt) {
+       overpayment = payment - remainingDebt;
+       newPaid = totalAmount; // Cap the paid amount to the total
+
+       // Register the overpayment as Wait Credit
+       store.addRecord({
+          record_type: 'wait',
+          client: showPayModal.client || 'STANDARD',
+          phone: showPayModal.phone || 'none',
+          balance: overpayment,
+          date: new Date().toISOString()
+       });
+       
+       store.showAlert(`Dette soldée. ${store.formatCurrency(overpayment)} ajouté en crédit d'attente.`);
+    } else {
+       store.showAlert(`Règlement de ${store.formatCurrency(payment)} enregistré !`);
+    }
     
     // Determine new status
     const newStatus = newPaid >= totalAmount ? 'PAID' : 'PARTIAL';
@@ -219,7 +289,6 @@ export default function Sales() {
       paymentMethod: payMethod // Update method for the final settlement if desired
     });
     
-    store.showAlert(`Règlement de ${store.formatCurrency(payment)} enregistré !`);
     setShowPayModal(null);
     setPayAmount('');
   };
@@ -370,8 +439,17 @@ export default function Sales() {
                       <p className="text-[10px] font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()}</p>
                       <p className="text-[8px] font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                    </div>
-                   <button className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
+                   <button 
+                     onClick={() => printThermalReceipt(s, s.operator, store.formatCurrency)}
+                     className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm"
+                   >
                       <Printer className="w-4 h-4" />
+                   </button>
+                   <button 
+                      onClick={() => shareReceipt(s, s.operator, store.formatCurrency)}
+                      className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                   >
+                      <MessageSquare className="w-4 h-4" />
                    </button>
                    <button 
                       onClick={() => handleEditSale(s)}
@@ -431,7 +509,7 @@ export default function Sales() {
                   >
                     <option value="">Sélectionner un produit</option>
                     {products.map(p => (
-                      <option key={p.id} value={p.id}>{p.name.toUpperCase()} ({p.quantity} en stock)</option>
+                      <option key={p.id} value={p.id} disabled={newSale.isAccepted}>{p.name.toUpperCase()} ({p.quantity} en stock)</option>
                     ))}
                   </select>
                </div>
@@ -443,9 +521,10 @@ export default function Sales() {
                       type="number"
                       required
                       min="1"
+                      disabled={newSale.isAccepted}
                       value={newSale.quantity}
                       onChange={e => setNewSale({...newSale, quantity: e.target.value})}
-                      className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
+                      className={`w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all ${newSale.isAccepted ? 'opacity-50' : ''}`}
                     />
                   </div>
                   <div>
@@ -467,11 +546,11 @@ export default function Sales() {
                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">Client</label>
                      <input
                        type="text"
-                       required
                        placeholder="Nom..."
+                       disabled={newSale.isAccepted}
                        value={newSale.client}
                        onChange={e => setNewSale({...newSale, client: e.target.value})}
-                       className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                       className={`w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30 ${newSale.isAccepted ? 'opacity-50' : ''}`}
                      />
                   </div>
                   <div>
@@ -479,9 +558,10 @@ export default function Sales() {
                      <input
                        type="text"
                        placeholder="07..."
+                       disabled={newSale.isAccepted}
                        value={newSale.phone}
                        onChange={e => setNewSale({...newSale, phone: e.target.value})}
-                       className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                       className={`w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30 ${newSale.isAccepted ? 'opacity-50' : ''}`}
                      />
                   </div>
                </div>
@@ -498,13 +578,92 @@ export default function Sales() {
                   </div>
                </div>
 
-               <button
-                 type="submit"
-                 className="w-full py-5 bg-emerald-500 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-emerald-500/30 hover:bg-emerald-600 active:scale-95 transition-all flex items-center justify-center gap-3"
-               >
-                 <Zap className="w-5 h-5" /> Enregistrer Transaction
-               </button>
+               {newSale.isAccepted && (
+                  <div className="space-y-3 animate-scale-in">
+                     <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 block italic">Encaissement (Montant Reçu)</label>
+                     <div className="relative group">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          autoFocus
+                          required
+                          value={newSale.paid}
+                          onChange={e => setNewSale({...newSale, paid: e.target.value})}
+                          className="w-full bg-emerald-50/50 border-2 border-emerald-500/20 rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                        />
+                     </div>
+                     {(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0)) > 0 && (
+                        <div className="flex justify-between items-center px-4 py-2 bg-rose-50 rounded-xl">
+                           <p className="text-[8px] font-black uppercase text-rose-500 tracking-widest">Reste à payer (Dette)</p>
+                           <p className="text-xs font-black text-rose-600">{store.formatCurrency(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0))}</p>
+                        </div>
+                     )}
+                  </div>
+               )}
+
+                <button
+                  type="submit"
+                  className={`w-full py-5 text-white rounded-3xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3 ${newSale.isAccepted ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-navy-950 shadow-navy-950/30'}`}
+                >
+                  <span className="flex items-center gap-3">
+                     {newSale.isAccepted ? <Check className="w-5 h-5" /> : <Zap className="w-5 h-5" />}
+                     <span>{newSale.isAccepted ? 'Enregistrer Transaction' : 'Le Client a Accepté'}</span>
+                  </span>
+                </button>
+
+               {newSale.isAccepted && (
+                  <button 
+                    type="button"
+                    onClick={() => setNewSale(prev => ({ ...prev, isAccepted: false }))}
+                    className="w-full py-2 text-[9px] font-black uppercase text-blue-gray hover:text-rose-500 transition-all"
+                  >
+                     Modifier la commande
+                  </button>
+               )}
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Overpayment Choice Modal */}
+      {showOverpayModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-xl animate-scale-in">
+          <div className="bg-white w-full max-w-sm rounded-[40px] p-10 text-center shadow-3xl">
+            <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full mx-auto flex items-center justify-center mb-4">
+              <Banknote className="w-10 h-10" />
+            </div>
+            <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-1">Trop-Perçu Détecté</h3>
+            <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-2 opacity-60">Le client a payé plus que le montant dû</p>
+            <div className="my-4 py-4 px-6 bg-amber-50 rounded-2xl border border-amber-100">
+              <p className="text-[10px] font-black uppercase text-amber-600 tracking-widest mb-1">Excédent</p>
+              <p className="text-3xl font-black text-amber-600">{store.formatCurrency(pendingOverpay)}</p>
+            </div>
+            <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-6 leading-relaxed opacity-60">
+              Classer cet excédent comme :
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                onClick={() => { setShowOverpayModal(false); registerSale('tip'); }}
+                className="flex flex-col items-center gap-2 py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-amber-500/30 active:scale-95"
+              >
+                <Star className="w-6 h-6" />
+                Pourboire
+                <span className="text-[8px] opacity-70 normal-case font-bold">Offert à l'opérateur</span>
+              </button>
+              <button
+                onClick={() => { setShowOverpayModal(false); registerSale('credit'); }}
+                className="flex flex-col items-center gap-2 py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-emerald-500/30 active:scale-95"
+              >
+                <Wallet className="w-6 h-6" />
+                Crédit Client
+                <span className="text-[8px] opacity-70 normal-case font-bold">Réservé au prochain achat</span>
+              </button>
+            </div>
+            <button onClick={() => setShowOverpayModal(false)} className="mt-4 text-[9px] font-black uppercase text-blue-gray tracking-widest opacity-40 hover:opacity-70 transition-all">
+              Annuler
+            </button>
           </div>
         </div>
       )}

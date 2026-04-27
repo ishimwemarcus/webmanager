@@ -5,7 +5,7 @@ import { UserCheck, ArrowRight, User, ShieldCheck } from 'lucide-react';
 
 export default function ShiftGateway() {
   const store = useStore();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [operator, setOperator] = useState('');
   const [selectedCurrency, setSelectedCurrency] = useState(store.currency || 'RWF');
 
@@ -69,7 +69,7 @@ export default function ShiftGateway() {
         <form onSubmit={handleStartShift} className="p-12 pt-4 space-y-8">
             <div className="space-y-4">
                 <div className="flex justify-between items-center px-2">
-                  <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">Identification Employé</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray">{lang === 'fr' ? 'Identification Employé' : 'Employee ID'}</label>
                   <span className="text-xs font-bold text-navy-brand opacity-50">Session v4.0</span>
                 </div>
                 <div className="relative group">
@@ -79,7 +79,7 @@ export default function ShiftGateway() {
                         required
                         value={operator}
                         onChange={(e) => setOperator(e.target.value)}
-                        placeholder="VOTRE NOM ICI..."
+                        placeholder={lang === 'fr' ? 'VOTRE NOM ICI...' : 'YOUR NAME HERE...'}
                         className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] pl-16 pr-6 py-6 text-navy-950 font-black focus:bg-white focus:border-navy-brand focus:ring-8 focus:ring-navy-brand/5 outline-none transition-all text-xl tracking-[0.2em] uppercase placeholder:text-navy-100 shadow-inner"
                         autoFocus
                     />
@@ -87,7 +87,7 @@ export default function ShiftGateway() {
             </div>
 
             <div className="space-y-4">
-                <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray px-2">Devise de Travail (Currency)</label>
+                <label className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray px-2">{lang === 'fr' ? 'Devise de Travail' : 'Working Currency'}</label>
                 <div className="grid grid-cols-3 gap-3">
                   {currencies.map(c => (
                     <button
@@ -103,13 +103,13 @@ export default function ShiftGateway() {
             </div>
 
             <button type="submit" className="w-full py-6 rounded-[24px] bg-navy-brand text-white text-sm font-black uppercase tracking-[0.3em] flex items-center justify-center gap-3 shadow-2xl hover:bg-navy-900 active:scale-95 transition-all group overflow-hidden relative">
-                <span className="relative z-10">Démarrer Vacation</span>
+                <span className="relative z-10">{lang === 'fr' ? 'Démarrer Vacation' : 'Start Shift'}</span>
                 <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-2 transition-transform" />
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
 
             <p className="text-center text-[10px] text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
-              Protocole de sécurité MARC actif. Devise sélectionnée: <span className="text-navy-brand">{selectedCurrency}</span>
+              {lang === 'fr' ? 'Protocole de sécurité MARC actif. Devise sélectionnée:' : 'MARC security protocol active. Selected currency:'} <span className="text-navy-brand">{selectedCurrency}</span>
             </p>
         </form>
       </div>

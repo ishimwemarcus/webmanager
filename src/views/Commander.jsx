@@ -4,7 +4,7 @@ import { useLanguage } from '../context/LanguageContext';
 import {
   ShoppingCart, Plus, Minus, Trash2, Search, Check,
   User, ChevronRight, X, Zap, Package, AlertTriangle,
-  CreditCard, Wallet, Clock, Filter, Layers, ShieldCheck
+  CreditCard, Wallet, Clock, Filter, Layers, ShieldCheck, Printer
 } from 'lucide-react';
 
 export default function Commander() {
@@ -22,6 +22,8 @@ export default function Commander() {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [success, setSuccess] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState(0); // 0: Preparing, 1: Waiting Payment
+  const [pendingSales, setPendingSales] = useState([]);
 
   // Categories
   const categories = useMemo(() => {
@@ -71,19 +73,25 @@ export default function Commander() {
     }).filter(Boolean));
   };
 
-  // Process sale
-  const handleCheckout = () => {
+  // Stage 1: Client Accepts
+  const handleAcceptance = () => {
     if (cart.length === 0) return;
+    
+    if (!clientName.trim() || !clientPhone.trim()) {
+       store.showAlert("Le nom et le téléphone du client sont obligatoires.", "error");
+       return;
+    }
+    
     setIsProcessing(true);
 
-    // Save one sale record per cart item using Smart Transaction engine
+    const createdSales = [];
     cart.forEach(item => {
-      const shareOfPaid = cartTotal > 0 ? (paidInput / cartTotal) * (item.qty * item.unitPrice) : 0;
       const saleRecord = {
         record_type: 'sale',
         name: item.product.name,
         amount: item.qty * item.unitPrice,
-        paid: Math.min(shareOfPaid, item.qty * item.unitPrice),
+        paid: 0,
+        status: 'waiting',
         quantity: item.qty,
         client: clientName || 'Comptoir',
         phone: clientPhone || 'none',
@@ -92,8 +100,34 @@ export default function Commander() {
         useCredit: true
       };
       
-      // Use the smart engine to handle debt/credit/stock automatically
-      store.processSmartTransaction(saleRecord);
+      const res = store.processSmartTransaction(saleRecord);
+      if (res) createdSales.push(res);
+    });
+
+    setPendingSales(createdSales);
+    setCheckoutStep(1);
+    setIsProcessing(false);
+    store.showAlert("Commande Acceptée - En attente de paiement", "warning");
+  };
+
+  // Stage 2: Finalize Payment
+  const handleFinalCheckout = () => {
+    if (pendingSales.length === 0) return;
+    setIsProcessing(true);
+
+    const totalToPay = cartTotal;
+    const actualPaid = paidInput;
+
+    pendingSales.forEach(sale => {
+      const shareOfPaid = totalToPay > 0 ? (actualPaid / totalToPay) * sale.amount : 0;
+      const finalPaid = Math.min(shareOfPaid, sale.amount);
+      
+      store.updateRecord({
+        ...sale,
+        paid: finalPaid,
+        status: finalPaid >= sale.amount ? 'paid' : 'partial',
+        paymentMethod: 'Cash' // Default or can be expanded
+      });
     });
 
     setTimeout(() => {
@@ -101,10 +135,29 @@ export default function Commander() {
       setClientName('');
       setClientPhone('');
       setAmountPaid('');
+      setPendingSales([]);
+      setCheckoutStep(0);
       setIsProcessing(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     }, 800);
+  };
+
+  const cancelPending = () => {
+    store.showConfirm("Annuler cette commande acceptée ? Les stocks seront restaurés.", () => {
+       pendingSales.forEach(sale => {
+          // 1. Delete the sale record
+          store.deleteRecord(sale);
+          // 2. Restore stock
+          const prod = store.getProducts().find(p => p.id === sale.product_id || p.product_id === sale.product_id);
+          if (prod) {
+             store.updateRecord({ ...prod, quantity: (prod.quantity || 0) + (sale.quantity || 0) });
+          }
+       });
+       setPendingSales([]);
+       setCheckoutStep(0);
+       store.showAlert("Commande annulée et stocks restaurés.");
+    });
   };
 
   return (
@@ -121,8 +174,25 @@ export default function Commander() {
           </p>
         </div>
         {success && (
-          <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest animate-bounce-gentle shadow-2xl">
-            <Check className="w-5 h-5" /> Vente Enregistrée avec Succès!
+          <div className="flex items-center gap-3">
+             <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest animate-bounce-gentle shadow-2xl">
+               <Check className="w-5 h-5" /> Vente Enregistrée avec Succès!
+             </div>
+             <button 
+               onClick={() => {
+                  store.showAlert("Recherche du dernier ticket...");
+                  // Since Commander clears state, we look for the most recent sale(s)
+                  const allSales = store.getSales();
+                  if (allSales.length > 0) {
+                     const lastSale = allSales[allSales.length - 1];
+                     import('../utils/Reporter').then(m => m.printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency));
+                  }
+               }}
+               className="p-4 bg-navy-950 text-white rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+             >
+                <Printer className="w-5 h-5" />
+                <span className="text-[10px] font-black uppercase">Imprimer Ticket</span>
+             </button>
           </div>
         )}
       </div>
@@ -173,10 +243,10 @@ export default function Commander() {
                     
                     return (
                        <div
-                         key={id}
-                         onClick={() => addToCart(product)}
-                         className={`glass-card bg-white p-5 rounded-[32px] border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''}`}
-                       >
+                          key={id}
+                          onClick={() => checkoutStep === 0 && addToCart(product)}
+                          className={`glass-card bg-white p-5 rounded-[32px] border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''} ${checkoutStep > 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                        >
                           {inCart && (
                              <div className="absolute top-4 right-4 w-7 h-7 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-black text-[10px] shadow-lg animate-scale-in">
                                 {inCart.qty}
@@ -274,11 +344,15 @@ export default function Commander() {
                           <p className="text-[11px] font-black text-navy-950 uppercase truncate">{item.product.name}</p>
                           <p className="text-[9px] font-black text-blue-gray uppercase opacity-60">{store.formatCurrency(item.unitPrice)}/u</p>
                        </div>
-                       <div className="flex items-center gap-3">
-                          <button onClick={() => updateQty(item.product.id || item.product.product_id, -1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus className="w-3.5 h-3.5" /></button>
-                          <span className="w-5 text-center text-sm font-black text-navy-950">{item.qty}</span>
-                          <button onClick={() => updateQty(item.product.id || item.product.product_id, 1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"><Plus className="w-3.5 h-3.5" /></button>
-                       </div>
+                        <div className="flex items-center gap-3">
+                           {checkoutStep === 0 && (
+                              <button onClick={() => updateQty(item.product.id || item.product.product_id, -1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus className="w-3.5 h-3.5" /></button>
+                           )}
+                           <span className="w-5 text-center text-sm font-black text-navy-950">{item.qty}</span>
+                           {checkoutStep === 0 && (
+                              <button onClick={() => updateQty(item.product.id || item.product.product_id, 1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"><Plus className="w-3.5 h-3.5" /></button>
+                           )}
+                        </div>
                        <p className="text-[11px] font-black text-navy-950 w-20 text-right">{store.formatCurrency(item.qty * item.unitPrice)}</p>
                     </div>
                  ))}
@@ -308,18 +382,40 @@ export default function Commander() {
                     </div>
                  )}
 
-                 <button
-                   onClick={handleCheckout}
-                   disabled={cart.length === 0 || isProcessing}
-                   className={`w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl ${
-                     cart.length === 0 || isProcessing
-                       ? 'bg-navy-100 text-blue-gray cursor-not-allowed opacity-50'
-                       : 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]'
-                   }`}
-                 >
-                   {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
-                   {isProcessing ? 'Validation...' : 'Finaliser la Vente'}
-                 </button>
+                  <div key="checkout-actions-container" className="min-h-[80px]">
+                     {checkoutStep === 1 ? (
+                        <div key="step-1-actions" className="flex flex-col gap-3 animate-scale-in">
+                           <button
+                             onClick={handleFinalCheckout}
+                             disabled={isProcessing}
+                             className="w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
+                           >
+                             {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
+                             <span>{isProcessing ? 'Validation...' : 'Confirmer Paiement & Finaliser'}</span>
+                           </button>
+                           <button
+                             onClick={cancelPending}
+                             className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[9px] text-rose-500 hover:bg-rose-50 transition-all"
+                           >
+                              Annuler l'Acceptation
+                           </button>
+                        </div>
+                     ) : (
+                        <button
+                          key="step-0-action"
+                          onClick={handleAcceptance}
+                          disabled={cart.length === 0 || isProcessing}
+                          className={`w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl ${
+                            cart.length === 0 || isProcessing
+                              ? 'bg-navy-100 text-blue-gray cursor-not-allowed opacity-50'
+                              : 'bg-navy-950 text-white hover:bg-emerald-600 shadow-navy-950/20 active:scale-[0.98]'
+                          }`}
+                        >
+                          {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
+                          <span>{isProcessing ? 'Validation...' : 'Le Client a Accepté'}</span>
+                        </button>
+                     )}
+                  </div>
               </div>
            </div>
 

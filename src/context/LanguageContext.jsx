@@ -1,6 +1,194 @@
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 
 const translations = {
+  en: {
+    // Navigation & Branding
+    dashboard: 'Dashboard',
+    stock: 'Inventory Management',
+    sales: 'Sales Operations',
+    waitSystem: 'Credit Management',
+    ledger: 'General Ledger',
+    admin: 'System Control',
+    logOut: 'Logout',
+    liveSync: 'Sync',
+    searchPlaceholder: 'Search assets...',
+    inventoryHeader: 'Inventory Management',
+    commandInterface: 'Management Console',
+    systemArchitecture: 'Operational Framework',
+    operationalDiagnostics: 'System Records',
+    confirmAction: 'Confirm Action',
+    runSnapshot: 'Run Full Analysis',
+    archiveHistory: 'Data Archive History',
+    payloadGenerated: 'Internal Data Generated',
+    supportGateStatus: 'Security Status',
+    grantSupport: 'Grant Access',
+    revokeSupport: 'Revoke Access',
+    partialPaymentDirect: 'Go to Ledger',
+    receivableDirect: 'Go to Sales Manifest',
+    broadcastWhatsApp: 'Broadcast via WhatsApp',
+    downloadPayload: 'Download Data',
+    addRecord: 'Add Record',
+    back: 'Back',
+    commanderInterface: 'Order Interface',
+
+    // Auth
+    loginGateway: 'Secure Login',
+    commandGateway: 'Administrative Access',
+    identityRequest: 'New User Request',
+    registerNode: 'Create Account',
+    initializeSession: 'Sign In',
+    initializeInterface: 'Enter Dashboard',
+    fullIdentity: 'Authorized Name',
+    fullName: 'Full Name',
+    systemId: 'Personal ID',
+    password: 'Password',
+    accessRequest: 'Access Requested',
+    awaitingClearance: 'Awaiting Admin Approval',
+    authorizeAccess: 'Approve Access',
+    requestIdentity: 'Create New Account',
+    resumeSession: 'Back to Login',
+    accessDenied: 'Access Denied: Invalid Credentials',
+    pendingClearance: 'Pending: Admin Approval Required',
+    accountSequestered: 'Access Revoked: Contact Admin',
+    protocolError: 'Error: All fields are required',
+    handleUnavailable: 'ID Unavailable: Already in use',
+    requestSubmitted: 'Success: Request submitted for approval',
+
+    // Dashboard
+    assetManifest: 'Total Assets',
+    liquidityDelta: 'Revenue Flow',
+    retentionCredit: 'Client Credit',
+    liabilityIndex: 'Unpaid Debt',
+    allProtocolsNominal: 'System Status: Active',
+    systemWarning: 'Warning: Low Stock',
+    systemAlert: 'Alert: Immediate Action',
+    totalValuation: 'Portfolio Value',
+    reserveLow: 'Low Stock',
+    reserveOptimal: 'Optimal Stock',
+
+    // Sales / Transactions
+    transactionPortal: 'Transaction Portal',
+    exchangeDate: 'Transaction Date',
+    assetDetail: 'Product Name',
+    entityInfo: 'Client Name',
+    transactionVal: 'Total Amount',
+    settledAmount: 'Amount Paid',
+    varianceTip: 'Adjust Balance',
+    recordExchange: 'Add Sale',
+    unitsSold: 'Quantity',
+    totalRevenue: 'Total Revenue',
+
+    // Stock / Inventory
+    assetIdentity: 'Product Name',
+    sector: 'Category',
+    reserve: 'Quantity',
+    unitRate: 'Unit Price',
+    valuation: 'Total Value',
+    optimal: 'In Stock',
+    low: 'Almost Depleted',
+    depleted: 'Out of Stock',
+
+    // Reports / Intelligence
+    projectTracker: 'Financial Tracking',
+    plannedValue: 'Projected Revenue',
+    actualValue: 'Actual Revenue',
+    targetStock: 'Target Stock',
+    actualStock: 'Available Units',
+    grossMargin: 'Net Margin',
+    assetLiquidity: 'Liquidity',
+
+    // Ledger / Settlement
+    ledgerAudit: 'Ledger Audit',
+    manualEntry: 'New Entry',
+    debit: 'Expense',
+    credit: 'Sale',
+    outstandingObligation: 'Financial Obligations',
+    financialNodes: 'Operational Accounts',
+    accountActivity: 'Transaction History',
+
+    // Wait / Retention
+    retention: 'Client Credit',
+    protocol: 'Management',
+    creditRetention: 'Client Balances',
+    loyaltyProgram: 'Loyalty Program',
+
+    // Admin / Recovery
+    governance: 'Staff Management',
+    masterSettlement: 'Global Accounts',
+    provisionIdentity: 'User Provisioning',
+    clearance: 'Role',
+    identityIdentity: 'Staff Name',
+    authorize: 'Approve',
+    entityIdentity: 'Username',
+    provision: 'Status',
+    supportAccess: 'System Support',
+    grantAccess: 'Grant Admin Access',
+    revokeAccess: 'Revoke Access',
+    clearanceEnabled: 'Support: ENABLED',
+    clearanceDisabled: 'Support: DISABLED',
+
+    // Common
+    date: 'Date',
+    status: 'Status',
+    action: 'Action',
+    search: 'Search records...',
+    cancel: 'Cancel',
+    execute: 'Confirm',
+    abort: 'Abort',
+    all: 'All Time',
+    today: 'Today',
+    month: 'This Month',
+    custom: 'Custom Range',
+    active: 'Active',
+    pending: 'Pending',
+    restricted: 'Inactive',
+    quantumSecured: 'Secured Access',
+    masterClearance: 'System Ver. 4.0',
+
+    // New Luxury Features
+    clientsDatabase: 'Client Database',
+    spoilage: 'Report a Loss (Spoilage)',
+    thermalReceipt: 'Cash Receipt (80mm)',
+    closeRegister: 'Close Register',
+    printReceipt: 'Print Receipt',
+    spoilageReason: 'Reason for loss (e.g. Expired)',
+    expectedCash: 'Expected Cash',
+    actualCash: 'Actual Cash (Drawer)',
+    cashDiscrepancy: 'Cash Discrepancy',
+    vipStatus: 'VIP Client',
+    riskStatus: 'Financial Risk',
+    commanderCenter: 'Command Center',
+    forecasting: 'AI Forecasting',
+    leaderboard: 'Performance Leaderboard',
+    riskRoom: 'Critical Risk Zone',
+    projectedRevenue: 'Projected Revenue (7d)',
+    efficiencyIndex: 'Efficiency Index',
+    topOperator: 'Top Operator',
+    performanceDelta: 'Performance Variance',
+    newSale: 'New Sale',
+    todayRevenue: 'Today\'s Revenue',
+    totalTransactions: 'Total Transactions',
+    records: 'Records',
+    currentShift: 'Current Shift',
+    allShifts: 'All Shifts',
+    confirmSale: 'Confirm Sale',
+    confirm: 'Confirm',
+    success: 'Success',
+    transactionRecorded: 'Transaction recorded successfully',
+    print: 'Print',
+    share: 'Share',
+    intelligence: 'Business Intelligence',
+    auditor: 'Multi-Sector Auditor',
+    sectors: 'Sectors',
+    salesSec: 'Sales',
+    ledgerSec: 'Ledger',
+    stockSec: 'Stock',
+    lossesSec: 'Losses',
+    pdf: 'PDF',
+    revenue: 'Sales Revenue',
+    debtsIssued: 'Debts Issued',
+    netMargin: 'NET MARGIN'
+  },
   fr: {
     // Navigation & Branding
     dashboard: 'Vue d\'Ensemble',
@@ -194,10 +382,19 @@ const translations = {
 const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
-  const lang = 'fr';
-  const t = (key) => translations.fr[key] || key;
+  const [lang, setLang] = useState(() => localStorage.getItem('biztrack_lang') || 'en');
+
+  const toggleLang = () => {
+    const next = lang === 'en' ? 'fr' : 'en';
+    setLang(next);
+    localStorage.setItem('biztrack_lang', next);
+  };
+
+  const t = (key) => (translations[lang] && translations[lang][key]) || translations.en[key] || key;
+  const L = (en, fr) => lang === 'fr' ? fr : en;
+
   return (
-    <LanguageContext.Provider value={{ lang, t }}>
+    <LanguageContext.Provider value={{ lang, toggleLang, t, L }}>
       {children}
     </LanguageContext.Provider>
   );

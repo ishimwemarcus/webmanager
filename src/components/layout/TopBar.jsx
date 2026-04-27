@@ -42,11 +42,11 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="flex flex-col">
             <div className="flex items-center gap-2 md:gap-3">
               <h2 className="text-xs md:text-lg font-black text-white uppercase tracking-tighter">
-                VUE <span className="text-emerald-500 hidden xs:inline">CONSOLE DE GESTION</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
+                {lang === 'fr' ? 'VUE' : 'VIEW'} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">SYNCHRONISATION</span>
+                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
               </div>
             </div>
             <p className="text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{today}</p>
@@ -55,7 +55,7 @@ export default function TopBar({ onToggleSidebar }) {
           <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
               <div className={`w-2 h-2 rounded-full animate-pulse ${store.getSystemStatus() === 'systemWarning' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
               <span className="text-[10px] font-black uppercase tracking-widest text-white">
-                {store.getSystemStatus() === 'systemWarning' ? 'Attention Requise' : 'Système Nominal'}
+                {store.getSystemStatus() === 'systemWarning' ? (lang === 'fr' ? 'Attention Requise' : 'Attention Required') : (lang === 'fr' ? 'Système Nominal' : 'System Nominal')}
               </span>
           </div>
         </div>
@@ -66,15 +66,24 @@ export default function TopBar({ onToggleSidebar }) {
         <div className="flex items-center gap-3">
           {/* Operator Badge */}
           {currentOperator && (
-            <div
-              onClick={() => store.setIsShiftEndModalOpen(true)}
-              className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl cursor-pointer hover:bg-white/10 transition-all"
-              title="Click to End Shift"
-            >
-              <div className="w-6 h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs md:text-sm shadow-[0_0_15px_rgba(16,185,129,0.4)]">
-                {currentOperator.charAt(0).toUpperCase()}
+            <div className="flex items-center gap-2">
+              {/* Operator name badge */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
+                <div className="w-6 h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+                  {currentOperator.charAt(0).toUpperCase()}
+                </div>
+                <span className="hidden sm:block text-xs font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
               </div>
-              <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
+
+              {/* Shift End Button — prominently red */}
+              <button
+                onClick={() => store.setIsShiftEndModalOpen(true)}
+                title="Terminer le poste et passer la main"
+                className="flex items-center gap-2 px-3 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="hidden md:inline">{lang === 'fr' ? 'Fin Poste' : 'End Shift'}</span>
+              </button>
             </div>
           )}
 

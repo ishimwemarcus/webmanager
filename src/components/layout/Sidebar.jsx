@@ -26,16 +26,16 @@ export default function Sidebar({ className }) {
   })();
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: 'PERFORMANCE' },
-    { to: '/commander', icon: Cpu, label: 'PRENDRE COMMANDE' },
-    { to: '/stock', icon: Package, label: 'INVENTAIRE' },
-    { to: '/sales', icon: ShoppingCart, label: 'TRANSACTIONS' },
-    { to: '/wait', icon: Clock, label: 'GRAND LIVRE' },
-    { to: '/reports', icon: BarChart2, label: 'INTELLIGENCE' },
-    { to: '/clients', icon: Users, label: 'BASE CLIENTS' },
-    { to: '/shifts', icon: Clock, label: 'JOURNAL DES POSTES' },
-    { to: '/spoilage', icon: AlertTriangle, label: 'PERTES (AVARIES)' },
-    { to: '/cloture', icon: Calculator, label: 'CLÔTURE CAISSE' }
+    { to: '/', icon: LayoutDashboard, label: t('dashboard') },
+    { to: '/commander', icon: Cpu, label: t('commanderInterface') },
+    { to: '/stock', icon: Package, label: t('stock') },
+    { to: '/sales', icon: ShoppingCart, label: t('sales') },
+    { to: '/wait', icon: Clock, label: t('ledger') },
+    { to: '/reports', icon: BarChart2, label: t('intelligence') },
+    { to: '/clients', icon: Users, label: t('clientsDatabase') },
+    { to: '/shifts', icon: Clock, label: t('currentShift') },
+    { to: '/spoilage', icon: AlertTriangle, label: t('spoilage') },
+    { to: '/cloture', icon: Calculator, label: t('closeRegister') }
   ];
 
   return (
@@ -73,7 +73,7 @@ export default function Sidebar({ className }) {
       </div>
 
       <div className="px-4 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">Management Sectors</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">{t('systemArchitecture')}</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -101,7 +101,7 @@ export default function Sidebar({ className }) {
           className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 transition-all group"
         >
           <Calculator className="w-4 h-4" />
-          <span>CASHREGISTER</span>
+          <span>{t('closeRegister')}</span>
         </NavLink>
 
         <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl mb-3 flex items-center gap-3">
@@ -109,8 +109,8 @@ export default function Sidebar({ className }) {
             <Users className="w-4 h-4" />
           </div>
           <div className="overflow-hidden">
-            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Session Active</p>
-            <p className="text-xs font-black text-white uppercase truncate">{store.currentOperator || 'Administrateur'}</p>
+            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">{t('active')}</p>
+            <p className="text-xs font-black text-white uppercase truncate">{store.currentOperator || 'Admin'}</p>
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export default function Sidebar({ className }) {
           className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>LOGOUT</span>
+          <span>{t('logOut')}</span>
         </div>
       </div>
     </aside>

@@ -1,12 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Clock, CheckCircle2, X, ShoppingCart, TrendingUp, User } from 'lucide-react';
+import { Clock, CheckCircle2, X, ShoppingCart, TrendingUp, User, Star } from 'lucide-react';
 
 export default function ShiftEndModal({ isOpen, onClose }) {
   const store = useStore();
   const { t } = useLanguage();
   const [endTime, setEndTime] = useState(new Date().toISOString().slice(0, 16)); // YYYY-MM-DDTHH:mm
+  const [blindCount, setBlindCount] = useState('');
+  const [isCounted, setIsCounted] = useState(false);
 
   const shiftData = useMemo(() => {
     return store.getShiftTransactions(store.shiftStart);
@@ -20,7 +22,11 @@ export default function ShiftEndModal({ isOpen, onClose }) {
     return (shiftData.expenses || []).reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
   }, [shiftData.expenses]);
 
-  const netCash = revenue - expenseTotal;
+  const tipTotal = useMemo(() => {
+    return (shiftData.tips || []).reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+  }, [shiftData.tips]);
+
+  const netCash = revenue - expenseTotal + tipTotal;
 
   if (!isOpen) return null;
 
@@ -37,6 +43,8 @@ export default function ShiftEndModal({ isOpen, onClose }) {
       revenue: revenue,
       expenses: expenseTotal,
       net: netCash,
+      blind_count: parseFloat(blindCount) || 0,
+      count_difference: (parseFloat(blindCount) || 0) - netCash,
       transactions: shiftData.sales.length,
       sales: shiftData.sales,
       expenseList: shiftData.expenses
@@ -120,19 +128,112 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                 )}
              </div>
           </div>
+
+          {/* Tips Section */}
+          {(shiftData.tips || []).length > 0 && (
+            <div className="space-y-3">
+               <div className="flex items-center justify-between px-2">
+                  <p className="text-xs font-black uppercase tracking-widest text-amber-500 flex items-center gap-2">
+                    <Star className="w-4 h-4" /> Pourboires Reçus ({shiftData.tips.length})
+                  </p>
+                  <p className="text-xs font-black text-amber-600">{store.formatCurrency(tipTotal)}</p>
+               </div>
+               <div className="divide-y divide-amber-50 border border-amber-100 rounded-3xl overflow-hidden bg-amber-50/30">
+                  {shiftData.tips.map((t, i) => (
+                    <div key={i} className="p-4 flex items-center justify-between">
+                       <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <Star className="w-4 h-4 text-amber-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-black text-amber-900 uppercase">{t.client || 'Client'}</p>
+                            <p className="text-[9px] font-bold text-amber-500/70">{new Date(t.date).toLocaleTimeString()}</p>
+                          </div>
+                       </div>
+                       <p className="font-black text-amber-600">{store.formatCurrency(t.amount)}</p>
+                    </div>
+                  ))}
+               </div>
+            </div>
+          )}
         </div>
 
         <div className="p-10 bg-navy-50/50 border-t border-navy-50 flex flex-col md:flex-row items-center justify-between gap-6">
-           <div className="text-center md:text-left">
-              <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">Net à Remettre</p>
-              <p className="text-3xl font-black text-navy-950">{store.formatCurrency(netCash)}</p>
-           </div>
-           <button 
-             onClick={handleConfirm}
-             className="btn-premium !bg-navy-950"
-           >
-             Confirmer & Fermer le Poste <CheckCircle2 className="w-5 h-5" />
-           </button>
+           {!isCounted ? (
+              <div className="w-full flex flex-col items-center gap-4">
+                 <div className="w-full max-w-md space-y-2">
+                    <label className="text-xs font-black uppercase text-navy-950 tracking-widest text-center block">Comptage Physique Caisse</label>
+                    <p className="text-[10px] text-blue-gray uppercase tracking-widest text-center italic mb-4">Combien d'espèces avez-vous exactement en caisse ?</p>
+                    <input 
+                       type="number"
+                       value={blindCount}
+                       onChange={e => setBlindCount(e.target.value)}
+                       placeholder="Saisissez le montant compté..."
+                       className="w-full bg-white border-2 border-emerald-500/20 rounded-2xl px-6 py-4 text-center text-xl font-black outline-none focus:border-emerald-500 transition-all shadow-inner"
+                    />
+                 </div>
+                 <button 
+                   onClick={() => {
+                     if (blindCount === '') {
+                        store.showAlert("Veuillez saisir le montant compté.", "warning");
+                        return;
+                     }
+                     setIsCounted(true);
+                   }}
+                   className="btn-premium w-full max-w-md bg-emerald-600 hover:bg-emerald-700 text-white"
+                 >
+                   Valider le Comptage <CheckCircle2 className="w-5 h-5" />
+                 </button>
+              </div>
+           ) : (
+              <div className="w-full space-y-6">
+                 <div className="space-y-3">
+                    {/* Breakdown */}
+                    <div className="grid grid-cols-3 gap-3">
+                       <div className="p-4 bg-emerald-50 rounded-2xl text-center">
+                          <p className="text-[9px] font-black uppercase text-emerald-600 tracking-widest mb-1">Ventes</p>
+                          <p className="text-lg font-black text-emerald-700">{store.formatCurrency(revenue)}</p>
+                       </div>
+                       <div className="p-4 bg-amber-50 rounded-2xl text-center">
+                          <p className="text-[9px] font-black uppercase text-amber-500 tracking-widest mb-1">Pourboires</p>
+                          <p className="text-lg font-black text-amber-600">{store.formatCurrency(tipTotal)}</p>
+                       </div>
+                       <div className="p-4 bg-rose-50 rounded-2xl text-center">
+                          <p className="text-[9px] font-black uppercase text-rose-500 tracking-widest mb-1">Dépenses</p>
+                          <p className="text-lg font-black text-rose-600">-{store.formatCurrency(expenseTotal)}</p>
+                       </div>
+                    </div>
+                    {/* Main reconciliation row */}
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-white rounded-3xl border border-navy-50 shadow-sm">
+                       <div className="text-center">
+                          <p className="text-[9px] font-black uppercase text-blue-gray tracking-widest mb-1">Net Attendu</p>
+                          <p className="text-2xl font-black text-navy-950">{store.formatCurrency(netCash)}</p>
+                       </div>
+                       <div className="text-2xl font-black text-navy-200">vs</div>
+                       <div className="text-center">
+                          <p className="text-[9px] font-black uppercase text-blue-gray tracking-widest mb-1">Votre Comptage</p>
+                          <p className="text-2xl font-black text-navy-950">{store.formatCurrency(parseFloat(blindCount) || 0)}</p>
+                       </div>
+                       <div className={`text-center px-5 py-3 rounded-2xl ${((parseFloat(blindCount) || 0) - netCash) < 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                          <p className="text-[9px] font-black uppercase tracking-widest mb-1">Écart</p>
+                          <p className="text-xl font-black">
+                             {((parseFloat(blindCount) || 0) - netCash) > 0 ? '+' : ''}
+                             {store.formatCurrency((parseFloat(blindCount) || 0) - netCash)}
+                          </p>
+                       </div>
+                    </div>
+                 </div>
+                 
+                 <div className="flex justify-end">
+                    <button 
+                      onClick={handleConfirm}
+                      className="btn-premium !bg-navy-950"
+                    >
+                      Confirmer & Fermer le Poste <CheckCircle2 className="w-5 h-5" />
+                    </button>
+                 </div>
+              </div>
+           )}
         </div>
       </div>
     </div>

@@ -14,12 +14,13 @@ import {
   ShieldCheck,
   Zap,
   Activity,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from 'lucide-react';
 
 export default function Cloture() {
    const store = useStore();
-   const { t } = useLanguage();
+   const { t, L } = useLanguage();
 
    const [actualCash, setActualCash] = useState('');
    const [note, setNote] = useState('');
@@ -51,9 +52,9 @@ export default function Cloture() {
    };
 
    const handleDelete = (record) => {
-      store.showConfirm("Confirmer la suppression de cette clôture ?", () => {
+      store.showConfirm(L("Confirm deletion of this reconciliation?", "Confirmer la suppression de cette clôture ?"), () => {
          store.deleteRecord(record);
-         store.showAlert("Clôture supprimée", "success");
+         store.showAlert(L("Reconciliation deleted", "Clôture supprimée"), "success");
       });
    };
 
@@ -67,7 +68,7 @@ export default function Cloture() {
             discrepancy,
             note
          });
-         store.showAlert("Clôture mise à jour avec succès!");
+         store.showAlert(L("Reconciliation updated successfully!", "Clôture mise à jour avec succès!"));
          setEditingRecord(null);
       } else {
          store.addRecord({
@@ -80,7 +81,7 @@ export default function Cloture() {
             operator: store.currentOperator
          });
          
-         store.showAlert("Fin de poste enregistrée. Déconnexion en cours...", "success");
+         store.showAlert(L("Shift end recorded. Logging out...", "Fin de poste enregistrée. Déconnexion en cours..."), "success");
          
          setTimeout(() => {
             if (store.setShiftStart) store.setShiftStart('');
@@ -102,10 +103,10 @@ export default function Cloture() {
       <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
         <div className="space-y-1">
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            Clôture Caisse
+            {L('Cash Register', 'Clôture Caisse')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
-            Audit Journalier — Réconciliation du Tiroir-Caisse
+            {L('Daily Audit — Cash Drawer Reconciliation', 'Audit Journalier — Réconciliation du Tiroir-Caisse')}
           </p>
         </div>
       </div>
@@ -121,26 +122,26 @@ export default function Cloture() {
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div className="p-6 bg-navy-50 rounded-3xl border border-navy-100">
-                     <p className="text-[8px] font-black uppercase text-blue-gray mb-1 italic">Ventes Cash</p>
+                     <p className="text-[8px] font-black uppercase text-blue-gray mb-1 italic">{L('Cash Sales', 'Ventes Cash')}</p>
                      <p className="text-lg font-black text-navy-950 tracking-tighter">{store.formatCurrency(stats.salesCash)}</p>
                   </div>
                   <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100">
-                     <p className="text-[8px] font-black uppercase text-emerald-600 mb-1 italic">Ledger (+)</p>
+                     <p className="text-[8px] font-black uppercase text-emerald-600 mb-1 italic">{L('Ledger (+)', 'Ledger (+)')}</p>
                      <p className="text-lg font-black text-emerald-600 tracking-tighter">{store.formatCurrency(stats.ledgerIncome)}</p>
                   </div>
                   <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
-                     <p className="text-[8px] font-black uppercase text-rose-500 mb-1 italic">Ledger (-)</p>
+                     <p className="text-[8px] font-black uppercase text-rose-500 mb-1 italic">{L('Ledger (-)', 'Ledger (-)')}</p>
                      <p className="text-lg font-black text-rose-500 tracking-tighter">-{store.formatCurrency(stats.ledgerExpense)}</p>
                   </div>
                   <div className="p-6 bg-navy-950 rounded-3xl text-white shadow-xl">
-                     <p className="text-[8px] font-black uppercase text-white/40 mb-1 italic">Théorique</p>
+                     <p className="text-[8px] font-black uppercase text-white/40 mb-1 italic">{L('Expected', 'Théorique')}</p>
                      <p className="text-lg font-black text-emerald-400 tracking-tighter">{store.formatCurrency(stats.expected)}</p>
                   </div>
                </div>
 
                <form onSubmit={handleReconcile} className="space-y-8 pt-8 border-t border-navy-50">
                   <div className="space-y-4">
-                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">Somme Physique Comptée</p>
+                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Physical Cash Count', 'Somme Physique Comptée')}</p>
                      <div className="relative group">
                         <Wallet className="absolute left-8 top-1/2 -translate-y-1/2 w-8 h-8 text-navy-950" />
                         <input
@@ -161,24 +162,28 @@ export default function Cloture() {
                               {discrepancy === 0 ? <ShieldCheck className="w-8 h-8" /> : <AlertTriangle className="w-8 h-8" />}
                            </div>
                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">Écart de Caisse</p>
+                              <p className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">{L('Cash Discrepancy', 'Écart de Caisse')}</p>
                               <p className="text-3xl font-black tracking-tighter">{store.formatCurrency(discrepancy)}</p>
                            </div>
                         </div>
                         <span className="text-[10px] font-black uppercase tracking-widest bg-white px-4 py-2 rounded-full shadow-sm">
-                           {discrepancy === 0 ? 'SYSTÈME ÉQUILIBRÉ' : discrepancy > 0 ? 'SURPLUS DÉTECTÉ' : 'MANQUANT DÉTECTÉ'}
+                           {discrepancy === 0 
+                              ? L('SYSTEM BALANCED', 'SYSTÈME ÉQUILIBRÉ') 
+                              : discrepancy > 0 
+                                 ? L('SURPLUS DETECTED', 'SURPLUS DÉTECTÉ') 
+                                 : L('SHORTAGE DETECTED', 'MANQUANT DÉTECTÉ')}
                         </span>
                      </div>
                   )}
 
                   <div className="space-y-4">
-                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">Commentaire d'Audit</p>
+                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Audit Comment', 'Commentaire d\'Audit')}</p>
                      <textarea
                         rows="3"
                         value={note}
                         onChange={e => setNote(e.target.value)}
                         className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] p-8 text-sm font-black text-navy-950 uppercase outline-none focus:border-navy-950 transition-all placeholder:text-blue-gray/20"
-                        placeholder="Précisez la raison de l'écart ou notez les détails de fin de poste..."
+                        placeholder={L('Specify the reason for discrepancy or note shift-end details...', 'Précisez la raison de l\'écart ou notez les détails de fin de poste...')}
                      />
                   </div>
 
@@ -186,7 +191,7 @@ export default function Cloture() {
                      type="submit" 
                      className="w-full py-8 bg-navy-950 text-white rounded-[32px] font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-4 shadow-2xl hover:bg-black transition-all active:scale-[0.98]"
                   >
-                     {editingRecord ? 'Mettre à jour la Clôture' : 'Confirmer & Valider la Caisse'} <TrendingUp className="w-5 h-5" />
+                     {editingRecord ? L('Update Reconciliation', 'Mettre à jour la Clôture') : L('Confirm & Validate Register', 'Confirmer & Valider la Caisse')} <TrendingUp className="w-5 h-5" />
                   </button>
                </form>
             </div>
@@ -196,7 +201,7 @@ export default function Cloture() {
          <div className="lg:col-span-5 space-y-6">
             <div className="flex items-center gap-3 mb-2 px-4">
                <History className="w-5 h-5 text-blue-gray" />
-               <h3 className="text-xs font-black uppercase tracking-[0.4em] text-navy-950 italic">Archives d'Audit</h3>
+               <h3 className="text-xs font-black uppercase tracking-[0.4em] text-navy-950 italic">{L('Audit Archives', 'Archives d\'Audit')}</h3>
             </div>
 
             <div className="space-y-4">
@@ -216,7 +221,7 @@ export default function Cloture() {
                      
                      <div className="text-right space-y-4">
                         <div>
-                           <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">Écart</p>
+                           <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Variance', 'Écart')}</p>
                            <p className={`text-xl font-black ${r.discrepancy === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                               {r.discrepancy > 0 ? '+' : ''}{store.formatCurrency(r.discrepancy)}
                            </p>
@@ -230,7 +235,7 @@ export default function Cloture() {
                ))}
                {history.length === 0 && (
                   <div className="py-20 text-center glass-card border-dashed border-2 border-navy-100 opacity-20">
-                     <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">Aucune archive</p>
+                     <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No archives', 'Aucune archive')}</p>
                   </div>
                )}
             </div>
