@@ -302,6 +302,9 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
     else if (record.record_type === 'category') setCategories(prev => [...prev, record]);
     else if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
+    else if (record.record_type === 'debt_payment') { 
+      settleClientDebt(record.client, record.phone, record.amount, record.paymentMethod, record.operator);
+    }
 
     return record;
   };
@@ -616,11 +619,70 @@ export const StoreProvider = ({ children }) => {
     return createdSale;
   };
 
+  const settleClientDebt = (clientName, phone, amount, method, operator) => {
+    const payment = parseFloat(amount) || 0;
+    const searchName = (clientName || '').trim().toLowerCase();
+    const searchPhone = (phone || 'none').trim();
+
+    if (payment <= 0 || !searchName) return;
+
+    // 1. Find unpaid sales for this client (FIFO)
+    const unpaidSales = sales
+      .filter(s => (s.client || '').trim().toLowerCase() === searchName 
+                && (s.phone || 'none').trim() === searchPhone
+                && (parseFloat(s.amount) || 0) > (parseFloat(s.paid) || 0))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let remainingPayment = payment;
+
+    for (const s of unpaidSales) {
+      if (remainingPayment <= 0) break;
+      const debt = (parseFloat(s.amount) || 0) - (parseFloat(s.paid) || 0);
+      const pay = Math.min(debt, remainingPayment);
+      remainingPayment -= pay;
+      
+      updateRecord({ 
+        ...s, 
+        paid: (parseFloat(s.paid) || 0) + pay, 
+        status: (parseFloat(s.paid) || 0) + pay >= (parseFloat(s.amount) || 0) ? 'paid' : 'partial' 
+      });
+    }
+
+    // 2. If surplus remains, add as Wait Credit
+    if (remainingPayment > 0) {
+      addRecord({
+        record_type: 'wait_credit',
+        client: clientName,
+        phone: phone,
+        amount: remainingPayment,
+        balance: remainingPayment,
+        status: 'active',
+        date: new Date().toISOString(),
+        note: `Surplus from Debt Settlement (${method})`
+      });
+    }
+
+    // 3. Record the payment in the ledger
+    const ledgerEntry = {
+      record_type: 'ledger_entry',
+      type: 'revenue',
+      name: `Debt Payment — ${clientName}`,
+      amount: payment,
+      paymentMethod: method,
+      operator: operator || currentOperator,
+      shiftId: shiftStart,
+      date: new Date().toISOString(),
+      note: `Settlement of outstanding client liability.`
+    };
+    
+    return addRecord(ledgerEntry);
+  };
+
 
   return (
     <StoreContext.Provider value={{
       getProducts, getSales, getExpenses, getUsers, getLedgerManual, getWaitCredits, getCategories, getClientWaitBalance, getClientDebtBalance, getAssetManagementData, getReportArchive,
-      addRecord, updateRecord, deleteRecord, processSmartTransaction, generateAndArchiveFullReport,
+      addRecord, updateRecord, deleteRecord, processSmartTransaction, settleClientDebt, generateAndArchiveFullReport,
       formatCurrency, formatDate, getSystemStatus, generateDailySummary, calculateTradingRatio,
       exportData, exportPersonalData, importData, clearAllData,
       confirmState, showConfirm,

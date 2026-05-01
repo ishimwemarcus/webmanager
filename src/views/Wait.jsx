@@ -24,6 +24,9 @@ export default function Wait() {
   const store = useStore();
   const { t, L, lang } = useLanguage();
   const [activeTab, setActiveTab] = useState('DEBTS'); // 'CREDITS' or 'DEBTS'
+  const [showPayModal, setShowPayModal] = useState(null);
+  const [payAmount, setPayAmount] = useState('');
+  const [payMethod, setPayMethod] = useState('Cash');
   
   const waitCredits = store.getWaitCredits ? store.getWaitCredits() : [];
   const sales = store.getSales ? store.getSales() : [];
@@ -33,7 +36,7 @@ export default function Wait() {
     const map = {};
     waitCredits.forEach(w => {
       const key = w.client?.toLowerCase() || 'unknown';
-      if (!map[key]) map[key] = { client: w.client, records: [], total: 0 };
+      if (!map[key]) map[key] = { client: w.client, records: [], total: 0, phone: w.phone || 'none' };
       map[key].records.push(w);
       map[key].total += parseFloat(w.balance) || 0;
     });
@@ -56,7 +59,27 @@ export default function Wait() {
   const totalDebtSum = debtMap.reduce((s, d) => s + d.total, 0);
 
   const handleMarkUsed = (record) => {
-    store.updateRecord({ ...record, balance: 0, status: 'used' });
+    store.showConfirm(L("Deduct this credit from client balance?", "Déduire ce crédit du solde client ?"), () => {
+       store.updateRecord({ ...record, balance: 0, status: 'used' });
+       store.showAlert(L("Credit balance updated.", "Solde de crédit mis à jour."));
+    });
+  };
+
+  const handleSettleDebt = (e) => {
+    e.preventDefault();
+    if (!showPayModal || !payAmount) return;
+
+    store.settleClientDebt(
+       showPayModal.client, 
+       showPayModal.phone, 
+       payAmount, 
+       payMethod, 
+       store.currentOperator
+    );
+    
+    store.showAlert(L(`Payment of ${store.formatCurrency(payAmount)} processed for ${showPayModal.client}.`, `Paiement de ${store.formatCurrency(payAmount)} traité pour ${showPayModal.client}.`));
+    setShowPayModal(null);
+    setPayAmount('');
   };
 
   const confirmDelete = (record) => {
@@ -152,7 +175,16 @@ export default function Wait() {
                                    <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                                 </div>
                              </div>
-                             <p className="text-lg font-black text-emerald-600">{store.formatCurrency(r.balance)}</p>
+                             <div className="flex items-center gap-3">
+                                <p className="text-lg font-black text-emerald-600">{store.formatCurrency(r.balance)}</p>
+                                <button 
+                                  onClick={() => handleMarkUsed(r)}
+                                  className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                                  title={L("Use Credit", "Utiliser Crédit")}
+                                >
+                                   <CheckCircle2 className="w-3.5 h-3.5" />
+                                </button>
+                             </div>
                           </div>
                        ))}
                     </div>
@@ -182,22 +214,33 @@ export default function Wait() {
                              <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">{L('Client Liability', 'Passif Client')}</p>
                              <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
                           </div>
-                          <button 
-                            onClick={() => {
-                               const summary = {
-                                  client: c.client,
-                                  phone: c.phone,
-                                  name: L("DEBT STATEMENT", "RELEVÉ DE DETTE"),
-                                  amount: c.total,
-                                  paid: 0,
-                                  date: new Date().toISOString()
-                               };
-                               import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency));
-                            }}
-                            className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
-                          >
-                             <Printer className="w-3 h-3" /> {L('Print Statement', 'Imprimer Relevé')}
-                          </button>
+                          <div className="flex items-center gap-2">
+                             <button 
+                               onClick={() => {
+                                  setShowPayModal(c);
+                                  setPayAmount(c.total);
+                               }}
+                               className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                             >
+                                <Wallet className="w-3 h-3" /> {L('Settle Payment', 'Régler Paiement')}
+                             </button>
+                             <button 
+                               onClick={() => {
+                                  const summary = {
+                                     client: c.client,
+                                     phone: c.phone,
+                                     name: L("DEBT STATEMENT", "RELEVÉ DE DETTE"),
+                                     amount: c.total,
+                                     paid: 0,
+                                     date: new Date().toISOString()
+                                  };
+                                  import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency));
+                               }}
+                               className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
+                             >
+                                <Printer className="w-3 h-3" /> {L('Print Statement', 'Imprimer Relevé')}
+                             </button>
+                          </div>
                        </div>
                     </div>
                     <div className="divide-y divide-navy-50">
@@ -227,19 +270,57 @@ export default function Wait() {
         )}
       </div>
 
-      {/* Protocol Banner */}
-      <div className="glass-card bg-navy-950 p-8 rounded-[40px] text-white flex items-center gap-6 shadow-2xl relative overflow-hidden">
-         <div className="absolute bottom-[-50%] right-[-10%] w-64 h-64 bg-emerald-500/10 blur-[100px] rounded-full"></div>
-         <div className="w-14 h-14 bg-white/10 backdrop-blur-xl rounded-2xl flex items-center justify-center border border-white/10 relative z-10">
-            <Layers className="w-7 h-7 text-emerald-400" />
+       {/* Debt Settlement Modal */}
+       {showPayModal && (
+         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-navy-950/60 backdrop-blur-md animate-fade-in" onClick={() => setShowPayModal(null)}>
+            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
+               <div className="text-center space-y-2 mb-10">
+                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Manual Settlement', 'Règlement Manuel')}</h3>
+                  <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showPayModal.client}</p>
+               </div>
+
+               <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
+                  <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">{L('Total Liability', 'Passif Total')}</p>
+                  <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(showPayModal.total)}</p>
+               </div>
+
+               <form onSubmit={handleSettleDebt} className="space-y-8">
+                  <div className="space-y-6">
+                     <div className="relative">
+                        <Wallet className="absolute left-6 top-1/2 -translate-y-1/2 w-7 h-7 text-navy-950" />
+                        <input
+                          autoFocus
+                          value={payAmount}
+                          onChange={e => setPayAmount(e.target.value)}
+                          type="number"
+                          step="0.01"
+                          required
+                          className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] pl-20 pr-8 py-6 text-3xl font-black text-navy-950 outline-none focus:border-navy-950 transition-all text-center"
+                          placeholder="0.00"
+                        />
+                     </div>
+                     
+                     <div className="flex bg-navy-50 p-1.5 rounded-3xl border border-navy-100">
+                        {['Cash', 'Momo', 'Card'].map(m => (
+                           <button
+                              key={m}
+                              type="button"
+                              onClick={() => setPayMethod(m)}
+                              className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
+                           >
+                              {m}
+                           </button>
+                        ))}
+                     </div>
+                  </div>
+
+                  <button type="submit" className="w-full py-8 bg-emerald-500 text-white rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-2xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all active:scale-[0.98]">
+                     {L('Validate Payment', 'Valider le Règlement')} <CheckCircle2 className="w-6 h-6" />
+                  </button>
+               </form>
+            </div>
          </div>
-         <div className="relative z-10">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 mb-1">{L('Double Entry Architecture', 'Architecture de Double Inscription')}</p>
-            <p className="text-[11px] font-bold text-white/40 leading-relaxed max-w-2xl">
-               {L('The system synchronizes balances (Credits) and unpaid items (Debts) in real time. This bifocal vision allows for optimal cash management and reduction of insolvency risks.', 'Le système synchronise les reliquats (Crédits) et les impayés (Dettes) en temps réel. Cette vision bifocale permet une gestion optimale des liquidités et une réduction des risques d\'insolvabilité.')}
-            </p>
-         </div>
-      </div>
+       )}
 
     </div>
   );
