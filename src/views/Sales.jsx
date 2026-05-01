@@ -49,6 +49,7 @@ export default function Sales() {
   const [showOverpayModal, setShowOverpayModal] = useState(false);
   const [pendingOverpay, setPendingOverpay] = useState(0);
   const [editingSale, setEditingSale] = useState(null);
+  const [debtPayment, setDebtPayment] = useState(0);
 
   const [newSale, setNewSale] = useState({
     product_id: '',
@@ -60,7 +61,8 @@ export default function Sales() {
     phone: '',
     useCredit: true,
     overpayType: null,
-    isAccepted: false
+    isAccepted: false,
+    debtPaymentAmount: 0
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
@@ -151,7 +153,8 @@ export default function Sales() {
     const paid = parseFloat(newSale.paid);
     const totalPayment = paid + (newSale.useCredit ? availableCredit : 0);
     const overpay = Math.max(0, totalPayment - amount);
-    const effectivePaid = overpayChoice ? amount : totalPayment; // Cap at amount if tip
+    const effectivePaid = overpayChoice ? amount : totalPayment;
+    const debtPaymentAmt = parseFloat(newSale.debtPaymentAmount) || 0;
 
     const finalSale = {
       record_type: 'sale',
@@ -166,10 +169,26 @@ export default function Sales() {
       phone: newSale.phone,
       paymentMethod: newSale.paymentMethod,
       useCredit: newSale.useCredit,
-      overpayChoice
+      overpayChoice,
+      debtPaymentAmount: debtPaymentAmt
     };
 
     store.processSmartTransaction(finalSale);
+
+    // NEW: Handle debt payment
+    if (debtPaymentAmt > 0 && newSale.client) {
+      store.addRecord({
+        record_type: 'debt_payment',
+        client: newSale.client,
+        phone: newSale.phone,
+        amount: debtPaymentAmt,
+        paymentMethod: newSale.paymentMethod,
+        date: new Date().toISOString(),
+        operator: store.currentOperator,
+        note: L(`Debt payment during purchase of ${product.name}`, `Paiement de dette lors de l'achat de ${product.name}`)
+      });
+      store.showAlert(L(`${store.formatCurrency(debtPaymentAmt)} applied to debt for ${newSale.client}!`, `${store.formatCurrency(debtPaymentAmt)} appliqué à la dette de ${newSale.client} !`), 'success');
+    }
 
     // Handle overpayment based on operator choice
     if (overpay > 0 && overpayChoice === 'tip') {
@@ -212,7 +231,9 @@ export default function Sales() {
       paid: s.paid || 0,
       paymentMethod: s.paymentMethod || 'Cash',
       useCredit: s.useCredit !== false,
-      overpayType: null
+      overpayType: null,
+      isAccepted: false,
+      debtPaymentAmount: 0
     });
     setShowModal(true);
   };
@@ -246,7 +267,8 @@ export default function Sales() {
     setShowModal(false);
     setShowConfirmPop(false);
     setEditingSale(null);
-    setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null, isAccepted: false });
+    setDebtPayment(0);
+    setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null, isAccepted: false, debtPaymentAmount: 0 });
   };
 
   const handlePayDebt = (e) => {
@@ -263,9 +285,8 @@ export default function Sales() {
 
     if (payment > remainingDebt) {
        overpayment = payment - remainingDebt;
-       newPaid = totalAmount; // Cap the paid amount to the total
+       newPaid = totalAmount;
 
-       // Register the overpayment as Wait Credit
        store.addRecord({
           record_type: 'wait',
           client: showPayModal.client || 'STANDARD',
@@ -279,14 +300,13 @@ export default function Sales() {
        store.showAlert(L(`Payment of ${store.formatCurrency(payment)} recorded!`, `Règlement de ${store.formatCurrency(payment)} enregistré !`));
     }
     
-    // Determine new status
     const newStatus = newPaid >= totalAmount ? 'PAID' : 'PARTIAL';
     
     store.updateRecord({
       ...showPayModal,
       paid: newPaid,
       status: newStatus,
-      paymentMethod: payMethod // Update method for the final settlement if desired
+      paymentMethod: payMethod
     });
     
     setShowPayModal(null);
@@ -480,7 +500,6 @@ export default function Sales() {
             </div>
           ))
         ) : (
-
           <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-30">
              <ShoppingCart className="w-20 h-20 mx-auto text-blue-gray mb-6" />
              <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No transactions recorded', 'Aucune transaction enregistrée')}</p>
@@ -565,6 +584,40 @@ export default function Sales() {
                      />
                   </div>
                </div>
+
+               {/* NEW: Client Debt Display and Payment */}
+               {newSale.client && clientDebt > 0 && (
+                  <div className="bg-rose-50 border border-rose-200 p-6 rounded-3xl space-y-4 animate-scale-in">
+                     <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-black uppercase tracking-widest text-rose-500">{L('Active Debt', 'Dette Active')}</p>
+                        <p className="text-2xl font-black text-rose-600">{store.formatCurrency(clientDebt)}</p>
+                     </div>
+                     
+                     <div className="relative">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-2 block">{L('Pay toward debt', 'Payer vers la dette')}</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max={clientDebt}
+                          step="0.01"
+                          value={newSale.debtPaymentAmount}
+                          onChange={e => {
+                            const val = Math.min(parseFloat(e.target.value) || 0, clientDebt);
+                            setNewSale({...newSale, debtPaymentAmount: val});
+                          }}
+                          className="w-full bg-white border-2 border-rose-200 rounded-2xl px-5 py-4 text-sm font-black text-rose-600 outline-none focus:border-rose-500 transition-all placeholder:text-rose-300"
+                          placeholder="0.00"
+                        />
+                     </div>
+
+                     {newSale.debtPaymentAmount > 0 && (
+                        <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-rose-100">
+                           <p className="text-[9px] font-black uppercase text-rose-500">{L('After payment', 'Après paiement')}</p>
+                           <p className="text-sm font-black text-emerald-600">{store.formatCurrency(clientDebt - newSale.debtPaymentAmount)}</p>
+                        </div>
+                     )}
+                  </div>
+               )}
 
                {/* Pricing Summary */}
                <div className="bg-navy-950 p-6 rounded-3xl text-white space-y-3">
@@ -679,7 +732,7 @@ export default function Sales() {
                <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">{L(`Finalize this ${store.formatCurrency(newSale.amount)} operation?`, `Voulez-vous finaliser l'enregistrement de cette opération de ${store.formatCurrency(newSale.amount)} ?`)}</p>
                
                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => handlePopConfirm(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                  <button onClick={() => setShowConfirmPop(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
                   <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Confirm', 'Confirmer')}</button>
                </div>
             </div>
