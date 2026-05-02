@@ -20,12 +20,28 @@ export default function TopBar({ onToggleSidebar }) {
     }
   }, [eyeCare]);
 
-  const today = new Date().toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', {
+  const [currentTime, setCurrentTime] = React.useState(new Date());
+  
+  React.useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const todayDate = currentTime.toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC'
   });
+
+  const timeStr = currentTime.toLocaleTimeString(lang === 'en' ? 'en-US' : 'fr-FR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  }) + ' GMT';
 
 
   return (
@@ -49,7 +65,7 @@ export default function TopBar({ onToggleSidebar }) {
                 <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
               </div>
             </div>
-            <p className="text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{today}</p>
+            <p className="text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">

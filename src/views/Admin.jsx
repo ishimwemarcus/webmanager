@@ -295,11 +295,28 @@ export default function Admin() {
                 <div className="flex items-center gap-6">
                   <Trash2 className="w-10 h-10 text-danger-pro" />
                   <div>
-                    <h4 className="text-xl font-black text-navy-brand uppercase tracking-tight">Factory Purge</h4>
+                    <h4 className="text-xl font-black text-navy-950 uppercase tracking-tight">Factory Purge</h4>
                     <p className="text-xs md:text-sm text-blue-gray font-black uppercase tracking-widest mt-1">Permanently wipe all system data.</p>
                   </div>
                 </div>
-                <button onClick={() => store.showConfirm("Wipe all data?", store.clearAllData)} className="px-8 py-4 bg-danger-pro/5 text-danger-pro border border-danger-pro/10 rounded-2xl text-xs md:text-sm font-black uppercase hover:bg-danger-pro hover:text-white transition-all">Clear Systems</button>
+                {!store.purgeUnlocked ? (
+                  <button onClick={() => {
+                    const psw = prompt("ENTER MASTER OVERRIDE PASSWORD:");
+                    if (psw && psw.toLowerCase() === 'marc') {
+                      store.setPurgeUnlocked(true);
+                      store.showAlert("PURGE PROTOCOL UNLOCKED", "warning");
+                    } else if (psw !== null) {
+                      store.showAlert("ACCESS DENIED", "error");
+                    }
+                  }} className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-xs md:text-sm font-black uppercase hover:bg-danger-pro transition-all shadow-xl">Unlock Purge</button>
+                ) : (
+                  <button onClick={() => {
+                    store.showConfirm("CRITICAL PROTOCOL: Wipe all local and remote server data permanently?", () => {
+                       store.clearAllData();
+                       store.setPurgeUnlocked(false);
+                    });
+                  }} className="px-8 py-4 bg-danger-pro text-white rounded-2xl text-xs md:text-sm font-black uppercase hover:bg-rose-700 transition-all shadow-2xl animate-pulse">Execute Wipe</button>
+                )}
               </div>
             </div>
           )}

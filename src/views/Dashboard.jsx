@@ -74,7 +74,7 @@ export default function Dashboard() {
               </div>
            </div>
            <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-60">
-              {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })} | {new Date().toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })} GMT
            </p>
         </div>
 
@@ -116,8 +116,8 @@ export default function Dashboard() {
          </div>
       </div>
 
-      <div className="space-y-2">
-         <h2 className="text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Overview', 'Vue d\'ensemble')}</h2>
+      <div className="space-y-1">
+         <h2 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Overview', 'Vue d\'ensemble')}</h2>
          <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.5em] opacity-40 italic">{L('System Folders', 'Dossiers Système')}</p>
       </div>
 
@@ -126,29 +126,29 @@ export default function Dashboard() {
         {/* Main Metrics Cards */}
         <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
            {/* Total Assets */}
-           <div className="glass-card bg-white p-10 rounded-[48px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.02] transition-all">
-              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                 <Database className="w-32 h-32" />
+           <div className="glass-card bg-white p-6 rounded-[32px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
+              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                 <Database className="w-24 h-24" />
               </div>
-              <div className="w-12 h-12 bg-navy-50 text-navy-950 rounded-2xl flex items-center justify-center mb-6">
+              <div className="w-10 h-10 bg-navy-50 text-navy-950 rounded-xl flex items-center justify-center mb-4">
                  <Database className="w-5 h-5" />
               </div>
-              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.3em] mb-3 italic">{L('Total Assets', 'Total des Actifs')}</p>
-              <p className="text-4xl font-black text-navy-950 mb-6 tracking-tighter">{store.formatCurrency(totalStockValue)}</p>
-              <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
-                 <ShieldCheck className="w-3.5 h-3.5" /> {L('Optimal Stock', 'Stock Optimal')}
+              <p className="text-[9px] font-black text-blue-gray uppercase tracking-[0.2em] mb-2 italic">{L('Total Assets', 'Total des Actifs')}</p>
+              <p className="text-3xl font-black text-navy-950 mb-4 tracking-tighter">{store.formatCurrency(totalStockValue)}</p>
+              <div className="flex items-center gap-2 text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
+                 <ShieldCheck className="w-3 h-3" /> {L('Optimal Stock', 'Stock Optimal')}
               </div>
            </div>
 
            {/* Revenue Flow */}
-           <div className="glass-card bg-white p-10 rounded-[48px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.02] transition-all">
-              <div className="w-16 h-16 bg-navy-950 text-white rounded-3xl flex items-center justify-center mb-6 shadow-2xl shadow-navy-950/20">
-                 <Zap className="w-8 h-8" />
+           <div className="glass-card bg-white p-6 rounded-[32px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
+              <div className="w-12 h-12 bg-navy-950 text-white rounded-xl flex items-center justify-center mb-4 shadow-xl shadow-navy-950/20">
+                 <Zap className="w-6 h-6" />
               </div>
-              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.3em] mb-3 italic">{L('Revenue Flow', 'Flux de Revenus')}</p>
-              <p className="text-4xl font-black text-navy-950 mb-6 tracking-tighter">{store.formatCurrency(totalSales)}</p>
-              <div className="flex items-center gap-2 text-emerald-500 text-[10px] font-black uppercase tracking-widest bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100 mb-8">
-                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              <p className="text-[9px] font-black text-blue-gray uppercase tracking-[0.2em] mb-2 italic">{L('Revenue Flow', 'Flux de Revenus')}</p>
+              <p className="text-3xl font-black text-navy-950 mb-4 tracking-tighter">{store.formatCurrency(totalSales)}</p>
+              <div className="flex items-center gap-2 text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 mb-6">
+                 <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
                  {L('Inbound Stream Active', 'Flux Entrant Actif')}
               </div>
               

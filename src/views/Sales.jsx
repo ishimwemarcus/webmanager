@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { printThermalReceipt, shareReceipt } from '../utils/Reporter';
+import { printThermalReceipt, shareReceipt, printDebtSettlementReceipt, shareDebtSettlementReceipt } from '../utils/Reporter';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import {
@@ -50,6 +50,8 @@ export default function Sales() {
   const [pendingOverpay, setPendingOverpay] = useState(0);
   const [editingSale, setEditingSale] = useState(null);
   const [debtPayment, setDebtPayment] = useState(0);
+  const [showWalletModal, setShowWalletModal] = useState(false);
+  const [walletSettleAmount, setWalletSettleAmount] = useState('');
 
   const [newSale, setNewSale] = useState({
     product_id: '',
@@ -217,6 +219,45 @@ export default function Sales() {
     setPendingOverpay(0);
     setShowOverpayModal(false);
     setTimeout(() => setShowSuccess(false), 3000);
+  };
+
+  const handleSettleFullWallet = (e) => {
+    if (e) e.preventDefault();
+    const amount = parseFloat(walletSettleAmount);
+    if (!amount || amount <= 0) return;
+
+    store.settleClientDebt(newSale.client, newSale.phone, amount, newSale.paymentMethod, store.currentOperator);
+    store.showAlert(L(`${store.formatCurrency(amount)} applied to settle ${newSale.client}'s wallet!`, `${store.formatCurrency(amount)} appliqué pour solder le compte de ${newSale.client} !`), 'success');
+    
+    // Generate Receipt for Settlement
+    const receiptData = {
+      client: newSale.client,
+      phone: newSale.phone,
+      amount: amount,
+      paymentMethod: newSale.paymentMethod,
+      remainingBalance: store.getClientGlobalBalance(newSale.client, newSale.phone) - amount, // Optimistic UI or better: get fresh
+      date: new Date().toISOString()
+    };
+    // Re-calculating correctly for receipt
+    receiptData.remainingBalance = store.getClientGlobalBalance(newSale.client, newSale.phone);
+
+    printDebtSettlementReceipt(receiptData, store.currentOperator, store.formatCurrency);
+
+    setWalletSettleAmount('');
+    setShowWalletModal(false);
+  };
+
+  const sendWhatsAppReminder = (name, phone, balance) => {
+    if (!phone || phone === 'none') {
+      store.showAlert(L("No phone number found for this client.", "Aucun numéro de téléphone trouvé pour ce client."), "error");
+      return;
+    }
+    const message = L(
+      `Hello ${name}, your current balance at ${L('MARC Store', 'Boutique MARC')} is ${store.formatCurrency(balance)}. Thank you for your loyalty!`,
+      `Bonjour ${name}, votre solde actuel chez ${L('MARC Store', 'Boutique MARC')} est de ${store.formatCurrency(balance)}. Merci pour votre fidélité !`
+    );
+    const url = `https://wa.me/${phone.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
   };
 
   const handleEditSale = (s) => {
@@ -456,7 +497,7 @@ export default function Sales() {
 
                 <div className="flex items-center justify-end gap-3">
                    <div className="text-right hidden sm:block">
-                      <p className="text-[10px] font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()}</p>
+                      <p className="text-[10px] font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()} | {new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                       <p className="text-[8px] font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                    </div>
                    <button 
@@ -573,17 +614,67 @@ export default function Sales() {
                      />
                   </div>
                   <div>
-                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Phone', 'Téléphone')}</label>
-                     <input
-                       type="text"
-                       placeholder="07..."
-                       disabled={newSale.isAccepted}
-                       value={newSale.phone}
-                       onChange={e => setNewSale({...newSale, phone: e.target.value})}
-                       className={`w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30 ${newSale.isAccepted ? 'opacity-50' : ''}`}
-                     />
+                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Phone', 'Téléphone')}</label>
+                    <input
+                      type="text"
+                      placeholder="07..."
+                      disabled={newSale.isAccepted}
+                      value={newSale.phone}
+                      onChange={e => setNewSale({...newSale, phone: e.target.value})}
+                      className={`w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30 ${newSale.isAccepted ? 'opacity-50' : ''}`}
+                    />
                   </div>
                </div>
+
+               {/* Smart Wallet Snapshot */}
+               {newSale.client && (
+                 <div className="bg-navy-950 rounded-[32px] p-6 text-white space-y-4 shadow-2xl relative overflow-hidden group animate-scale-in">
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-all"></div>
+                   
+                   <div className="flex items-center justify-between relative z-10">
+                     <div>
+                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 italic mb-1">MARC Smart Wallet</p>
+                       <h4 className="text-lg font-black uppercase tracking-tighter">{newSale.client}</h4>
+                     </div>
+                     <div className="flex items-center gap-1">
+                       {[...Array(5)].map((_, i) => (
+                         <Star key={i} className={`w-3 h-3 ${i < store.getClientTrustScore(newSale.client, newSale.phone) ? 'text-amber-400 fill-amber-400' : 'text-white/20'}`} />
+                       ))}
+                     </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-4 relative z-10">
+                     <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
+                       <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">{L('Net Balance', 'Solde Net')}</p>
+                       <p className={`text-xl font-black ${store.getClientGlobalBalance(newSale.client, newSale.phone) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                         {store.formatCurrency(store.getClientGlobalBalance(newSale.client, newSale.phone))}
+                       </p>
+                     </div>
+                     <div className="flex flex-col gap-2">
+                       <button 
+                         type="button"
+                         onClick={() => {
+                           const bal = store.getClientGlobalBalance(newSale.client, newSale.phone);
+                           if (bal < 0) {
+                             setWalletSettleAmount(Math.abs(bal).toString());
+                             setShowWalletModal(true);
+                           }
+                         }}
+                         className="flex-1 bg-white text-navy-950 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                       >
+                         <Zap className="w-3 h-3" /> {L('Settle All', 'Tout Solder')}
+                       </button>
+                       <button 
+                         type="button"
+                         onClick={() => sendWhatsAppReminder(newSale.client, newSale.phone, store.getClientGlobalBalance(newSale.client, newSale.phone))}
+                         className="flex-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                       >
+                         <MessageSquare className="w-3 h-3" /> {L('Remind', 'Rappeler')}
+                       </button>
+                     </div>
+                   </div>
+                 </div>
+               )}
 
                {/* NEW: Client Debt Display and Payment */}
                {newSale.client && clientDebt > 0 && (
@@ -787,6 +878,40 @@ export default function Sales() {
                  </button>
               </form>
            </div>
+        </div>
+      )}
+
+      {/* Wallet Settlement Modal */}
+      {showWalletModal && (
+        <div className="fixed inset-0 z-[400] flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-xl animate-fade-in">
+          <div className="bg-white w-full max-w-sm rounded-[40px] p-10 text-center shadow-3xl">
+            <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full mx-auto flex items-center justify-center mb-6">
+              <ShieldCheck className="w-10 h-10" />
+            </div>
+            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-1">{L('Quick Settlement', 'Règlement Rapide')}</h3>
+            <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-8 italic opacity-60">{L('Clearing Global Wallet Balance', 'Solde du Compte Global')}</p>
+            
+            <form onSubmit={handleSettleFullWallet} className="space-y-6">
+               <div className="bg-navy-50 p-6 rounded-3xl border border-navy-100 mb-6">
+                  <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest mb-2">{L('Amount to Pay', 'Montant à Payer')}</p>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    autoFocus
+                    value={walletSettleAmount}
+                    onChange={e => setWalletSettleAmount(e.target.value)}
+                    className="w-full bg-transparent text-3xl font-black text-navy-950 text-center outline-none"
+                    placeholder="0.00"
+                  />
+               </div>
+
+               <div className="grid grid-cols-2 gap-4">
+                  <button type="button" onClick={() => setShowWalletModal(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                  <button type="submit" className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Validate', 'Valider')}</button>
+               </div>
+            </form>
+          </div>
         </div>
       )}
 

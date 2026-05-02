@@ -39,8 +39,8 @@ export default function Sidebar({ className }) {
   ];
 
   return (
-    <aside className={`w-72 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
-      <div className="p-8">
+    <aside className={`w-64 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
+      <div className="p-6">
         <div
           onClick={() => window.location.href = '/'}
           className="flex flex-col items-center text-center gap-4 group/logo cursor-pointer hover:opacity-90 transition-all active:scale-95"
@@ -80,7 +80,7 @@ export default function Sidebar({ className }) {
               key={item.to}
               to={item.to}
               className={({ isActive }) => `
-                flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-500 group relative
+                flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-500 group relative
                 ${isActive 
                   ? 'bg-[#10B981] text-black shadow-[0_10px_20px_rgba(16,185,129,0.3)] translate-x-1' 
                   : 'hover:bg-white/5 text-white/40 hover:text-white hover:translate-x-1'}

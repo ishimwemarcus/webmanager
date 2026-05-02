@@ -61,6 +61,7 @@ export const StoreProvider = ({ children }) => {
   const [shiftStart, setShiftStart] = useState(() => localStorage.getItem('biztrack_shift_start') || '');
   const [showQRModal, setShowQRModal] = useState(false);
   const [isShiftEndModalOpen, setIsShiftEndModalOpen] = useState(false);
+  const [purgeUnlocked, setPurgeUnlocked] = useState(false);
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
@@ -235,6 +236,35 @@ export const StoreProvider = ({ children }) => {
     return salesDebt + ledgerDebt;
   };
 
+  const getClientGlobalBalance = (clientName, phone = 'none') => {
+    if (!clientName) return 0;
+    const debt = getClientDebtBalance(clientName, phone);
+    const credit = getClientWaitBalance(clientName, phone);
+    return credit - debt; // Positive = Credit, Negative = Debt
+  };
+
+  const getClientTrustScore = (clientName, phone = 'none') => {
+    if (!clientName) return 0;
+    const searchName = clientName.toLowerCase().trim();
+    const searchPhone = (phone || 'none').trim();
+
+    const clientSales = sales.filter(s => (s.client || '').toLowerCase().trim() === searchName && (s.phone || 'none').trim() === searchPhone);
+    if (clientSales.length === 0) return 3; // Neutral for new clients
+
+    const totalAmount = clientSales.reduce((s, x) => s + (parseFloat(x.amount) || 0), 0);
+    const totalPaid = clientSales.reduce((s, x) => s + (parseFloat(x.paid) || 0), 0);
+    
+    if (totalAmount === 0) return 5;
+    
+    const ratio = totalPaid / totalAmount;
+    const score = Math.min(5, Math.max(1, Math.round(ratio * 5)));
+    
+    // Bonus for high transaction count
+    if (clientSales.length > 10 && score >= 4) return 5;
+    
+    return score;
+  };
+
   const getAssetManagementData = () => {
     const cats = [...new Set(products.map(p => p.category).filter(Boolean))];
     return cats.map(cat => {
@@ -298,7 +328,14 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'wait_credit') { setWaitCredits(prev => [...prev, record]); apiPush('biztrack_wait'); }
     
     else if (record.record_type === 'report') setReportArchive(prev => [...prev, record]);
-    else if (record.record_type === 'loss') setLosses(prev => [...prev, record]);
+    else if (record.record_type === 'loss') {
+      setLosses(prev => [...prev, record]);
+      // Auto-Decrement Stock
+      const product = products.find(p => p.id === record.product_id || p.product_id === record.product_id);
+      if (product) {
+        updateRecord({ ...product, quantity: Math.max(0, (product.quantity || 0) - (parseFloat(record.quantity) || 0)) });
+      }
+    }
     else if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
     else if (record.record_type === 'category') setCategories(prev => [...prev, record]);
     else if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
@@ -365,12 +402,28 @@ export const StoreProvider = ({ children }) => {
       }).catch(()=>{});
 
       if (record.record_type === 'product') { setProducts(del); apiDelete('biztrack_products'); }
-      else if (record.record_type === 'sale') { setSales(del); apiDelete('biztrack_sales'); }
+      else if (record.record_type === 'sale') { 
+        setSales(del); 
+        apiDelete('biztrack_sales'); 
+        // UNDO Stock Impact
+        const product = products.find(p => p.id === record.product_id || p.product_id === record.product_id);
+        if (product) {
+          updateRecord({ ...product, quantity: (product.quantity || 0) + (parseFloat(record.quantity) || 0) });
+        }
+      }
       else if (record.record_type === 'expense') { setExpenses(del); apiDelete('biztrack_expenses'); }
       else if (record.record_type === 'user') { setUsers(del); apiDelete('biztrack_users'); }
       else if (record.record_type === 'ledger_entry') { setLedgerManual(del); apiDelete('biztrack_ledger'); }
       else if (record.record_type === 'wait_credit') { setWaitCredits(del); apiDelete('biztrack_wait'); }
-      else if (record.record_type === 'loss') { setLosses(del); apiDelete('biztrack_losses'); }
+      else if (record.record_type === 'loss') { 
+        setLosses(del); 
+        apiDelete('biztrack_losses'); 
+        // UNDO Stock Impact
+        const product = products.find(p => p.id === record.product_id || p.product_id === record.product_id);
+        if (product) {
+          updateRecord({ ...product, quantity: (product.quantity || 0) + (parseFloat(record.quantity) || 0) });
+        }
+      }
       else if (record.record_type === 'reconciliation') { setReconciliations(del); apiDelete('biztrack_reconciliations'); }
       else if (record.record_type === 'report') { setReportArchive(del); apiDelete('biztrack_reports'); }
       else if (record.record_type === 'category') { setCategories(del); apiDelete('biztrack_categories'); }
@@ -495,8 +548,18 @@ export const StoreProvider = ({ children }) => {
       'biztrack_users', 'biztrack_ledger', 'biztrack_wait', 
       'biztrack_report_archive', 'biztrack_pin', 'biztrack_locked', 'biztrack_user'
     ];
-    keys.forEach(k => localStorage.removeItem(k));
-    window.location.reload();
+    keys.forEach(k => {
+      localStorage.removeItem(k);
+      // Also purge from the remote server
+      if (k !== 'biztrack_pin' && k !== 'biztrack_locked' && k !== 'biztrack_user') {
+        fetch(`${API_URL}?action=overwrite&key=${k}`, { 
+          method: 'POST', 
+          headers: { 'Bypass-Tunnel-Reminder': 'true' },
+          body: JSON.stringify([]) 
+        }).catch(()=>{});
+      }
+    });
+    setTimeout(() => window.location.reload(), 1000); // Give server a second to process before reloading
   };
 
   const showConfirm = (message, onConfirm, onCancel = null) => {
@@ -619,7 +682,7 @@ export const StoreProvider = ({ children }) => {
     return createdSale;
   };
 
-  const settleClientDebt = (clientName, phone, amount, method, operator) => {
+  const settleClientDebt = (clientName, phone, amount, method, operator, excludeIds = []) => {
     const payment = parseFloat(amount) || 0;
     const searchName = (clientName || '').trim().toLowerCase();
     const searchPhone = (phone || 'none').trim();
@@ -630,7 +693,8 @@ export const StoreProvider = ({ children }) => {
     const unpaidSales = sales
       .filter(s => (s.client || '').trim().toLowerCase() === searchName 
                 && (s.phone || 'none').trim() === searchPhone
-                && (parseFloat(s.amount) || 0) > (parseFloat(s.paid) || 0))
+                && (parseFloat(s.amount) || 0) > (parseFloat(s.paid) || 0)
+                && !excludeIds.includes(s.id))
       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let remainingPayment = payment;
@@ -681,7 +745,7 @@ export const StoreProvider = ({ children }) => {
 
   return (
     <StoreContext.Provider value={{
-      getProducts, getSales, getExpenses, getUsers, getLedgerManual, getWaitCredits, getCategories, getClientWaitBalance, getClientDebtBalance, getAssetManagementData, getReportArchive,
+      getProducts, getSales, getExpenses, getUsers, getLedgerManual, getWaitCredits, getCategories, getClientWaitBalance, getClientDebtBalance, getClientGlobalBalance, getClientTrustScore, getAssetManagementData, getReportArchive,
       addRecord, updateRecord, deleteRecord, processSmartTransaction, settleClientDebt, generateAndArchiveFullReport,
       formatCurrency, formatDate, getSystemStatus, generateDailySummary, calculateTradingRatio,
       exportData, exportPersonalData, importData, clearAllData,

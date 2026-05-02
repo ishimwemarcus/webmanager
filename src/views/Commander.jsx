@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
+import { printThermalReceipt } from '../utils/Reporter';
 import {
   ShoppingCart, Plus, Minus, Trash2, Search, Check,
   User, ChevronRight, X, Zap, Package, AlertTriangle,
@@ -130,6 +131,11 @@ export default function Commander() {
       });
     });
 
+    const extra = actualPaid - totalToPay;
+    if (extra > 0 && clientName) {
+      store.settleClientDebt(clientName, clientPhone, extra, 'Cash', store.currentOperator, pendingSales.map(s => s.id));
+    }
+
     setTimeout(() => {
       setCart([]);
       setClientName('');
@@ -184,8 +190,8 @@ export default function Commander() {
                   // Since Commander clears state, we look for the most recent sale(s)
                   const allSales = store.getSales();
                   if (allSales.length > 0) {
-                     const lastSale = allSales[allSales.length - 1];
-                     import('../utils/Reporter').then(m => m.printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency));
+                     const lastSale = allSales[0];
+                     printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency);
                   }
                }}
                className="p-4 bg-navy-950 text-white rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
@@ -245,14 +251,14 @@ export default function Commander() {
                        <div
                           key={id}
                           onClick={() => checkoutStep === 0 && addToCart(product)}
-                          className={`glass-card bg-white p-5 rounded-[32px] border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''} ${checkoutStep > 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
+                          className={`glass-card bg-white p-3.5 rounded-2xl border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''} ${checkoutStep > 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                         >
                           {inCart && (
                              <div className="absolute top-4 right-4 w-7 h-7 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-black text-[10px] shadow-lg animate-scale-in">
                                 {inCart.qty}
                              </div>
                           )}
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 shadow-inner ${inCart ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 shadow-inner ${inCart ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
                              <Package className="w-6 h-6" />
                           </div>
                           <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight mb-1 group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
@@ -318,7 +324,7 @@ export default function Commander() {
            </div>
 
            {/* Cart Terminal */}
-           <div className="flex-1 glass-card bg-white p-8 rounded-[48px] border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
+           <div className="flex-1 glass-card bg-white p-5 rounded-3xl border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-8">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
@@ -388,10 +394,10 @@ export default function Commander() {
                            <button
                              onClick={handleFinalCheckout}
                              disabled={isProcessing}
-                             className="w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
+                             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
                            >
-                             {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Check className="w-5 h-5" />}
-                             <span>{isProcessing ? L('Validating...', 'Validation...') : L('Confirm Payment & Finalize', 'Confirmer Paiement & Finaliser')}</span>
+                             {isProcessing ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                             <span>{isProcessing ? L('Validating...', 'Validation...') : L('Confirm Payment', 'Confirmer Paiement')}</span>
                            </button>
                            <button
                              onClick={cancelPending}
@@ -405,14 +411,14 @@ export default function Commander() {
                           key="step-0-action"
                           onClick={handleAcceptance}
                           disabled={cart.length === 0 || isProcessing}
-                          className={`w-full py-6 rounded-[32px] font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 transition-all shadow-2xl ${
+                          className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 transition-all shadow-2xl ${
                             cart.length === 0 || isProcessing
                               ? 'bg-navy-100 text-blue-gray cursor-not-allowed opacity-50'
                               : 'bg-navy-950 text-white hover:bg-emerald-600 shadow-navy-950/20 active:scale-[0.98]'
                           }`}
                         >
-                          {isProcessing ? <Clock className="w-5 h-5 animate-spin" /> : <Zap className="w-5 h-5" />}
-                          <span>{isProcessing ? L('Validating...', 'Validation...') : L('Client Has Accepted', 'Le Client a Accepté')}</span>
+                          {isProcessing ? <Clock className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+                          <span>{isProcessing ? L('Validating...', 'Validation...') : L('Order Accepted', 'Commande Acceptée')}</span>
                         </button>
                      )}
                   </div>

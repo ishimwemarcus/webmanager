@@ -68,12 +68,6 @@ export default function Spoilage() {
         valuation: qtyNum * (parseFloat(product.cost) || 0)
       });
     } else {
-      // Logic for new loss
-      if (qtyNum > (product.quantity || 0)) {
-        store.showAlert(L("Error: Quantity exceeds available stock!", "Erreur: Quantité supérieure au stock disponible!"), "error");
-        return;
-      }
-
       store.addRecord({
         record_type: 'loss',
         product_id: newLoss.product_id,
@@ -84,12 +78,6 @@ export default function Spoilage() {
         valuation: qtyNum * (parseFloat(product.cost) || 0),
         operator: store.currentOperator
       });
-
-      // Update stock
-      store.updateRecord({
-        ...product,
-        quantity: (product.quantity || 0) - qtyNum
-      });
     }
 
     setShowModal(false);
@@ -99,13 +87,6 @@ export default function Spoilage() {
 
   const handleDelete = (loss) => {
     store.showConfirm(L("Are you sure you want to delete this record? The quantity will be returned to stock.", "Êtes-vous sûr de vouloir supprimer ce record ? La quantité sera retournée au stock."), () => {
-      const product = products.find(p => (p.id || p.product_id) === loss.product_id);
-      if (product) {
-        store.updateRecord({
-          ...product,
-          quantity: (product.quantity || 0) + (loss.quantity || 0)
-        });
-      }
       store.deleteRecord(loss);
       store.showAlert(L("Loss deleted and stock restored", "Perte supprimée et stock rétabli"), "success");
     });

@@ -42,7 +42,7 @@ export default function Reports() {
   const summaryData = useMemo(() => generateDailySummary(allSales, [], allLedger, allLosses, reportDate), [allSales, allLedger, allLosses, reportDate]);
   const reportData = summaryData.raw;
 
-  const { dailySales, dailyLedger, dailyLosses, dailyShifts, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected, intelligence, anomalies, ecoImpact } = useMemo(() => {
+  const { dailySales, dailyLedger, dailyLosses, dailyShifts, totalSalesRev, totalSalesCash, totalSalesDebt, totalExpense, totalReceivable, totalLossValuation, netCashCollected, intelligence, anomalies, ecoImpact, bizHealthScore } = useMemo(() => {
     const sales = allSales.filter(s => s.date && s.date.startsWith(reportDate));
     const ledger = allLedger.filter(l => l.date && l.date.startsWith(reportDate));
     const losses = allLosses.filter(l => l.date && l.date.startsWith(reportDate));
@@ -62,6 +62,17 @@ export default function Reports() {
        isOptimal: spoilagePercentage < 2
     };
 
+    // Business Health Score (0-100)
+    let healthScore = 100;
+    if (reportData.totalSales > 0) {
+      const lossPenalty = (reportData.totalLossValuation / reportData.totalSales) * 50;
+      const debtPenalty = (reportData.unpaidLedger / reportData.totalSales) * 30;
+      const expensePenalty = (reportData.totalExpenses / reportData.totalSales) * 20;
+      healthScore = Math.max(0, Math.min(100, 100 - lossPenalty - debtPenalty - expensePenalty));
+    } else if (reportData.totalExpenses > 0) {
+      healthScore = 50; // Expense without sales
+    }
+
     return {
       dailySales: sales,
       dailyLedger: ledger,
@@ -76,7 +87,8 @@ export default function Reports() {
       netCashCollected: reportData.netProfit,
       intelligence: bizIntel,
       anomalies: { lowStock: lowStockAlerts, unpaidDebt: unpaidDebtAlerts },
-      ecoImpact
+      ecoImpact,
+      bizHealthScore: Math.round(healthScore)
     };
   }, [allSales, allLedger, allLosses, reportDate, allShifts, reportData, allProducts, L]);
 
@@ -338,7 +350,21 @@ export default function Reports() {
             {L('Analytical Audit — High Fidelity Reporting', 'Audit Analytique — Reporting Haute Fidélité')}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-xl border border-emerald-100 shadow-sm">
+               <div className="relative w-10 h-10 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90">
+                     <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-navy-50" />
+                     <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={106.8} strokeDashoffset={106.8 - (106.8 * bizHealthScore / 100)} className={`${bizHealthScore > 80 ? 'text-emerald-500' : bizHealthScore > 50 ? 'text-amber-500' : 'text-rose-500'} transition-all duration-1000`} />
+                  </svg>
+                  <span className="absolute text-[9px] font-black text-navy-950">{bizHealthScore}%</span>
+               </div>
+               <div>
+                  <p className="text-[7px] font-black uppercase text-blue-gray tracking-widest">{L('Health', 'Santé')}</p>
+                  <p className="text-[9px] font-black text-navy-950 uppercase">{bizHealthScore > 80 ? 'Optimal' : bizHealthScore > 50 ? 'Stable' : 'Critical'}</p>
+               </div>
+            </div>
+
             <button 
                onClick={() => {
                   printFullMasterReport({
@@ -407,65 +433,84 @@ export default function Reports() {
            { icon: Clock, bg: 'bg-amber-50', color: 'text-amber-600', border: 'border-amber-100', label: L('Pending', 'En Attente'), val: dailySales.filter(s => s.status === 'waiting').reduce((acc, s) => acc + (parseFloat(s.amount)||0), 0), valColor: 'text-amber-600' },
            { icon: TrendingDown, bg: 'bg-rose-50', color: 'text-rose-500', border: 'border-rose-100', label: L('Expenses', 'Dépenses'), val: totalExpense, valColor: 'text-rose-600' },
          ].map((m, i) => (
-           <div key={i} className={`glass-card bg-white border ${m.border} shadow-sm relative overflow-hidden`}>
-              <div className={`w-10 h-10 ${m.bg} ${m.color} rounded-xl flex items-center justify-center mb-4 shadow-inner`}>
-                 <m.icon className="w-5 h-5" />
+           <div key={i} className={`glass-card bg-white p-4 border ${m.border} shadow-sm relative overflow-hidden rounded-2xl`}>
+              <div className={`w-8 h-8 ${m.bg} ${m.color} rounded-lg flex items-center justify-center mb-2 shadow-inner`}>
+                 <m.icon className="w-4 h-4" />
               </div>
               <p className="text-[9px] font-black uppercase tracking-widest text-blue-gray mb-1 italic">{m.label}</p>
-              <p className={`text-[clamp(1.25rem,3vw,1.875rem)] font-black ${m.valColor} tracking-tighter`}>{store.formatCurrency(m.val)}</p>
+              <p className={`text-xl font-black ${m.valColor} tracking-tighter`}>{store.formatCurrency(m.val)}</p>
            </div>
          ))}
-         <div className="glass-card bg-navy-950 shadow-2xl relative overflow-hidden text-white">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
-               <Activity className="w-12 h-12" />
+         <div className="glass-card bg-navy-950 p-4 shadow-xl relative overflow-hidden text-white border border-white/5 rounded-2xl">
+            <div className="absolute top-0 right-0 p-2 opacity-10">
+               <Activity className="w-8 h-8" />
             </div>
-            <div className="w-10 h-10 bg-white/10 backdrop-blur-xl rounded-xl flex items-center justify-center mb-4 border border-white/10">
-               <Zap className="w-5 h-5 text-emerald-400" />
+            <div className="w-8 h-8 bg-white/10 backdrop-blur-xl rounded-lg flex items-center justify-center mb-2 border border-white/10">
+               <Zap className="w-4 h-4 text-emerald-400" />
             </div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Adjusted Net Profit', 'Profit Net Ajusté')}</p>
-            <p className="text-[clamp(1.25rem,3vw,1.875rem)] font-black text-white tracking-tighter">{store.formatCurrency(netCashCollected)}</p>
+            <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Adjusted Net Profit', 'Profit Net Ajusté')}</p>
+            <p className="text-xl font-black text-white tracking-tighter">{store.formatCurrency(netCashCollected)}</p>
          </div>
       </div>
 
-      {/* Decision Support & Intelligence Panel */}
+      {/* Business Intelligence & Peak Analysis */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 no-print">
-         {/* Top Performance (Intelligence) */}
-         <div className="lg:col-span-2 glass-card bg-white p-8 rounded-[40px] border-emerald-100 shadow-sm flex flex-col md:flex-row gap-8">
-            <div className="flex-1 space-y-4">
+         <div className="lg:col-span-2 glass-card bg-white p-5 rounded-[24px] border-emerald-100 shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-4">
                <h3 className="text-xs font-black uppercase text-navy-950 tracking-widest flex items-center gap-2 mb-4">
                   <TrendingUp className="w-4 h-4 text-emerald-500" /> {L('Popular Items', 'Articles Populaires')}
                </h3>
                {intelligence.topProducts.length > 0 ? intelligence.topProducts.map((p, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-navy-50 rounded-2xl">
+                  <div key={i} className="flex items-center justify-between p-3 bg-navy-50 rounded-xl">
                      <span className="text-sm font-bold text-navy-950 uppercase">{p.name}</span>
                      <span className="text-xs font-black text-emerald-600 bg-emerald-100 px-3 py-1 rounded-xl">{p.qty} {L('sold', 'vendus')}</span>
                   </div>
                )) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
             </div>
             
-            <div className="w-px bg-navy-50 hidden md:block"></div>
-            
-            <div className="flex-1 space-y-4">
+            <div className="space-y-4">
                <h3 className="text-xs font-black uppercase text-navy-950 tracking-widest flex items-center gap-2 mb-4">
-                  <Cpu className="w-4 h-4 text-amber-500" /> {L('Team Performance', 'Performance Équipe')}
+                  <Zap className="w-4 h-4 text-amber-500" /> {L('Loyal Clients', 'Clients Fidèles')}
                </h3>
-               {intelligence.topOperators.length > 0 ? intelligence.topOperators.slice(0,3).map((op, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-amber-50 rounded-2xl">
-                     <span className="text-sm font-bold text-amber-900 uppercase">{op.name}</span>
-                     <div className="text-right">
-                        <p className="text-xs font-black text-amber-600">{store.formatCurrency(op.revenue)}</p>
-                        <p className="text-[9px] font-black uppercase text-amber-500/60 tracking-widest">{op.transactions} Tx</p>
-                     </div>
+               {intelligence.loyalClients.length > 0 ? intelligence.loyalClients.map((c, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-amber-50 rounded-xl">
+                     <span className="text-sm font-bold text-amber-900 uppercase">{c.name}</span>
+                     <span className="text-xs font-black text-amber-600 bg-amber-100 px-3 py-1 rounded-xl">{c.count} Tx</span>
                   </div>
                )) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
+            </div>
+            
+            <div className="space-y-4">
+               <h3 className="text-xs font-black uppercase text-navy-950 tracking-widest flex items-center gap-2 mb-4">
+                  <Clock className="w-4 h-4 text-indigo-500" /> {L('Peak Hour', 'Pic d\'Affluence')}
+               </h3>
+               {intelligence.peakHour.hour !== null ? (
+                  <div className="p-6 bg-indigo-50 rounded-[32px] text-center space-y-2 border border-indigo-100">
+                     <p className="text-3xl font-black text-indigo-600">{intelligence.peakHour.hour}:00</p>
+                     <p className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">{intelligence.peakHour.count} {L('Transactions', 'Transactions')}</p>
+                  </div>
+               ) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
             </div>
          </div>
 
          {/* Anomalies & Eco-Impact */}
-         <div className="glass-card bg-navy-950 p-8 rounded-[40px] shadow-sm flex flex-col gap-6 text-white">
+         <div className="glass-card bg-navy-950 p-5 rounded-[24px] shadow-sm flex flex-col gap-5 text-white">
             <h3 className="text-xs font-black uppercase text-white tracking-widest flex items-center gap-2">
                <ShieldCheck className="w-4 h-4 text-emerald-400" /> {L('Analysis & Alerts', 'Analyse & Alertes')}
             </h3>
+
+            {intelligence.peakHour.hour !== null && (
+               <div className="p-5 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-between group hover:bg-emerald-500/10 transition-all">
+                  <div className="flex items-center gap-3">
+                     <Clock className="w-5 h-5 text-emerald-400" />
+                     <div>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{L('Peak Traffic', 'Pic d\'Affluence')}</p>
+                        <p className="text-sm font-black text-white">{intelligence.peakHour.hour}:00</p>
+                     </div>
+                  </div>
+                  <span className="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-lg">{intelligence.peakHour.count} Tx</span>
+               </div>
+            )}
             
             {/* Alerts */}
             <div className="space-y-3">

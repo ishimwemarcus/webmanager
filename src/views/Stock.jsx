@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   Layers,
   Database,
-  Filter
+  Filter,
+  Wallet
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 
@@ -41,6 +42,8 @@ export default function Stock() {
   });
 
   const [editProduct, setEditProduct] = useState(null);
+  const [showLossModal, setShowLossModal] = useState(null);
+  const [lossData, setLossData] = useState({ quantity: 1, reason: '' });
 
   React.useEffect(() => {
     if (newProduct.packWeight && newProduct.packCount) {
@@ -119,6 +122,25 @@ export default function Stock() {
     store.showConfirm(L(`DELETE ${product.name.toUpperCase()}?`, `SUPPRIMER ${product.name.toUpperCase()}?`), () => {
       store.deleteRecord(product);
     });
+  };
+
+  const handleReportLoss = (e) => {
+    e.preventDefault();
+    if (!showLossModal) return;
+    
+    store.addRecord({
+      record_type: 'loss',
+      product_id: showLossModal.id || showLossModal.product_id,
+      name: showLossModal.name,
+      quantity: parseFloat(lossData.quantity) || 0,
+      reason: lossData.reason,
+      date: new Date().toISOString(),
+      valuation: (parseFloat(lossData.quantity) || 0) * (parseFloat(showLossModal.cost) || 0)
+    });
+    
+    store.showAlert(L(`Loss of ${lossData.quantity} recorded for ${showLossModal.name}`, `Perte de ${lossData.quantity} enregistrée pour ${showLossModal.name}`));
+    setShowLossModal(null);
+    setLossData({ quantity: 1, reason: '' });
   };
 
   return (
@@ -206,25 +228,33 @@ export default function Stock() {
       {!searchQuery && !selectedCategory && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 no-print animate-scale-in">
           {categories.map((cat) => {
-            const catCount = products.filter(p => p.category === cat.name).length;
-            const catValue = products.filter(p => p.category === cat.name).reduce((s, p) => s + (p.price * p.quantity), 0);
+            const catProducts = products.filter(p => p.category === cat.name);
+            const catCount = catProducts.length;
+            const catValue = catProducts.reduce((s, p) => s + (p.price * p.quantity), 0);
+            const lowStockCount = catProducts.filter(p => p.quantity <= 5).length;
+            
             return (
               <div 
                 key={cat.id}
-                className="glass-card bg-white p-8 rounded-[40px] border-emerald-50 flex flex-col items-center text-center group cursor-pointer hover:border-emerald-500 transition-all shadow-sm relative overflow-hidden"
+                className={`glass-card bg-white p-8 rounded-[40px] border-2 flex flex-col items-center text-center group cursor-pointer transition-all shadow-sm relative overflow-hidden ${lowStockCount > 0 ? 'border-rose-100 hover:border-rose-500' : 'border-emerald-50 hover:border-emerald-500'}`}
                 onClick={() => setSelectedCategory(cat.name)}
               >
+                {lowStockCount > 0 && (
+                   <div className="absolute top-6 left-6 px-3 py-1 bg-rose-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse z-10">
+                      {lowStockCount} {L('Critical', 'Critique')}
+                   </div>
+                )}
                 <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
                    <Box className="w-24 h-24" />
                 </div>
-                <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 shadow-inner">
+                <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-inner ${lowStockCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
                    <Box className="w-8 h-8" />
                 </div>
                 <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">{L('Sector', 'Secteur')} {cat.name}</h4>
                 <p className="text-[10px] font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} {L('Items', 'Articles')}</p>
                 <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-navy-950">
                    <span>{L('Estimated Value', 'Valeur Estimée')}</span>
-                   <span className="text-emerald-600">{store.formatCurrency(catValue)}</span>
+                   <span className={lowStockCount > 0 ? 'text-rose-600' : 'text-emerald-600'}>{store.formatCurrency(catValue)}</span>
                 </div>
               </div>
             );
@@ -279,6 +309,13 @@ export default function Stock() {
                     </div>
 
                     <div className="flex items-center justify-end gap-2">
+                       <button 
+                         onClick={() => setShowLossModal(p)} 
+                         className="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                         title={L('Report Loss', 'Signaler Perte')}
+                       >
+                          <AlertTriangle className="w-4 h-4" />
+                       </button>
                        <button onClick={() => setEditProduct(p)} className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
                           <Pencil className="w-4 h-4" />
                        </button>
@@ -380,6 +417,55 @@ export default function Stock() {
               </form>
            </div>
         </div>
+      )}
+
+      {/* Direct Loss Modal */}
+      {showLossModal && (
+         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-xl animate-scale-in">
+            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
+               <div className="text-center space-y-2 mb-10">
+                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Report Spoilage', 'Signaler Avarie')}</h3>
+                  <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showLossModal.name}</p>
+               </div>
+
+               <form onSubmit={handleReportLoss} className="space-y-8">
+                  <div className="space-y-6">
+                     <div className="space-y-2">
+                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Quantity Lost', 'Quantité Perdue')}</p>
+                        <input
+                          autoFocus
+                          value={lossData.quantity}
+                          onChange={e => setLossData({ ...lossData, quantity: e.target.value })}
+                          type="number"
+                          step="0.01"
+                          required
+                          className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] px-8 py-6 text-3xl font-black text-navy-950 outline-none focus:border-rose-500 transition-all text-center"
+                          placeholder="0.00"
+                        />
+                     </div>
+                     
+                     <div className="space-y-2">
+                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Reason / Cause', 'Raison / Cause')}</p>
+                        <input
+                          value={lossData.reason}
+                          onChange={e => setLossData({ ...lossData, reason: e.target.value })}
+                          type="text"
+                          required
+                          placeholder={L('Ex: Damaged, Expired...', 'Ex: Endommagé, Périmé...')}
+                          className="w-full bg-navy-50 border-2 border-transparent rounded-[24px] px-8 py-5 text-sm font-black text-navy-950 uppercase outline-none focus:border-rose-500 transition-all"
+                        />
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                     <button type="button" onClick={() => setShowLossModal(null)} className="py-6 bg-navy-50 text-navy-950 rounded-[32px] font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                     <button type="submit" className="py-6 bg-rose-600 text-white rounded-[32px] font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-rose-600/20 hover:bg-rose-700 transition-all active:scale-[0.98]">
+                        {L('Confirm Loss', 'Confirmer Perte')}
+                     </button>
+                  </div>
+               </form>
+            </div>
+         </div>
       )}
 
     </div>

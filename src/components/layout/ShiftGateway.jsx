@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
 import { useStore } from '../../context/StoreContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { UserCheck, ArrowRight, User, ShieldCheck } from 'lucide-react';
+import { UserCheck, ArrowRight, User, ShieldCheck, Clock } from 'lucide-react';
+
+const LiveClock = ({ lang }) => {
+  const [time, setTime] = useState(new Date());
+  React.useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return (
+    <div className="flex items-center gap-2 text-2xl font-black text-navy-950 tracking-tighter">
+       <Clock className="w-5 h-5 text-emerald-500" />
+       {time.toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' })} <span className="text-[10px] ml-1 opacity-40">GMT</span>
+    </div>
+  );
+};
 
 export default function ShiftGateway() {
   const store = useStore();
@@ -63,6 +77,13 @@ export default function ShiftGateway() {
             <div className="flex items-center justify-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <p className="text-xs md:text-sm text-blue-gray uppercase tracking-[0.4em] font-black">{t('loginGateway')}</p>
+            </div>
+            
+            <div className="mt-6 flex flex-col items-center">
+               <p className="text-[10px] font-black text-navy-950/40 uppercase tracking-[0.3em] mb-1 italic">
+                  {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}
+               </p>
+               <LiveClock lang={lang} />
             </div>
         </div>
 

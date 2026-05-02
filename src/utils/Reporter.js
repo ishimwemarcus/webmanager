@@ -132,7 +132,29 @@ export const generateBusinessIntelligence = (sales) => {
     .sort(([, a], [, b]) => b.revenue - a.revenue)
     .map(([name, stats]) => ({ name, ...stats }));
 
-  return { topProducts, topClients, topOperators };
+  // Peak Traffic Hours
+  const hourlyTraffic = {};
+  sales.forEach(s => {
+    if (s.date) {
+      const hour = new Date(s.date).getHours();
+      hourlyTraffic[hour] = (hourlyTraffic[hour] || 0) + 1;
+    }
+  });
+  const peakHour = Object.entries(hourlyTraffic)
+    .sort(([, a], [, b]) => b - a)[0] || [null, 0];
+
+  // Client Loyalty (Frequency)
+  const clientFrequency = {};
+  sales.forEach(s => {
+    const c = (s.client || 'STANDARD').toUpperCase();
+    clientFrequency[c] = (clientFrequency[c] || 0) + 1;
+  });
+  const loyalClients = Object.entries(clientFrequency)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 3)
+    .map(([name, count]) => ({ name, count }));
+
+  return { topProducts, topClients, topOperators, peakHour: { hour: peakHour[0], count: peakHour[1] }, loyalClients };
 };
 
 
@@ -175,6 +197,16 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
           <span>MONTANT RÉGLÉ:</span>
           <span>${formatCurrency(sale.paid)}</span>
         </div>
+        ${sale.debtPaymentAmount > 0 ? `
+        <div class="flex">
+          <span>PAIEMENT DE DETTE:</span>
+          <span>${formatCurrency(sale.debtPaymentAmount)}</span>
+        </div>
+        <div class="flex bold">
+          <span>TOTAL ENCAISSÉ:</span>
+          <span>${formatCurrency(parseFloat(sale.paid) + parseFloat(sale.debtPaymentAmount))}</span>
+        </div>
+        ` : ''}
         ${sale.paid < sale.amount ? `
         <div class="flex bold">
           <span>RESTE A PAYER (DETTE):</span>
@@ -188,6 +220,76 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
         <div class="center" style="margin-top: 15px;">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/portal/' + encodeURIComponent(sale.client) + '/' + encodeURIComponent(sale.phone || 'none'))}" style="width: 35mm; height: 35mm;" />
           <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">SCANNEZ POUR VOTRE HISTORIQUE & DETTES</p>
+        </div>
+
+        <script>
+          window.onload = () => {
+            setTimeout(() => {
+              window.print();
+              window.onafterprint = () => window.close();
+            }, 500);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+  const printWindow = window.open('', '_blank', 'width=350,height=600');
+  printWindow.document.write(content);
+  printWindow.document.close();
+};
+
+export const printDebtSettlementReceipt = (data, operator, formatCurrency) => {
+  const { client, phone, amount, paymentMethod, remainingBalance, date } = data;
+  const content = `
+    <html>
+      <head>
+        <title>Recu de Reglement</title>
+        <style>
+          body { font-family: 'Courier New', Courier, monospace; width: 80mm; margin: 0 auto; padding: 10px; font-size: 13px; color: #000; }
+          .center { text-align: center; }
+          .bold { font-weight: bold; }
+          .large { font-size: 18px; }
+          .divider { border-top: 1px dashed #000; margin: 10px 0; border-bottom: none; }
+          .flex { display: flex; justify-content: space-between; margin-bottom: 4px; }
+        </style>
+      </head>
+      <body>
+        <div class="center bold large">MARC</div>
+        <div class="center">RECU DE REGLEMENT DE DETTE</div>
+        <div class="divider"></div>
+        <div><span class="bold">Date:</span> ${new Date(date).toLocaleString()}</div>
+        <div><span class="bold">Opérateur:</span> ${operator || 'Admin'}</div>
+        <div><span class="bold">Client:</span> ${client.toUpperCase()}</div>
+        <div class="divider"></div>
+        <div class="flex bold">
+          <span>DÉSIGNATION</span>
+          <span>MONTANT</span>
+        </div>
+        <div class="flex">
+          <span>Règlement Balance Global</span>
+          <span>${formatCurrency(amount)}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="flex">
+          <span>MODE DE PAIEMENT:</span>
+          <span>${paymentMethod || 'Cash'}</span>
+        </div>
+        <div class="flex bold large" style="margin-top: 10px;">
+          <span>TOTAL PAYÉ:</span>
+          <span>${formatCurrency(amount)}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="flex" style="color: ${remainingBalance < 0 ? '#ef4444' : '#10b981'}; font-weight: bold;">
+          <span>NOUVEAU SOLDE WALLET:</span>
+          <span>${formatCurrency(remainingBalance)}</span>
+        </div>
+        <div class="divider"></div>
+        <div class="center" style="margin-top: 15px;">Merci pour votre règlement !</div>
+        <div class="center" style="font-size: 10px; margin-top: 4px;">SYSTEME MARC VER 4.0</div>
+        
+        <div class="center" style="margin-top: 15px;">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/portal/' + encodeURIComponent(client) + '/' + encodeURIComponent(phone || 'none'))}" style="width: 35mm; height: 35mm;" />
+          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">CONSULTEZ VOTRE COMPTE EN TEMPS RÉEL</p>
         </div>
 
         <script>
@@ -482,6 +584,7 @@ export const shareReceipt = (sale, operator, formatCurrency) => {
 🛒 *Article:* ${sale.name} (x${sale.quantity})
 💰 *Total:* ${formatCurrency(sale.amount)}
 💵 *Réglé:* ${formatCurrency(sale.paid)}
+${sale.debtPaymentAmount > 0 ? `💳 *Paiement Dette:* ${formatCurrency(sale.debtPaymentAmount)}\n💰 *Total Reçu:* ${formatCurrency(parseFloat(sale.paid) + parseFloat(sale.debtPaymentAmount))}` : ''}
 ${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
 ---------------------------------------
 🔗 *Votre Portail Client:* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
@@ -490,7 +593,35 @@ ${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
 🙏 _Merci de votre confiance !_
   `.trim();
 
-  const phone = sale.phone ? sale.phone.replace(/\D/g, '') : '';
-  const url = phone ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  const phoneDigits = sale.phone ? sale.phone.replace(/\D/g, '') : '';
+  const url = phoneDigits ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+};
+
+export const shareDebtSettlementReceipt = (data, operator, formatCurrency) => {
+  const { client, phone, amount, paymentMethod, remainingBalance, date } = data;
+  const dateStr = new Date(date).toLocaleString('fr-FR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  const text = `
+📜 *RECU DE REGLEMENT - MARC*
+---------------------------------------
+📅 *Date:* ${dateStr}
+👤 *Opérateur:* ${operator}
+🤝 *Client:* ${client.toUpperCase()}
+---------------------------------------
+💰 *Montant Payé:* ${formatCurrency(amount)}
+💳 *Mode:* ${paymentMethod}
+---------------------------------------
+⚖️ *Nouveau Solde Wallet:* ${formatCurrency(remainingBalance)}
+🔗 *Lien Portail:* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(client)}/${encodeURIComponent(phone || 'none')}
+---------------------------------------
+🙏 _Merci pour votre règlement !_
+  `.trim();
+
+  const phoneDigits = phone ? phone.replace(/\D/g, '') : '';
+  const url = phoneDigits ? `https://wa.me/${phoneDigits}?text=${encodeURIComponent(text)}` : `https://wa.me/?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
 };

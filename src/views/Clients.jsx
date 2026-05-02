@@ -36,7 +36,8 @@ export default function Clients() {
 
     Object.keys(clients).forEach(k => {
       const c = clients[k];
-      clients[k].currentDebt = store.getClientDebtBalance ? store.getClientDebtBalance(c.name, c.phone) : 0;
+      clients[k].globalBalance = store.getClientGlobalBalance ? store.getClientGlobalBalance(c.name, c.phone) : 0;
+      clients[k].trustScore = store.getClientTrustScore ? store.getClientTrustScore(c.name, c.phone) : 3;
     });
 
     return Object.values(clients)
@@ -45,8 +46,8 @@ export default function Clients() {
   }, [sales, store, searchQuery, L]);
 
   const totalClients = clientData.length;
-  const vipCount = clientData.filter(c => c.totalSpent > 1000 && c.transactions > 2).length;
-  const riskCount = clientData.filter(c => c.currentDebt > c.totalSpent * 0.3).length;
+  const vipCount = clientData.filter(c => c.trustScore >= 4).length;
+  const riskCount = clientData.filter(c => c.globalBalance < 0 && Math.abs(c.globalBalance) > c.totalSpent * 0.3).length;
 
   const portalUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal`;
 
@@ -130,7 +131,12 @@ export default function Clients() {
                    </div>
                    <div>
                       <h3 className="text-lg font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{c.name}</h3>
-                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{c.phone === 'none' ? L('No contact indexed', 'Aucun contact indexé') : c.phone}</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className={`w-2.5 h-2.5 ${i < c.trustScore ? 'text-amber-400 fill-amber-400' : 'text-navy-100'}`} />
+                        ))}
+                      </div>
+                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">{c.phone === 'none' ? L('No contact indexed', 'Aucun contact indexé') : c.phone}</p>
                    </div>
                 </div>
 
@@ -144,9 +150,9 @@ export default function Clients() {
                       <p className="text-xs font-black text-navy-950">{store.formatCurrency(c.totalSpent)}</p>
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Active Debt', 'Dette Active')}</p>
-                      <p className={`text-xs font-black ${c.currentDebt > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                         {c.currentDebt > 0 ? store.formatCurrency(c.currentDebt) : L('Up to date', 'À Jour')}
+                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Wallet Balance', 'Solde du Compte')}</p>
+                      <p className={`text-xs font-black ${c.globalBalance < 0 ? 'text-rose-600' : c.globalBalance > 0 ? 'text-emerald-600' : 'text-blue-gray'}`}>
+                         {c.globalBalance === 0 ? L('Neutral', 'Neutre') : store.formatCurrency(c.globalBalance)}
                       </p>
                    </div>
                    <div className="hidden md:flex items-center justify-center">

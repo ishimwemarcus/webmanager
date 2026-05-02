@@ -262,7 +262,7 @@ export default function Ledger() {
                      <div>
                         <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Date / Flow', 'Date / Flux')}</p>
                         <p className="text-xs font-black text-navy-950 uppercase opacity-60">
-                           {new Date(d.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
+                           {new Date(d.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')} | {new Date(d.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}
                         </p>
                      </div>
                      <div>
