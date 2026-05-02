@@ -56,7 +56,10 @@ export const StoreProvider = ({ children }) => {
   });
   const [confirmState, setConfirmState] = useState({ isOpen: false, message: '', onConfirm: null, onCancel: null });
   const [notification, setNotification] = useState(null); // { message, type: 'success' | 'error' | 'warning' }
-  const [currency, setCurrency] = useState(() => localStorage.getItem('biztrack_currency') || '€');
+  const [currency, setCurrency] = useState(() => {
+    const saved = localStorage.getItem('biztrack_currency') || '€';
+    return (typeof saved === 'string' && !saved.includes('[object')) ? saved : '€';
+  });
   const [currentOperator, setCurrentOperator] = useState(() => localStorage.getItem('biztrack_operator') || '');
   const [shiftStart, setShiftStart] = useState(() => localStorage.getItem('biztrack_shift_start') || '');
   const [showQRModal, setShowQRModal] = useState(false);
@@ -65,7 +68,7 @@ export const StoreProvider = ({ children }) => {
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
-  const API_URL = 'https://ishimwe-marc-sync.loca.lt/manager%20web/api.php';
+  const API_URL = 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
 
   // Network Sync Engine - Polls the central PHP server (with circuit breaker)
