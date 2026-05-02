@@ -65,7 +65,7 @@ export const StoreProvider = ({ children }) => {
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
-  const API_URL = 'https://guardianapi.loca.lt/manager%20web/api.php';
+  const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
 
   // Network Sync Engine - Polls the central PHP server (with circuit breaker)

@@ -127,7 +127,7 @@ export default function TopBar({ onToggleSidebar }) {
               setShowQR(true);
               // Force sync to ensure Boss sees the absolute latest state
               const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts'];
-              const API_URL = 'https://guardianapi.loca.lt/manager%20web/api.php';
+              const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
               keys.forEach(k => {
                 const localData = localStorage.getItem('biztrack_' + k);
                 if (localData) {
