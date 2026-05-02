@@ -33,6 +33,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
   const [currentUser] = useState({ username: 'admin', role: 'Master' });
   const [appBooted, setAppBooted] = useState(false);
+  const handleBootComplete = React.useCallback(() => setAppBooted(true), []);
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -53,7 +54,7 @@ function App() {
 
   return (
     <>
-    {!appBooted && <BootScreen onComplete={() => setAppBooted(true)} />}
+    {!appBooted && <BootScreen onComplete={handleBootComplete} />}
     {appBooted && !store.currentOperator && !window.location.hash.includes('/portal/') && <ShiftGateway />}
     <QRModal />
     <ShiftEndModal 

@@ -25,28 +25,28 @@ export default function QRModal() {
           <QrCode className="w-8 h-8" />
         </div>
         
-        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1 text-center mt-4 md:mt-0">{L('Client Portal', 'Portail Client')}</h2>
+        <h2 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight mb-1 text-center mt-4 md:mt-0">{L('Boss Live Sync', 'Sync Direct Boss')}</h2>
         <p className="text-xs md:text-xs md:text-sm text-navy-400 text-center font-bold mb-4 md:mb-8 uppercase tracking-widest leading-relaxed max-w-[200px] md:max-w-none">
-          {L('Scan to track your transactions.', 'Scannez pour suivre vos transactions.')}
+          {L('Scan to mirror this terminal in real-time.', 'Scannez pour répliquer ce terminal en temps réel.')}
         </p>
         
         <div className="relative bg-white p-4 rounded-[32px] shadow-[0_0_60px_rgba(59,130,246,0.4)] border-8 border-white/10 hover:scale-105 transition-transform duration-500 group">
           <div className="absolute inset-0 bg-gradient-to-t from-accent-500/0 via-accent-500/20 to-accent-500/0 h-1 sm:h-2 top-0 animate-scan z-10"></div>
           <img 
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#/portal')}`} 
-            alt="MARC Portal QR Code"
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} 
+            alt="MARC Boss Sync QR Code"
             className="w-56 h-56 md:w-64 md:h-64 rounded-xl object-contain bg-white relative z-0"
           />
         </div>
 
         
         <a 
-          href={`${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal`} 
+          href="https://ishimwemarcus.github.io/webmanager/?pass=MARCUS" 
           target="_blank" 
           rel="noreferrer"
           className="mt-6 text-xs md:text-sm md:text-xs text-accent-500 font-bold tracking-widest hover:text-white hover:underline uppercase text-center break-all px-4"
         >
-          {window.location.hostname}/portal
+          ishimwemarcus.github.io/webmanager/?pass=MARCUS
         </a>
 
         {/* Manual Master Override Sync Button */}

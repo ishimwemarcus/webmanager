@@ -36,7 +36,7 @@ export default function BootScreen({ onComplete }) {
             <div className="absolute inset-0 bg-[#2563eb]/20 animate-pulse"></div>
             <div className={`absolute top-0 bottom-0 left-0 w-1 bg-[#2563eb] transition-all duration-[2000ms] ease-out ${phase >= 1 ? 'h-full' : 'h-0'} z-20`}></div>
             
-            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://guardian-business.surge.sh')}`} alt="MARC QR Boot" className="absolute inset-0 w-full h-full object-contain p-4 z-10" />
+            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} alt="MARC Boss Sync QR" className="absolute inset-0 w-full h-full object-contain p-4 z-10" />
           </div>
         </div>
 

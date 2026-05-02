@@ -121,10 +121,25 @@ export default function TopBar({ onToggleSidebar }) {
             <Eye className="w-4 h-4" />
           </button>
 
-          {/* Portal QR Shortcut */}
+          {/* Boss Live Sync QR Shortcut */}
           <button
-            onClick={() => setShowQR(true)}
-            title={L('Generate Client Portal QR', 'Générer QR Portail Client')}
+            onClick={() => {
+              setShowQR(true);
+              // Force sync to ensure Boss sees the absolute latest state
+              const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts'];
+              const API_URL = 'https://guardianapi.loca.lt/manager/htdocs/manager%20web/api.php';
+              keys.forEach(k => {
+                const localData = localStorage.getItem('biztrack_' + k);
+                if (localData) {
+                  fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
+                    method: 'POST',
+                    headers: { 'Bypass-Tunnel-Reminder': 'true' },
+                    body: localData
+                  }).catch(() => {});
+                }
+              });
+            }}
+            title={L('Live Sync / Screen Share QR', 'QR Sync Rapide')}
             className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
           >
             <QrCode className="w-4 h-4" />
@@ -150,11 +165,11 @@ export default function TopBar({ onToggleSidebar }) {
             <div className="w-20 h-20 bg-navy-brand rounded-3xl mx-auto flex items-center justify-center text-white mb-6">
               <QrCode className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{L('Mobile Access', 'Accès Mobile')}</h3>
-            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">{L('Scan to sync this terminal with your smartphone.', 'Scannez pour synchroniser ce terminal avec votre smartphone.')}</p>
+            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{L('Boss Live Sync', 'Sync Direct Boss')}</h3>
+            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">{L('Scan to mirror this terminal in real-time.', 'Scannez pour répliquer ce terminal en temps réel.')}</p>
             <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname.replace(/\/$/, '') + '/#/portal')}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
             </div>
             <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
           </div>

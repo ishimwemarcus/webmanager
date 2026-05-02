@@ -84,7 +84,10 @@ export const StoreProvider = ({ children }) => {
           { k: 'biztrack_expenses', set: setExpenses },
           { k: 'biztrack_users', set: setUsers },
           { k: 'biztrack_ledger', set: setLedgerManual },
-          { k: 'biztrack_wait', set: setWaitCredits }
+          { k: 'biztrack_wait', set: setWaitCredits },
+          { k: 'biztrack_losses', set: setLosses },
+          { k: 'biztrack_reconciliations', set: setReconciliations },
+          { k: 'biztrack_shifts', set: setShifts }
         ];
 
         // Quick reachability check first (single request)
@@ -330,14 +333,15 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'report') setReportArchive(prev => [...prev, record]);
     else if (record.record_type === 'loss') {
       setLosses(prev => [...prev, record]);
+      apiPush('biztrack_losses');
       // Auto-Decrement Stock
       const product = products.find(p => p.id === record.product_id || p.product_id === record.product_id);
       if (product) {
         updateRecord({ ...product, quantity: Math.max(0, (product.quantity || 0) - (parseFloat(record.quantity) || 0)) });
       }
     }
-    else if (record.record_type === 'reconciliation') setReconciliations(prev => [...prev, record]);
-    else if (record.record_type === 'category') setCategories(prev => [...prev, record]);
+    else if (record.record_type === 'reconciliation') { setReconciliations(prev => [...prev, record]); apiPush('biztrack_reconciliations'); }
+    else if (record.record_type === 'category') { setCategories(prev => [...prev, record]); apiPush('biztrack_categories'); }
     else if (record.record_type === 'shift') { setShifts(prev => [...prev, record]); apiPush('biztrack_shifts'); }
     else if (record.record_type === 'debt_payment') { 
       settleClientDebt(record.client, record.phone, record.amount, record.paymentMethod, record.operator);
