@@ -65,7 +65,7 @@ export default function TopBar({ onToggleSidebar }) {
                 <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
               </div>
             </div>
-            <p className="text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
+            <p className="hidden sm:block text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
           </div>
 
           <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
@@ -77,15 +77,15 @@ export default function TopBar({ onToggleSidebar }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-6 lg:gap-10">
+      <div className="flex items-center gap-4 lg:gap-10">
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           {/* Operator Badge */}
           {currentOperator && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               {/* Operator name badge */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
-                <div className="w-6 h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-[10px] sm:text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]">
                   {currentOperator.charAt(0).toUpperCase()}
                 </div>
                 <span className="hidden sm:block text-xs font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
@@ -95,9 +95,9 @@ export default function TopBar({ onToggleSidebar }) {
               <button
                 onClick={() => store.setIsShiftEndModalOpen(true)}
                 title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
-                className="flex items-center gap-2 px-3 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-2xl text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-xl sm:rounded-2xl text-white font-black text-[8px] sm:text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden md:inline">{L('End Shift', 'Fin Poste')}</span>
               </button>
             </div>
@@ -106,9 +106,9 @@ export default function TopBar({ onToggleSidebar }) {
           {/* Language Toggle */}
           <button
             onClick={toggleLang}
-            className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-2xl text-white transition-all font-black text-xs md:text-sm uppercase tracking-widest group hover:bg-white/10"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white transition-all font-black text-[10px] sm:text-xs md:text-sm uppercase tracking-widest group hover:bg-white/10"
           >
-            <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform text-emerald-500" />
+            <Globe className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform text-emerald-500" />
             <span>{lang === 'en' ? 'EN' : 'FR'}</span>
           </button>
 
@@ -116,9 +116,9 @@ export default function TopBar({ onToggleSidebar }) {
           <button
             onClick={() => setEyeCare(!eyeCare)}
             title={L('Toggle Eye Care Mode', 'Activer le mode confort visuel')}
-            className={`flex items-center gap-2 px-3 py-2 border rounded-2xl transition-all font-black group ${eyeCare ? 'bg-[#BEF264]/20 border-[#BEF264] text-[#BEF264]' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
+            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 border rounded-xl sm:rounded-2xl transition-all font-black group ${eyeCare ? 'bg-[#BEF264]/20 border-[#BEF264] text-[#BEF264]' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
           >
-            <Eye className="w-4 h-4" />
+            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
 
           {/* Boss Live Sync QR Shortcut */}
@@ -140,19 +140,19 @@ export default function TopBar({ onToggleSidebar }) {
               });
             }}
             title={L('Live Sync / Screen Share QR', 'QR Sync Rapide')}
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
           >
-            <QrCode className="w-4 h-4" />
+            <QrCode className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
 
           {/* Currency Input Modifier */}
-          <div className="flex items-center gap-1 md:gap-2 px-2 md:px-3 py-2 bg-white/5 border border-white/10 rounded-2xl">
+          <div className="flex items-center gap-1 md:gap-2 px-1 sm:px-2 md:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl">
             <span className="hidden md:inline text-xs font-black uppercase text-white/40" title={L('Currency Profile', 'Profil Devise')}>CUR</span>
             <input
               type="text"
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
-              className="w-10 md:w-12 bg-transparent border-none text-white font-black text-xs md:text-sm p-0 focus:ring-0 text-center uppercase"
+              className="w-6 sm:w-10 md:w-12 bg-transparent border-none text-white font-black text-[10px] sm:text-xs md:text-sm p-0 focus:ring-0 text-center uppercase"
             />
           </div>
         </div>
