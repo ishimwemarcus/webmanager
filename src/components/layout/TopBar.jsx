@@ -137,6 +137,7 @@ export default function TopBar({ onToggleSidebar }) {
                   if (localData) {
                     await fetch(`${store.API_URL}?action=overwrite&key=biztrack_${k}`, {
                       method: 'POST',
+                      headers: { 'Bypass-Tunnel-Reminder': 'true' },
                       body: localData
                     });
                   }
@@ -144,6 +145,7 @@ export default function TopBar({ onToggleSidebar }) {
                 // Special case for currency (wrapped)
                 await fetch(`${store.API_URL}?action=overwrite&key=biztrack_currency`, { 
                   method: 'POST', 
+                  headers: { 'Bypass-Tunnel-Reminder': 'true' },
                   body: JSON.stringify([{ val: currency }]) 
                 });
                 

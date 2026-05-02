@@ -64,13 +64,15 @@ export default function QRModal() {
                 if (localData) {
                   await fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
                     method: 'POST',
+                    headers: { 'Bypass-Tunnel-Reminder': 'true' },
                     body: localData
                   });
                 }
               }
               // Special case for currency
               await fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
-                method: 'POST', 
+                method: 'POST',
+                headers: { 'Bypass-Tunnel-Reminder': 'true' },
                 body: JSON.stringify([{ val: currency }]) 
               });
 
