@@ -168,7 +168,7 @@ export default function TopBar({ onToggleSidebar }) {
             <span className="hidden md:inline text-xs font-black uppercase text-white/40" title={L('Currency Profile', 'Profil Devise')}>CUR</span>
             <input
               type="text"
-              value={currency}
+              value={typeof currency === 'string' ? currency : (currency?.val || '€')}
               onChange={(e) => setCurrency(e.target.value)}
               className="w-6 sm:w-10 md:w-12 bg-transparent border-none text-white font-black text-[10px] sm:text-xs md:text-sm p-0 focus:ring-0 text-center uppercase"
             />

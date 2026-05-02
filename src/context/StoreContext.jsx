@@ -90,7 +90,10 @@ export const StoreProvider = ({ children }) => {
           { k: 'biztrack_shifts', set: setShifts },
           { k: 'biztrack_categories', set: setCategories },
           { k: 'biztrack_reports', set: setReportArchive },
-          { k: 'biztrack_currency', set: (val) => setCurrency(Array.isArray(val) ? (val[0]?.val || '€') : val) }
+          { k: 'biztrack_currency', set: (val) => {
+            const clean = Array.isArray(val) ? (val[0]?.val || val[0] || '€') : (val?.val || val || '€');
+            setCurrency(String(clean));
+          }}
         ];
 
         // Quick reachability check first (single request)
@@ -153,12 +156,13 @@ export const StoreProvider = ({ children }) => {
   useEffect(() => localStorage.setItem('biztrack_shift_start', shiftStart), [shiftStart]);
   
   useEffect(() => {
-    localStorage.setItem('biztrack_currency', currency);
+    const stringCurrency = String(currency?.val || currency || '€');
+    localStorage.setItem('biztrack_currency', stringCurrency);
     // Push to server (wrapped as array for PHP compatibility)
     fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
       method: 'POST', 
       headers: { 'Bypass-Tunnel-Reminder': 'true' },
-      body: JSON.stringify([{ val: currency }]) 
+      body: JSON.stringify([{ val: stringCurrency }]) 
     }).catch(()=>{});
   }, [currency, API_URL]);
 
@@ -469,11 +473,12 @@ export const StoreProvider = ({ children }) => {
 
   const formatCurrency = (value) => {
     const val = parseFloat(value || 0);
-    const noDecimals = currency === 'RWF' || currency === 'TZS' || currency === 'UGX';
+    const curStr = String(currency?.val || currency || '€');
+    const noDecimals = curStr === 'RWF' || curStr === 'TZS' || curStr === 'UGX';
     return `${val.toLocaleString(undefined, {
       minimumFractionDigits: noDecimals ? 0 : 2, 
       maximumFractionDigits: noDecimals ? 0 : 2
-    })} ${currency}`;
+    })} ${curStr}`;
   };
 
   const getSystemStatus = () => {
