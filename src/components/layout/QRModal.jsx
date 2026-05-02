@@ -54,7 +54,7 @@ export default function QRModal() {
           onClick={async () => {
             const btn = document.getElementById('sync-btn-global');
             if (btn) btn.disabled = true;
-            const API_URL = 'https://guardianapi.loca.lt/manager/htdocs/manager%20web/api.php';
+            const API_URL = 'https://guardianapi.loca.lt/manager%20web/api.php';
             const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories'];
             
             try {
