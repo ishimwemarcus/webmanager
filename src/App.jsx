@@ -62,7 +62,7 @@ function App() {
       onClose={() => store.setIsShiftEndModalOpen(false)} 
     />
 
-    <div className={`flex h-[100dvh] bg-transparent relative overflow-hidden transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 scale-100' : 'opacity-0 scale-105 absolute inset-0 pointer-events-none'}`}>
+    <div className={`fixed inset-0 w-full h-[100dvh] flex bg-transparent overflow-hidden transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-105 pointer-events-none'}`}>
       <GlobalAlerts />
       <ToastNotification />
       <FloatingCalculator />
@@ -93,7 +93,7 @@ function App() {
           <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         )}
 
-        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-3 lg:p-6'}`}>
+        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe [-webkit-overflow-scrolling:touch] ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-3 lg:p-6'}`}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/stock" element={<Stock />} />
