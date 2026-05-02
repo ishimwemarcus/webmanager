@@ -65,8 +65,8 @@ export const StoreProvider = ({ children }) => {
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
-  const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
-  const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
+  const API_URL = 'https://df3700545372a5.lhr.life/manager%20web/api.php';
+  const FETCH_CONFIG = { headers: { 'Content-Type': 'application/json' } };
 
   // Network Sync Engine - Polls the central PHP server (with circuit breaker)
   useEffect(() => {
@@ -157,10 +157,9 @@ export const StoreProvider = ({ children }) => {
     // Push to server (wrapped as array for PHP compatibility)
     fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
       method: 'POST', 
-      headers: { 'Bypass-Tunnel-Reminder': 'true' },
       body: JSON.stringify([{ val: currency }]) 
     }).catch(()=>{});
-  }, [currency]);
+  }, [currency, API_URL]);
 
   // Cross-tab sync: re-read state when another tab (e.g. admin panel) writes to localStorage
   useEffect(() => {
@@ -574,9 +573,8 @@ export const StoreProvider = ({ children }) => {
       localStorage.removeItem(k);
       // Also purge from the remote server
       if (k !== 'biztrack_pin' && k !== 'biztrack_locked' && k !== 'biztrack_user') {
-        fetch(`${API_URL}?action=overwrite&key=${k}`, { 
+        fetch(`https://df3700545372a5.lhr.life?action=overwrite&key=${k}`, { 
           method: 'POST', 
-          headers: { 'Bypass-Tunnel-Reminder': 'true' },
           body: JSON.stringify([]) 
         }).catch(()=>{});
       }
@@ -779,7 +777,8 @@ export const StoreProvider = ({ children }) => {
       shiftStart, setShiftStart,
       showQRModal, setShowQRModal,
       isShiftEndModalOpen, setIsShiftEndModalOpen,
-      getLosses, getReconciliations, getShifts, getShiftTransactions
+      getLosses, getReconciliations, getShifts, getShiftTransactions,
+      API_URL
     }}>
       {children}
     </StoreContext.Provider>

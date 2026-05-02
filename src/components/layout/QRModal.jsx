@@ -4,7 +4,7 @@ import { useStore } from '../../context/StoreContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function QRModal() {
-  const { showQRModal, setShowQRModal, currency, showAlert } = useStore();
+  const { showQRModal, setShowQRModal, currency, showAlert, API_URL } = useStore();
   const { L } = useLanguage();
   const [isSyncing, setIsSyncing] = React.useState(false);
 
@@ -56,7 +56,6 @@ export default function QRModal() {
           disabled={isSyncing}
           onClick={async () => {
             setIsSyncing(true);
-            const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
             const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts', 'reports'];
             
             try {
@@ -65,7 +64,6 @@ export default function QRModal() {
                 if (localData) {
                   await fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
                     method: 'POST',
-                    headers: { 'Bypass-Tunnel-Reminder': 'true' },
                     body: localData
                   });
                 }
@@ -73,7 +71,6 @@ export default function QRModal() {
               // Special case for currency
               await fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
                 method: 'POST', 
-                headers: { 'Bypass-Tunnel-Reminder': 'true' },
                 body: JSON.stringify([{ val: currency }]) 
               });
 

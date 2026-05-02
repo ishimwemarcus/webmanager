@@ -130,23 +130,20 @@ export default function TopBar({ onToggleSidebar }) {
               setShowQR(true);
               
               const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts', 'reports'];
-              const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
               
               try {
                 for (const k of keys) {
                   const localData = localStorage.getItem('biztrack_' + k);
                   if (localData) {
-                    await fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
+                    await fetch(`${store.API_URL}?action=overwrite&key=biztrack_${k}`, {
                       method: 'POST',
-                      headers: { 'Bypass-Tunnel-Reminder': 'true' },
                       body: localData
                     });
                   }
                 }
                 // Special case for currency (wrapped)
-                await fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
+                await fetch(`${store.API_URL}?action=overwrite&key=biztrack_currency`, { 
                   method: 'POST', 
-                  headers: { 'Bypass-Tunnel-Reminder': 'true' },
                   body: JSON.stringify([{ val: currency }]) 
                 });
                 
