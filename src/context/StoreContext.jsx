@@ -87,7 +87,10 @@ export const StoreProvider = ({ children }) => {
           { k: 'biztrack_wait', set: setWaitCredits },
           { k: 'biztrack_losses', set: setLosses },
           { k: 'biztrack_reconciliations', set: setReconciliations },
-          { k: 'biztrack_shifts', set: setShifts }
+          { k: 'biztrack_shifts', set: setShifts },
+          { k: 'biztrack_categories', set: setCategories },
+          { k: 'biztrack_reports', set: setReportArchive },
+          { k: 'biztrack_currency', set: (val) => setCurrency(Array.isArray(val) ? (val[0]?.val || '€') : val) }
         ];
 
         // Quick reachability check first (single request)
@@ -146,9 +149,18 @@ export const StoreProvider = ({ children }) => {
   useEffect(() => localStorage.setItem('biztrack_losses', JSON.stringify(losses)), [losses]);
   useEffect(() => localStorage.setItem('biztrack_reconciliations', JSON.stringify(reconciliations)), [reconciliations]);
   useEffect(() => localStorage.setItem('biztrack_shifts', JSON.stringify(shifts)), [shifts]);
-  useEffect(() => localStorage.setItem('biztrack_currency', currency), [currency]);
   useEffect(() => localStorage.setItem('biztrack_operator', currentOperator), [currentOperator]);
   useEffect(() => localStorage.setItem('biztrack_shift_start', shiftStart), [shiftStart]);
+  
+  useEffect(() => {
+    localStorage.setItem('biztrack_currency', currency);
+    // Push to server (wrapped as array for PHP compatibility)
+    fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
+      method: 'POST', 
+      headers: { 'Bypass-Tunnel-Reminder': 'true' },
+      body: JSON.stringify([{ val: currency }]) 
+    }).catch(()=>{});
+  }, [currency]);
 
   // Cross-tab sync: re-read state when another tab (e.g. admin panel) writes to localStorage
   useEffect(() => {
@@ -199,6 +211,12 @@ export const StoreProvider = ({ children }) => {
   const generateAndArchiveFullReport = () => {
     const report = generateSystemHealthReport(products, sales, expenses, ledgerManual, waitCredits, losses);
     setReportArchive(prev => [report, ...prev]);
+    // Force immediate sync for report
+    fetch(`${API_URL}?action=push&key=biztrack_reports`, { 
+      method: 'POST', 
+      headers: { 'Bypass-Tunnel-Reminder': 'true' },
+      body: JSON.stringify(report) 
+    }).catch(()=>{});
     return report;
   };
 
@@ -382,7 +400,7 @@ export const StoreProvider = ({ children }) => {
     else if (record.record_type === 'user') { setUsers(update); apiUpdate('biztrack_users'); }
     else if (record.record_type === 'ledger_entry') { setLedgerManual(update); apiUpdate('biztrack_ledger'); }
     else if (record.record_type === 'wait_credit') { setWaitCredits(update); apiUpdate('biztrack_wait'); }
-    else if (record.record_type === 'category') setCategories(update);
+    else if (record.record_type === 'category') { setCategories(update); apiUpdate('biztrack_categories'); }
     else if (record.record_type === 'loss') { setLosses(update); apiUpdate('biztrack_losses'); }
     else if (record.record_type === 'reconciliation') { setReconciliations(update); apiUpdate('biztrack_reconciliations'); }
     else if (record.record_type === 'shift') { setShifts(update); apiUpdate('biztrack_shifts'); }

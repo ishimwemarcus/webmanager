@@ -4,8 +4,9 @@ import { useStore } from '../../context/StoreContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function QRModal() {
-  const { showQRModal, setShowQRModal } = useStore();
+  const { showQRModal, setShowQRModal, currency, showAlert } = useStore();
   const { L } = useLanguage();
+  const [isSyncing, setIsSyncing] = React.useState(false);
 
   if (!showQRModal) return null;
 
@@ -51,11 +52,12 @@ export default function QRModal() {
 
         {/* Manual Master Override Sync Button */}
         <button
+          id="sync-btn-global"
+          disabled={isSyncing}
           onClick={async () => {
-            const btn = document.getElementById('sync-btn-global');
-            if (btn) btn.disabled = true;
+            setIsSyncing(true);
             const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
-            const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories'];
+            const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts', 'reports'];
             
             try {
               for (const k of keys) {
@@ -68,17 +70,24 @@ export default function QRModal() {
                   });
                 }
               }
-              alert(L("SUCCESS: Master Data Injected to Global Network!", "SUCCÈS : Données Master injectées dans le réseau global !"));
+              // Special case for currency
+              await fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
+                method: 'POST', 
+                headers: { 'Bypass-Tunnel-Reminder': 'true' },
+                body: JSON.stringify([{ val: currency }]) 
+              });
+
+              showAlert(L('All systems synchronized successfully.', 'Tous les systèmes synchronisés avec succès.'), 'success');
             } catch (e) {
-              alert(L("ERROR: Connection failed. Ensure Master PC is online.", "ERREUR : Échec de connexion. Vérifiez que le PC Master est en ligne."));
+              showAlert("Sync Protocol Failed.", "error");
             } finally {
-              if (btn) btn.disabled = false;
+              setIsSyncing(false);
             }
           }}
-          id="sync-btn-global"
-          className="mt-8 w-full md:w-auto px-6 py-4 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/30 rounded-2xl text-xs font-black uppercase tracking-[0.2em] transition-all disabled:opacity-50"
+          className={`w-full mt-6 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all border flex items-center justify-center gap-3 ${isSyncing ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500' : 'bg-accent-500/10 border-accent-500/20 text-accent-500 hover:bg-accent-500/20'}`}
         >
-          {L('Sync PC to Global Network', 'Sync PC vers Réseau Global')}
+          <QrCode className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
+          {isSyncing ? L('Syncing...', 'Synchronisation...') : L('Manual Master Override', 'Surcharge Maître Manuelle')}
         </button>
       </div>
     </div>

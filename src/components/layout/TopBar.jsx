@@ -9,6 +9,7 @@ export default function TopBar({ onToggleSidebar }) {
   const { currency, setCurrency, currentOperator } = store;
   const [showQR, setShowQR] = useState(false);
   const [eyeCare, setEyeCare] = useState(() => localStorage.getItem('biztrack_eyecare') === 'true');
+  const [isSyncing, setIsSyncing] = useState(false);
 
   React.useEffect(() => {
     if (eyeCare) {
@@ -123,26 +124,44 @@ export default function TopBar({ onToggleSidebar }) {
 
           {/* Boss Live Sync QR Shortcut */}
           <button
-            onClick={() => {
+            onClick={async () => {
+              if (isSyncing) return;
+              setIsSyncing(true);
               setShowQR(true);
-              // Force sync to ensure Boss sees the absolute latest state
-              const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts'];
+              
+              const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts', 'reports'];
               const API_URL = 'https://marcus-boss-sync.loca.lt/manager%20web/api.php';
-              keys.forEach(k => {
-                const localData = localStorage.getItem('biztrack_' + k);
-                if (localData) {
-                  fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
-                    method: 'POST',
-                    headers: { 'Bypass-Tunnel-Reminder': 'true' },
-                    body: localData
-                  }).catch(() => {});
+              
+              try {
+                for (const k of keys) {
+                  const localData = localStorage.getItem('biztrack_' + k);
+                  if (localData) {
+                    await fetch(`${API_URL}?action=overwrite&key=biztrack_${k}`, {
+                      method: 'POST',
+                      headers: { 'Bypass-Tunnel-Reminder': 'true' },
+                      body: localData
+                    });
+                  }
                 }
-              });
+                // Special case for currency (wrapped)
+                await fetch(`${API_URL}?action=overwrite&key=biztrack_currency`, { 
+                  method: 'POST', 
+                  headers: { 'Bypass-Tunnel-Reminder': 'true' },
+                  body: JSON.stringify([{ val: currency }]) 
+                });
+                
+                store.showAlert(L('Sync Complete', 'Synchronisation Terminée'), 'success');
+              } catch (e) {
+                store.showAlert('Sync Failed', 'error');
+              } finally {
+                setIsSyncing(false);
+              }
             }}
             title={L('Live Sync / Screen Share QR', 'QR Sync Rapide')}
-            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white/50 hover:bg-white/10 hover:text-white transition-all font-black group"
+            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 border rounded-xl sm:rounded-2xl transition-all font-black group ${isSyncing ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'}`}
           >
-            <QrCode className="w-3 h-3 sm:w-4 sm:h-4" />
+            <QrCode className={`w-3 h-3 sm:w-4 sm:h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+            {isSyncing && <span className="text-[8px] uppercase animate-pulse">Sync</span>}
           </button>
 
           {/* Currency Input Modifier */}
