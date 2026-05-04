@@ -36,20 +36,31 @@ function App() {
   const handleBootComplete = React.useCallback(() => setAppBooted(true), []);
 
   React.useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const magicPass = params.get('pass');
+    // Check both search and hash for magic link
+    const searchParams = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '');
+    
+    const magicPass = searchParams.get('pass') || hashParams.get('pass');
+    const syncParam = searchParams.get('sync') || hashParams.get('sync');
+
     if (magicPass?.toUpperCase() === 'MARCUS' && !store.currentOperator) {
+      if (syncParam) {
+        localStorage.setItem('biztrack_sync_url', syncParam);
+      }
+      
       localStorage.setItem('biztrack_user', JSON.stringify({
         name: 'MARC BOSS',
         username: 'master',
         role: 'Master',
         readOnly: true
       }));
-      store.setCurrentOperator('MARC');
+      localStorage.setItem('biztrack_operator', 'BOSS');
+      store.setCurrentOperator('BOSS');
       
-      // Remove param from URL without reloading
-      const newUrl = window.location.origin + window.location.pathname + window.location.hash;
+      // Remove params from URL without reloading
+      const newUrl = window.location.origin + window.location.pathname + '#/dashboard';
       window.history.replaceState({}, '', newUrl);
+      window.location.reload(); // Reload once to apply sync settings
     }
   }, [store]);
 

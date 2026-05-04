@@ -177,7 +177,7 @@ export default function TopBar({ onToggleSidebar }) {
             <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">{L('Scan to mirror this terminal in real-time.', 'Scannez pour répliquer ce terminal en temps réel.')}</p>
             <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200 relative overflow-hidden group">
               <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
+              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/?pass=MARCUS&sync=' + encodeURIComponent(store.syncUrl))}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
             </div>
             <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
           </div>

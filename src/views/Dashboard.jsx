@@ -104,10 +104,22 @@ export default function Dashboard() {
             >
                <MessageSquare className="w-4 h-4" /> {L('WhatsApp Report', 'Rapport WhatsApp')}
             </button>
-            <div className="hidden lg:flex items-center gap-8 glass-card !p-4 bg-white border-emerald-100 group hover:border-emerald-500 transition-all shadow-sm">
+            <div 
+               onClick={() => {
+                  const newUrl = prompt(L('Enter new Sync API URL:', 'Entrez la nouvelle URL de l\'API de Sync :'), store.syncUrl);
+                  if (newUrl) {
+                     store.setSyncUrl(newUrl);
+                     localStorage.setItem('biztrack_sync_url', newUrl);
+                     window.location.reload(); // Reload to restart the sync engine
+                  }
+               }}
+               className="hidden lg:flex items-center gap-8 glass-card !p-4 bg-white border-emerald-100 group hover:border-emerald-500 transition-all shadow-sm cursor-pointer"
+            >
                <div className="space-y-0.5">
                   <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest italic">{L('Target Link (IP or Domain)', 'Lien Cible (IP ou Domaine)')}</p>
-                  <p className="text-xs font-black text-navy-950 tracking-tighter">10.166.75.218</p>
+                  <p className="text-[10px] font-black text-navy-950 tracking-tighter truncate max-w-[150px]">
+                     {store.syncUrl.replace('https://', '').replace('/manager%20web/api.php', '')}
+                  </p>
                </div>
                <div className="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-lg flex items-center justify-center">
                   <Globe className="w-4 h-4" />

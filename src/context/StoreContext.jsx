@@ -72,7 +72,9 @@ export const StoreProvider = ({ children }) => {
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
-  const API_URL = 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
+  const [syncUrl, setSyncUrl] = useState(() => localStorage.getItem('biztrack_sync_url') || 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php');
+  
+  const API_URL = syncUrl;
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
 
   // Network Sync Engine - Polls the central PHP server (with circuit breaker)
@@ -820,7 +822,7 @@ export const StoreProvider = ({ children }) => {
       showQRModal, setShowQRModal,
       isShiftEndModalOpen, setIsShiftEndModalOpen,
       getLosses, getReconciliations, getShifts, getShiftTransactions,
-      API_URL, isReadOnly
+      API_URL, isReadOnly, syncUrl, setSyncUrl
     }}>
       {children}
     </StoreContext.Provider>
