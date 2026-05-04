@@ -447,6 +447,24 @@ export default function Sales() {
               </button>
             ))}
           </div>
+
+          {filterDate === 'custom' && (
+            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50/50 rounded-2xl border border-emerald-100 animate-fade-in flex-shrink-0">
+              <input 
+                type="date" 
+                value={customDates.start}
+                onChange={e => setCustomDates({...customDates, start: e.target.value})}
+                className="bg-transparent border-none text-[10px] font-black uppercase text-navy-950 outline-none"
+              />
+              <span className="text-[10px] font-black text-emerald-500/50 tracking-widest">→</span>
+              <input 
+                type="date" 
+                value={customDates.end}
+                onChange={e => setCustomDates({...customDates, end: e.target.value})}
+                className="bg-transparent border-none text-[10px] font-black uppercase text-navy-950 outline-none"
+              />
+            </div>
+          )}
         </div>
       </div>
 

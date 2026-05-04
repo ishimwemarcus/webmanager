@@ -56,15 +56,19 @@ export const StoreProvider = ({ children }) => {
   });
   const [confirmState, setConfirmState] = useState({ isOpen: false, message: '', onConfirm: null, onCancel: null });
   const [notification, setNotification] = useState(null); // { message, type: 'success' | 'error' | 'warning' }
-  const [currency, setCurrency] = useState(() => {
-    const saved = localStorage.getItem('biztrack_currency') || '€';
-    return (typeof saved === 'string' && !saved.includes('[object')) ? saved : '€';
-  });
+  const [currency, setCurrency] = useState('€');
   const [currentOperator, setCurrentOperator] = useState(() => localStorage.getItem('biztrack_operator') || '');
   const [shiftStart, setShiftStart] = useState(() => localStorage.getItem('biztrack_shift_start') || '');
   const [showQRModal, setShowQRModal] = useState(false);
   const [isShiftEndModalOpen, setIsShiftEndModalOpen] = useState(false);
   const [purgeUnlocked, setPurgeUnlocked] = useState(false);
+
+  const isReadOnly = (() => {
+    try {
+      const u = JSON.parse(localStorage.getItem('biztrack_user'));
+      return u?.readOnly === true;
+    } catch { return false; }
+  })();
 
   
   // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
@@ -216,6 +220,7 @@ export const StoreProvider = ({ children }) => {
   const getReportArchive = () => [...reportArchive].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   const generateAndArchiveFullReport = () => {
+    if (isReadOnly) return null;
     const report = generateSystemHealthReport(products, sales, expenses, ledgerManual, waitCredits, losses);
     setReportArchive(prev => [report, ...prev]);
     // Force immediate sync for report
@@ -324,6 +329,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const addRecord = (record) => {
+    if (isReadOnly) {
+      showAlert(L("READ-ONLY MODE: Changes are restricted.", "MODE LECTURE SEULE : Les modifications sont limitées."), "warning");
+      return;
+    }
     record.id = Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
     // Tag with current user so data stays isolated per operator
     if (record.record_type !== 'user' && record.record_type !== 'shift') {
@@ -376,6 +385,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const updateRecord = (record) => {
+    if (isReadOnly) {
+      showAlert(L("READ-ONLY MODE: Changes are restricted.", "MODE LECTURE SEULE : Les modifications sont limitées."), "warning");
+      return;
+    }
     const user = getCurrentUser();
     
     // Guardian Protocol: Owner Gate Enforcement for Master
@@ -415,6 +428,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const deleteRecord = (record) => {
+    if (isReadOnly) {
+      showAlert(L("READ-ONLY MODE: Changes are restricted.", "MODE LECTURE SEULE : Les modifications sont limitées."), "warning");
+      return;
+    }
     const user = getCurrentUser();
     
     const executeDelete = () => {
@@ -573,6 +590,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const clearAllData = () => {
+    if (isReadOnly) {
+      showAlert(L("CRITICAL ERROR: Data purge is restricted in Live-Sync mode.", "ERREUR CRITIQUE : La purge des données est limitée en mode Live-Sync."), "error");
+      return;
+    }
     const keys = [
       'biztrack_products', 'biztrack_sales', 'biztrack_expenses', 
       'biztrack_users', 'biztrack_ledger', 'biztrack_wait', 
@@ -607,12 +628,14 @@ export const StoreProvider = ({ children }) => {
   };
 
   const grantClearance = (userId) => {
+    if (isReadOnly) return;
     const newGrants = { ...clearanceGrants, [userId]: Date.now() };
     setClearanceGrants(newGrants);
     localStorage.setItem('biztrack_clearance', JSON.stringify(newGrants));
   };
 
   const revokeClearance = (userId) => {
+    if (isReadOnly) return;
     const newGrants = { ...clearanceGrants };
     delete newGrants[userId];
     setClearanceGrants(newGrants);
@@ -620,6 +643,7 @@ export const StoreProvider = ({ children }) => {
   };
 
   const resetUserProtocol = (userId, newPassword) => {
+    if (isReadOnly) return;
     const allUsers = load('biztrack_users', 'user', DEFAULT_USERS);
     const updated = allUsers.map(u => u.id === userId ? { ...u, password: newPassword } : u);
     localStorage.setItem('biztrack_users', JSON.stringify(updated));
@@ -627,6 +651,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const processSmartTransaction = (saleRecord) => {
+    if (isReadOnly) {
+      showAlert(L("READ-ONLY MODE: Transactions are disabled.", "MODE LECTURE SEULE : Les transactions sont désactivées."), "warning");
+      return;
+    }
     const { amount, paid, client, product_id, quantity, useCredit } = saleRecord;
     const actualAmount = parseFloat(amount) || 0;
     const actualPaid = parseFloat(paid) || 0;
@@ -713,6 +741,10 @@ export const StoreProvider = ({ children }) => {
   };
 
   const settleClientDebt = (clientName, phone, amount, method, operator, excludeIds = []) => {
+    if (isReadOnly) {
+      showAlert(L("READ-ONLY MODE: Debt settlement is disabled.", "MODE LECTURE SEULE : Le règlement des dettes est désactivé."), "warning");
+      return;
+    }
     const payment = parseFloat(amount) || 0;
     const searchName = (clientName || '').trim().toLowerCase();
     const searchPhone = (phone || 'none').trim();
@@ -788,7 +820,7 @@ export const StoreProvider = ({ children }) => {
       showQRModal, setShowQRModal,
       isShiftEndModalOpen, setIsShiftEndModalOpen,
       getLosses, getReconciliations, getShifts, getShiftTransactions,
-      API_URL
+      API_URL, isReadOnly
     }}>
       {children}
     </StoreContext.Provider>

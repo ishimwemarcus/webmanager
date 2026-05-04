@@ -30,7 +30,7 @@ export default function Sidebar({ className }) {
     { to: '/commander', icon: Cpu, label: t('commanderInterface') },
     { to: '/stock', icon: Package, label: t('stock') },
     { to: '/sales', icon: ShoppingCart, label: t('sales') },
-    { to: '/wait', icon: Clock, label: t('ledger') },
+    { to: '/wait', icon: BookOpen, label: t('ledger') },
     { to: '/reports', icon: BarChart2, label: t('intelligence') },
     { to: '/clients', icon: Users, label: t('clientsDatabase') },
     { to: '/shifts', icon: Clock, label: t('currentShift') },
@@ -115,7 +115,16 @@ export default function Sidebar({ className }) {
         </div>
 
         <div 
-          onClick={() => store.setIsShiftEndModalOpen(true)}
+          onClick={() => {
+            if (store.isReadOnly) {
+              localStorage.removeItem('biztrack_user');
+              localStorage.removeItem('biztrack_operator');
+              localStorage.removeItem('biztrack_shift_start');
+              window.location.href = '/';
+            } else {
+              store.setIsShiftEndModalOpen(true);
+            }
+          }}
           className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
         >
           <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />

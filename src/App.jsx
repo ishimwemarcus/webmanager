@@ -42,7 +42,8 @@ function App() {
       localStorage.setItem('biztrack_user', JSON.stringify({
         name: 'MARC BOSS',
         username: 'master',
-        role: 'Master'
+        role: 'Master',
+        readOnly: true
       }));
       store.setCurrentOperator('MARC');
       

@@ -228,7 +228,7 @@ export default function Dashboard() {
               <div>
                  <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Client Credit', 'Crédit Client')}</p>
                  <p className="text-2xl font-black text-navy-950">{store.formatCurrency(totalCredit)}</p>
-                 <p className="text-[8px] font-black text-indigo-500 uppercase tracking-widest mt-1">Pending / {waitCredits.length} Nodes</p>
+                 <p className="text-[8px] font-black text-indigo-500 uppercase tracking-widest mt-1">Pending / {waitCredits.filter(w => (parseFloat(w.balance)||0) > 0).length} Nodes</p>
               </div>
            </div>
 

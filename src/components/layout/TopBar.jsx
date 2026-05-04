@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, Bell, Search, Settings, LogOut, Globe, QrCode, X, Eye } from 'lucide-react';
+import { Menu, Bell, Search, Settings, LogOut, Globe, QrCode, X, Eye, RefreshCw, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
 
@@ -75,6 +75,15 @@ export default function TopBar({ onToggleSidebar }) {
                 {store.getSystemStatus() === 'systemWarning' ? L('Attention Required', 'Attention Requise') : L('System Nominal', 'Système Nominal')}
               </span>
           </div>
+
+          {store.isReadOnly && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] animate-fade-in">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
+                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-400">
+                  {L('Live View Mode', 'Mode Visionnage Direct')}
+                </span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -94,84 +103,65 @@ export default function TopBar({ onToggleSidebar }) {
 
               {/* Shift End Button — prominently red */}
               <button
-                onClick={() => store.setIsShiftEndModalOpen(true)}
+                onClick={() => {
+                  if (store.isReadOnly) {
+                    localStorage.removeItem('biztrack_user');
+                    localStorage.removeItem('biztrack_operator');
+                    localStorage.removeItem('biztrack_shift_start');
+                    window.location.href = '/';
+                  } else {
+                    store.setIsShiftEndModalOpen(true);
+                  }
+                }}
                 title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-xl sm:rounded-2xl text-white font-black text-[8px] sm:text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-xl sm:rounded-2xl text-white font-black text-[7px] sm:text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
               >
                 <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
-                <span className="hidden md:inline">{L('End Shift', 'Fin Poste')}</span>
+                <span className="inline">{L('End Shift', 'Fin Poste')}</span>
               </button>
             </div>
           )}
 
+        </div>
+        <div className="flex items-center gap-1 sm:gap-4 ml-1 sm:ml-6 border-l border-white/10 pl-1 sm:pl-6">
           {/* Language Toggle */}
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl text-white transition-all font-black text-[10px] sm:text-xs md:text-sm uppercase tracking-widest group hover:bg-white/10"
+            className="flex items-center gap-1 sm:gap-2 px-1 sm:px-3 py-1 sm:py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all active:scale-90"
           >
-            <Globe className="w-3 h-3 sm:w-4 sm:h-4 group-hover:rotate-12 transition-transform text-emerald-500" />
-            <span>{lang === 'en' ? 'EN' : 'FR'}</span>
+            <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400" />
+            <span className="text-[8px] sm:text-[10px] font-black text-white">{lang.toUpperCase()}</span>
           </button>
 
-          {/* Eye Care Toggle */}
-          <button
-            onClick={() => setEyeCare(!eyeCare)}
-            title={L('Toggle Eye Care Mode', 'Activer le mode confort visuel')}
-            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 border rounded-xl sm:rounded-2xl transition-all font-black group ${eyeCare ? 'bg-[#BEF264]/20 border-[#BEF264] text-[#BEF264]' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10'}`}
-          >
-            <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
-          </button>
-
-          {/* Boss Live Sync QR Shortcut */}
-          <button
-            onClick={async () => {
-              if (isSyncing) return;
+          {/* Sync Button */}
+          <button 
+            onClick={() => {
               setIsSyncing(true);
-              setShowQR(true);
-              
-              const keys = ['products', 'sales', 'expenses', 'users', 'ledger', 'wait', 'losses', 'reconciliations', 'categories', 'shifts', 'reports'];
-              
-              try {
-                for (const k of keys) {
-                  const localData = localStorage.getItem('biztrack_' + k);
-                  if (localData) {
-                    await fetch(`${store.API_URL}?action=overwrite&key=biztrack_${k}`, {
-                      method: 'POST',
-                      headers: { 'Bypass-Tunnel-Reminder': 'true' },
-                      body: localData
-                    });
-                  }
-                }
-                // Special case for currency (wrapped)
-                await fetch(`${store.API_URL}?action=overwrite&key=biztrack_currency`, { 
-                  method: 'POST', 
-                  headers: { 'Bypass-Tunnel-Reminder': 'true' },
-                  body: JSON.stringify([{ val: currency }]) 
-                });
-                
-                store.showAlert(L('Sync Complete', 'Synchronisation Terminée'), 'success');
-              } catch (e) {
-                store.showAlert('Sync Failed', 'error');
-              } finally {
-                setIsSyncing(false);
-              }
+              setTimeout(() => setIsSyncing(false), 2000);
             }}
-            title={L('Live Sync / Screen Share QR', 'QR Sync Rapide')}
-            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 border rounded-xl sm:rounded-2xl transition-all font-black group ${isSyncing ? 'bg-emerald-500/20 border-emerald-500 text-emerald-500' : 'bg-white/5 border-white/10 text-white/50 hover:bg-white/10 hover:text-white'}`}
+            className={`p-1 sm:p-2 bg-white/5 border border-white/10 rounded-xl transition-all active:scale-90 hover:bg-white/10 ${isSyncing ? 'animate-spin text-emerald-400' : 'text-white/60'}`}
           >
-            <QrCode className={`w-3 h-3 sm:w-4 sm:h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            {isSyncing && <span className="text-[8px] uppercase animate-pulse">Sync</span>}
+            <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
           </button>
 
-          {/* Currency Input Modifier */}
-          <div className="flex items-center gap-1 md:gap-2 px-1 sm:px-2 md:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl">
-            <span className="hidden md:inline text-xs font-black uppercase text-white/40" title={L('Currency Profile', 'Profil Devise')}>CUR</span>
-            <input
-              type="text"
-              value={typeof currency === 'string' ? currency : (currency?.val || '€')}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-6 sm:w-10 md:w-12 bg-transparent border-none text-white font-black text-[10px] sm:text-xs md:text-sm p-0 focus:ring-0 text-center uppercase"
-            />
+          {/* Grid icon (QR Modal trigger) */}
+          <button 
+            onClick={() => setShowQR(true)}
+            className="p-1 sm:p-2 bg-white/5 border border-white/10 rounded-xl transition-all active:scale-90 hover:bg-white/10 text-white/60"
+          >
+            <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
+          </button>
+
+          {/* Currency Controls */}
+          <div className="flex items-center gap-1 sm:gap-3">
+             <div className="hidden sm:block px-2 py-1 bg-white/5 border border-white/10 rounded-lg">
+                <span className="text-[8px] sm:text-[10px] font-black text-white/40 uppercase tracking-widest">CUR</span>
+             </div>
+             <button 
+               className="flex items-center justify-center w-6 h-6 sm:w-9 sm:h-9 bg-emerald-500 text-black rounded-lg sm:rounded-xl font-black text-xs sm:text-lg shadow-lg shadow-emerald-500/20 transition-all"
+             >
+               €
+             </button>
           </div>
         </div>
       </div>

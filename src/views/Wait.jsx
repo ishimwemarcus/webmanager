@@ -34,12 +34,14 @@ export default function Wait() {
   // Grouping Credits (Reliquats)
   const creditMap = useMemo(() => {
     const map = {};
-    waitCredits.forEach(w => {
-      const key = w.client?.toLowerCase() || 'unknown';
-      if (!map[key]) map[key] = { client: w.client, records: [], total: 0, phone: w.phone || 'none' };
-      map[key].records.push(w);
-      map[key].total += parseFloat(w.balance) || 0;
-    });
+    waitCredits
+      .filter(w => (parseFloat(w.balance) || 0) > 0) // Only show active credits
+      .forEach(w => {
+        const key = w.client?.toLowerCase() || 'unknown';
+        if (!map[key]) map[key] = { client: w.client, records: [], total: 0, phone: w.phone || 'none' };
+        map[key].records.push(w);
+        map[key].total += parseFloat(w.balance) || 0;
+      });
     return Object.values(map).sort((a,b) => b.total - a.total);
   }, [waitCredits]);
 
