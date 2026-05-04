@@ -158,11 +158,12 @@ export const generateBusinessIntelligence = (sales) => {
 };
 
 
-export const printThermalReceipt = (sale, operator, formatCurrency) => {
+export const printThermalReceipt = (sale, operator, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const content = `
     <html>
       <head>
-        <title>Ticket de Caisse</title>
+        <title>${L('Receipt', 'Ticket de Caisse')}</title>
         <style>
           body { font-family: 'Courier New', Courier, monospace; width: 80mm; margin: 0 auto; padding: 10px; font-size: 13px; color: #000; }
           .center { text-align: center; }
@@ -174,15 +175,15 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
       </head>
       <body>
         <div class="center bold large">MARC</div>
-        <div class="center">TICKET DE CAISSE</div>
+        <div class="center">${L('CASH RECEIPT', 'TICKET DE CAISSE')}</div>
         <div class="divider"></div>
-        <div><span class="bold">Date:</span> ${new Date(sale.date).toLocaleString()}</div>
-        <div><span class="bold">Opérateur:</span> ${operator || 'Admin'}</div>
-        <div><span class="bold">Client:</span> ${(sale.client || 'Client Standard').toUpperCase()}</div>
+        <div><span class="bold">${L('Date', 'Date')}:</span> ${new Date(sale.date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}</div>
+        <div><span class="bold">${L('Operator', 'Opérateur')}:</span> ${operator || 'Admin'}</div>
+        <div><span class="bold">${L('Client', 'Client')}:</span> ${(sale.client || L('Standard Client', 'Client Standard')).toUpperCase()}</div>
         <div class="divider"></div>
         <div class="flex bold">
-          <span>Description</span>
-          <span>Prix</span>
+          <span>${L('Description', 'Désignation')}</span>
+          <span>${L('Price', 'Prix')}</span>
         </div>
         <div class="flex">
           <span>${sale.name} x${sale.quantity || 1}</span>
@@ -190,36 +191,36 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
         </div>
         <div class="divider"></div>
         <div class="flex bold">
-          <span>NET A PAYER:</span>
+          <span>${L('NET TO PAY:', 'NET A PAYER :')}</span>
           <span class="large">${formatCurrency(sale.amount)}</span>
         </div>
         <div class="flex">
-          <span>MONTANT RÉGLÉ:</span>
+          <span>${L('AMOUNT PAID:', 'MONTANT RÉGLÉ :')}</span>
           <span>${formatCurrency(sale.paid)}</span>
         </div>
         ${sale.debtPaymentAmount > 0 ? `
         <div class="flex">
-          <span>PAIEMENT DE DETTE:</span>
+          <span>${L('DEBT PAYMENT:', 'PAIEMENT DE DETTE :')}</span>
           <span>${formatCurrency(sale.debtPaymentAmount)}</span>
         </div>
         <div class="flex bold">
-          <span>TOTAL ENCAISSÉ:</span>
+          <span>${L('TOTAL COLLECTED:', 'TOTAL ENCAISSÉ :')}</span>
           <span>${formatCurrency(parseFloat(sale.paid) + parseFloat(sale.debtPaymentAmount))}</span>
         </div>
         ` : ''}
         ${sale.paid < sale.amount ? `
         <div class="flex bold">
-          <span>RESTE A PAYER (DETTE):</span>
+          <span>${L('REMAINING (DEBT):', 'RESTE A PAYER (DETTE) :')}</span>
           <span>${formatCurrency(sale.amount - sale.paid)}</span>
         </div>
         ` : ''}
         <div class="divider"></div>
-        <div class="center" style="margin-top: 15px;">Merci de votre confiance !</div>
+        <div class="center" style="margin-top: 15px;">${L('Thank you for your business!', 'Merci de votre confiance !')}</div>
         <div class="center" style="font-size: 10px; margin-top: 4px;">SYSTEME MARC VER 4.0</div>
         
         <div class="center" style="margin-top: 15px;">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/portal/' + encodeURIComponent(sale.client) + '/' + encodeURIComponent(sale.phone || 'none'))}" style="width: 35mm; height: 35mm;" />
-          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">SCANNEZ POUR VOTRE HISTORIQUE & DETTES</p>
+          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">${L('SCAN FOR HISTORY & DEBTS', 'SCANNEZ POUR VOTRE HISTORIQUE & DETTES')}</p>
         </div>
 
         <script>
@@ -238,12 +239,13 @@ export const printThermalReceipt = (sale, operator, formatCurrency) => {
   printWindow.document.close();
 };
 
-export const printDebtSettlementReceipt = (data, operator, formatCurrency) => {
+export const printDebtSettlementReceipt = (data, operator, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const { client, phone, amount, paymentMethod, remainingBalance, date } = data;
   const content = `
     <html>
       <head>
-        <title>Recu de Reglement</title>
+        <title>${L('Settlement Receipt', 'Recu de Reglement')}</title>
         <style>
           body { font-family: 'Courier New', Courier, monospace; width: 80mm; margin: 0 auto; padding: 10px; font-size: 13px; color: #000; }
           .center { text-align: center; }
@@ -255,41 +257,41 @@ export const printDebtSettlementReceipt = (data, operator, formatCurrency) => {
       </head>
       <body>
         <div class="center bold large">MARC</div>
-        <div class="center">RECU DE REGLEMENT DE DETTE</div>
+        <div class="center">${L('DEBT SETTLEMENT RECEIPT', 'RECU DE REGLEMENT DE DETTE')}</div>
         <div class="divider"></div>
-        <div><span class="bold">Date:</span> ${new Date(date).toLocaleString()}</div>
-        <div><span class="bold">Opérateur:</span> ${operator || 'Admin'}</div>
-        <div><span class="bold">Client:</span> ${client.toUpperCase()}</div>
+        <div><span class="bold">${L('Date', 'Date')}:</span> ${new Date(date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}</div>
+        <div><span class="bold">${L('Operator', 'Opérateur')}:</span> ${operator || 'Admin'}</div>
+        <div><span class="bold">${L('Client', 'Client')}:</span> ${client.toUpperCase()}</div>
         <div class="divider"></div>
         <div class="flex bold">
-          <span>DÉSIGNATION</span>
-          <span>MONTANT</span>
+          <span>${L('DESIGNATION', 'DÉSIGNATION')}</span>
+          <span>${L('AMOUNT', 'MONTANT')}</span>
         </div>
         <div class="flex">
-          <span>Règlement Balance Global</span>
+          <span>${L('Global Wallet Settlement', 'Règlement Balance Global')}</span>
           <span>${formatCurrency(amount)}</span>
         </div>
         <div class="divider"></div>
         <div class="flex">
-          <span>MODE DE PAIEMENT:</span>
+          <span>${L('PAYMENT METHOD:', 'MODE DE PAIEMENT :')}</span>
           <span>${paymentMethod || 'Cash'}</span>
         </div>
         <div class="flex bold large" style="margin-top: 10px;">
-          <span>TOTAL PAYÉ:</span>
+          <span>${L('TOTAL PAID:', 'TOTAL PAYÉ :')}</span>
           <span>${formatCurrency(amount)}</span>
         </div>
         <div class="divider"></div>
         <div class="flex" style="color: ${remainingBalance < 0 ? '#ef4444' : '#10b981'}; font-weight: bold;">
-          <span>NOUVEAU SOLDE WALLET:</span>
+          <span>${L('NEW WALLET BALANCE:', 'NOUVEAU SOLDE WALLET :')}</span>
           <span>${formatCurrency(remainingBalance)}</span>
         </div>
         <div class="divider"></div>
-        <div class="center" style="margin-top: 15px;">Merci pour votre règlement !</div>
+        <div class="center" style="margin-top: 15px;">${L('Thank you for your payment!', 'Merci pour votre règlement !')}</div>
         <div class="center" style="font-size: 10px; margin-top: 4px;">SYSTEME MARC VER 4.0</div>
         
         <div class="center" style="margin-top: 15px;">
           <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/portal/' + encodeURIComponent(client) + '/' + encodeURIComponent(phone || 'none'))}" style="width: 35mm; height: 35mm;" />
-          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">CONSULTEZ VOTRE COMPTE EN TEMPS RÉEL</p>
+          <p style="font-size: 8px; margin-top: 4px; font-weight: bold;">${L('VIEW YOUR ACCOUNT IN REAL-TIME', 'CONSULTEZ VOTRE COMPTE EN TEMPS RÉEL')}</p>
         </div>
 
         <script>
@@ -308,11 +310,12 @@ export const printDebtSettlementReceipt = (data, operator, formatCurrency) => {
   printWindow.document.close();
 };
 
-export const printThermalReport = (reportData, formatCurrency) => {
+export const printThermalReport = (reportData, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const content = `
     <html>
       <head>
-        <title>Accounting Report</title>
+        <title>${L('Accounting Report', 'Rapport de Comptabilité')}</title>
         <style>
           body { font-family: 'Courier New', Courier, monospace; width: 80mm; margin: 0 auto; padding: 10px; font-size: 13px; color: #000; }
           .center { text-align: center; }
@@ -324,37 +327,37 @@ export const printThermalReport = (reportData, formatCurrency) => {
         </style>
       </head>
       <body>
-        <div class="center header">ACCOUNTING & OPERATIONS</div>
+        <div class="center header">${L('ACCOUNTING & OPERATIONS', 'COMPTABILITÉ & OPÉRATIONS')}</div>
         <div class="center bold">MARC MANAGEMENT PLATFORM</div>
         <div class="divider"></div>
-        <div><span class="bold">OPERATING DATE:</span> ${new Date().toLocaleDateString('fr-FR')}</div>
+        <div><span class="bold">${L('OPERATING DATE:', 'DATE D\'OPÉRATION :')}</span> ${new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</div>
         <div class="divider"></div>
         
         <div class="flex">
-          <span>Gross Revenue:</span>
+          <span>${L('Gross Revenue:', 'Chiffre d\'Affaires Brut :')}</span>
           <span>${formatCurrency(reportData.totalSales)}</span>
         </div>
         <div class="flex">
-          <span>Cash Collected:</span>
+          <span>${L('Cash Collected:', 'Espèces Encaissées :')}</span>
           <span>${formatCurrency(reportData.cashCollected)}</span>
         </div>
         <div class="flex">
-          <span>Expenses:</span>
+          <span>${L('Expenses:', 'Dépenses :')}</span>
           <span>${formatCurrency(reportData.totalExpenses)}</span>
         </div>
         <div class="flex">
-          <span>Losses (Spoilage):</span>
+          <span>${L('Losses (Spoilage):', 'Pertes (Avaries) :')}</span>
           <span>${formatCurrency(reportData.totalLossValuation)}</span>
         </div>
         <div class="divider"></div>
         
         <div class="flex bold large">
-          <span>NET PROFIT:</span>
+          <span>${L('NET PROFIT:', 'BÉNÉFICE NET :')}</span>
           <span>${formatCurrency(reportData.netProfit)}</span>
         </div>
         <div class="divider"></div>
         
-        <div class="center bold italic" style="text-transform: uppercase;">STATUS: ${reportData.performance}</div>
+        <div class="center bold italic" style="text-transform: uppercase;">${L('STATUS', 'STATUT')}: ${L(reportData.performance, reportData.performance === 'Stable' ? 'Stable' : 'Alerte : Profit Compromis')}</div>
         <div class="divider"></div>
         <div class="center" style="font-size: 9px; opacity: 0.7;">HIGH-FIDELITY AUDIT LOG v4.0</div>
         
@@ -374,7 +377,8 @@ export const printThermalReport = (reportData, formatCurrency) => {
   printWindow.document.close();
 };
 
-export const printFullMasterReport = (data, formatCurrency) => {
+export const printFullMasterReport = (data, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const { 
     reportDate, 
     financials, 
@@ -388,7 +392,7 @@ export const printFullMasterReport = (data, formatCurrency) => {
   const content = `
     <html>
       <head>
-        <title>Accounting & Operations Report</title>
+        <title>${L('Accounting & Operations Report', 'Rapport de Comptabilité & Opérations')}</title>
         <style>
           @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
           body { font-family: 'Courier Prime', Courier, monospace; padding: 10px; color: #000; line-height: 1.4; width: 80mm; margin: 0 auto; background: white; font-size: 10px; }
@@ -418,28 +422,28 @@ export const printFullMasterReport = (data, formatCurrency) => {
       </head>
       <body>
         <div class="header">
-          <h1>ACCOUNTING & OPERATIONS REPORT</h1>
-          <p>Operating Date: ${reportDate}</p>
+          <h1>${L('ACCOUNTING & OPERATIONS REPORT', 'RAPPORT DE COMPTABILITÉ & OPÉRATIONS')}</h1>
+          <p>${L('Operating Date:', 'Date d\'Opération :')} ${new Date(reportDate).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
         </div>
 
         <div class="section">
-          <div class="section-title">FINANCIAL PERFORMANCE SUMMARY</div>
+          <div class="section-title">${L('FINANCIAL PERFORMANCE SUMMARY', 'RÉSUMÉ DE LA PERFORMANCE FINANCIÈRE')}</div>
           <div class="metrics-grid">
-            <div class="metric-row"><span>Gross Sales Revenue</span> <span>${formatCurrency(financials.totalSales)}</span></div>
-            <div class="metric-row"><span>Cash Liquid Collected</span> <span>${formatCurrency(financials.cashCollected)}</span></div>
-            <div class="metric-row red"><span>Operating Expenses</span> <span>${formatCurrency(financials.totalExpenses)}</span></div>
-            <div class="metric-row red"><span>Losses (Spoilage)</span> <span>${formatCurrency(financials.totalLossValuation)}</span></div>
-            <div class="metric-row bold-large"><span>ADJUSTED NET PROFIT</span> <span>${formatCurrency(financials.netProfit)}</span></div>
+            <div class="metric-row"><span>${L('Gross Sales Revenue', 'Chiffre d\'Affaires Brut')}</span> <span>${formatCurrency(financials.totalSales)}</span></div>
+            <div class="metric-row"><span>${L('Cash Liquid Collected', 'Espèces Encaissées')}</span> <span>${formatCurrency(financials.cashCollected)}</span></div>
+            <div class="metric-row red"><span>${L('Operating Expenses', 'Dépenses Opérationnelles')}</span> <span>${formatCurrency(financials.totalExpenses)}</span></div>
+            <div class="metric-row red"><span>${L('Losses (Spoilage)', 'Pertes (Avaries)')}</span> <span>${formatCurrency(financials.totalLossValuation)}</span></div>
+            <div class="metric-row bold-large"><span>${L('ADJUSTED NET PROFIT', 'BÉNÉFICE NET AJUSTÉ')}</span> <span>${formatCurrency(financials.netProfit)}</span></div>
           </div>
         </div>
 
         ${activeSectors.includes('sales') ? `
         <div class="section">
-          <div class="section-title">SALES TRANSACTIONS</div>
+          <div class="section-title">${L('SALES TRANSACTIONS', 'TRANSACTIONS DE VENTE')}</div>
           <table>
             <thead>
               <tr>
-                <th>Time</th><th>Operator</th><th>Client</th><th>Product</th><th class="text-right">Qty</th><th class="text-right">Total</th><th class="text-right">Paid</th>
+                <th>${L('Time', 'Heure')}</th><th>${L('Operator', 'Opérateur')}</th><th>${L('Client', 'Client')}</th><th>${L('Product', 'Produit')}</th><th class="text-right">${L('Qty', 'Qté')}</th><th class="text-right">${L('Total', 'Total')}</th><th class="text-right">${L('Paid', 'Payé')}</th>
               </tr>
             </thead>
             <tbody>
@@ -462,11 +466,11 @@ export const printFullMasterReport = (data, formatCurrency) => {
 
         ${(activeSectors.includes('ledger') || activeSectors.includes('losses')) ? `
         <div class="section">
-          <div class="section-title">LEDGER & LOSS LOG</div>
+          <div class="section-title">${L('LEDGER & LOSS LOG', 'GRAND LIVRE & JOURNAL DES PERTES')}</div>
           <table>
             <thead>
               <tr>
-                <th>Type</th><th>Time</th><th>Operator</th><th>Entity</th><th>Description</th><th class="text-right">Amount</th>
+                <th>${L('Type', 'Type')}</th><th>${L('Time', 'Heure')}</th><th>${L('Operator', 'Opérateur')}</th><th>${L('Entity', 'Entité')}</th><th>${L('Description', 'Description')}</th><th class="text-right">${L('Amount', 'Montant')}</th>
               </tr>
             </thead>
             <tbody>
@@ -488,11 +492,11 @@ export const printFullMasterReport = (data, formatCurrency) => {
 
         ${activeSectors.includes('stock') ? `
         <div class="section">
-          <div class="section-title">INVENTORY / ASSET VALUATION</div>
+          <div class="section-title">${L('INVENTORY / ASSET VALUATION', 'INVENTAIRE / VALORISATION DES ACTIFS')}</div>
           <table>
             <thead>
               <tr>
-                <th>Product</th><th class="text-right">Qty</th><th class="text-right">Unit Cost</th><th class="text-right">Asset Value</th>
+                <th>${L('Product', 'Produit')}</th><th class="text-right">${L('Qty', 'Qté')}</th><th class="text-right">${L('Unit Cost', 'Coût Unit')}</th><th class="text-right">${L('Asset Value', 'Valeur Actif')}</th>
               </tr>
             </thead>
             <tbody>
@@ -506,17 +510,17 @@ export const printFullMasterReport = (data, formatCurrency) => {
               `).join('')}
             </tbody>
           </table>
-          <div class="total-footer">Total Inventory Asset Valuation: ${formatCurrency(inventory.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}</div>
+          <div class="total-footer">${L('Total Inventory Asset Valuation:', 'Valorisation Totale des Actifs en Stock :')} ${formatCurrency(inventory.reduce((acc, p) => acc + (p.quantity * p.cost), 0))}</div>
         </div>
         ` : ''}
 
         ${activeSectors.includes('shifts') ? `
         <div class="section">
-          <div class="section-title">EMPLOYEE SHIFT PERFORMANCE</div>
+          <div class="section-title">${L('EMPLOYEE SHIFT PERFORMANCE', 'PERFORMANCE DES POSTES EMPLOYÉS')}</div>
           <table>
             <thead>
               <tr>
-                <th>Operator</th><th>Shift Period</th><th class="text-center">Transactions</th><th class="text-right">Revenue</th>
+                <th>${L('Operator', 'Opérateur')}</th><th>${L('Shift Period', 'Période du Poste')}</th><th class="text-center">${L('Transactions', 'Transactions')}</th><th class="text-right">${L('Revenue', 'Chiffre d\'Aff')}</th>
               </tr>
             </thead>
             <tbody>
@@ -528,7 +532,7 @@ export const printFullMasterReport = (data, formatCurrency) => {
                   <td class="text-right" style="font-weight: 700;">${formatCurrency(sh.revenue || 0)}</td>
                 </tr>
               `).join('')}
-              ${shifts.length === 0 ? '<tr><td colspan="4" class="text-center" style="padding: 40px; color: #94a3b8;">Aucune donnée de poste</td></tr>' : ''}
+              ${shifts.length === 0 ? `<tr><td colspan="4" class="text-center" style="padding: 40px; color: #94a3b8;">${L('No shift data', 'Aucune donnée de poste')}</td></tr>` : ''}
             </tbody>
           </table>
         </div>
@@ -545,18 +549,19 @@ export const printFullMasterReport = (data, formatCurrency) => {
   printWindow.document.close();
 };
 
-export const shareDailyReport = (reportData, formatCurrency) => {
+export const shareDailyReport = (reportData, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const text = `
-📜 *ACCOUNTING & OPERATIONS REPORT*
-📅 *Operating Date:* ${new Date().toLocaleDateString('fr-FR')}
+📜 *${L('ACCOUNTING & OPERATIONS REPORT', 'RAPPORT DE COMPTABILITÉ & OPÉRATIONS')}*
+📅 *${L('Operating Date:', 'Date d\'Opération :')}* ${new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
 ---------------------------------------
-💰 *Gross Sales Revenue:* ${formatCurrency(reportData.totalSales)}
-💵 *Cash Liquid Collected:* ${formatCurrency(reportData.cashCollected)}
-🛑 *Operating Expenses:* ${formatCurrency(reportData.totalExpenses)}
-📉 *Losses (Spoilage):* ${formatCurrency(reportData.totalLossValuation)}
+💰 *${L('Gross Sales Revenue:', 'CA Brut :')}* ${formatCurrency(reportData.totalSales)}
+💵 *${L('Cash Liquid Collected:', 'Espèces Encaissées :')}* ${formatCurrency(reportData.cashCollected)}
+🛑 *${L('Operating Expenses:', 'Dépenses :')}* ${formatCurrency(reportData.totalExpenses)}
+📉 *${L('Losses (Spoilage):', 'Pertes (Avaries) :')}* ${formatCurrency(reportData.totalLossValuation)}
 ---------------------------------------
-✨ *ADJUSTED NET PROFIT:* ${formatCurrency(reportData.netProfit)}
-🏢 *Status:* ${reportData.performance.toUpperCase()}
+✨ *${L('ADJUSTED NET PROFIT:', 'BÉNÉFICE NET AJUSTÉ :')}* ${formatCurrency(reportData.netProfit)}
+🏢 *${L('Status:', 'Statut :')}* ${L(reportData.performance, reportData.performance === 'Stable' ? 'Stable' : 'Alerte : Profit Compromis').toUpperCase()}
 ---------------------------------------
 _Sent from MARC Management Platform_
   `.trim();
@@ -565,32 +570,33 @@ _Sent from MARC Management Platform_
   window.open(url, '_blank');
 };
 
-export const shareReceipt = (sale, operator, formatCurrency) => {
-  const dateStr = new Date(sale.date).toLocaleString('fr-FR', {
+export const shareReceipt = (sale, operator, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
+  const dateStr = new Date(sale.date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
   
   const debt = sale.amount - sale.paid;
-  const status = sale.paid >= sale.amount ? '✅ PAYÉ' : '⚠️ PARTIEL';
+  const status = sale.paid >= sale.amount ? L('✅ PAID', '✅ PAYÉ') : L('⚠️ PARTIAL', '⚠️ PARTIEL');
 
   const text = `
-📜 *RECU DE PAIEMENT - MARC*
+📜 *${L('PAYMENT RECEIPT - MARC', 'RECU DE PAIEMENT - MARC')}*
 ---------------------------------------
-📅 *Date:* ${dateStr}
-👤 *Opérateur:* ${operator}
-🤝 *Client:* ${sale.client.toUpperCase()}
+📅 *${L('Date:', 'Date :')}* ${dateStr}
+👤 *${L('Operator:', 'Opérateur :')}* ${operator}
+🤝 *${L('Client:', 'Client :')}* ${sale.client.toUpperCase()}
 ---------------------------------------
-🛒 *Article:* ${sale.name} (x${sale.quantity})
-💰 *Total:* ${formatCurrency(sale.amount)}
-💵 *Réglé:* ${formatCurrency(sale.paid)}
-${sale.debtPaymentAmount > 0 ? `💳 *Paiement Dette:* ${formatCurrency(sale.debtPaymentAmount)}\n💰 *Total Reçu:* ${formatCurrency(parseFloat(sale.paid) + parseFloat(sale.debtPaymentAmount))}` : ''}
-${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
+🛒 *${L('Article:', 'Article :')}* ${sale.name} (x${sale.quantity})
+💰 *${L('Total:', 'Total :')}* ${formatCurrency(sale.amount)}
+💵 *${L('Paid:', 'Réglé :')}* ${formatCurrency(sale.paid)}
+${sale.debtPaymentAmount > 0 ? `💳 *${L('Debt Payment:', 'Paiement Dette :')}* ${formatCurrency(sale.debtPaymentAmount)}\n💰 *${L('Total Received:', 'Total Reçu :')}* ${formatCurrency(parseFloat(sale.paid) + parseFloat(sale.debtPaymentAmount))}` : ''}
+${debt > 0 ? `🛑 *${L('Remaining Balance:', 'Solde Restant :')}* ${formatCurrency(debt)}` : ''}
 ---------------------------------------
-🔗 *Votre Portail Client:* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
+🔗 *${L('Your Client Portal:', 'Votre Portail Client :')}* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(sale.client)}/${encodeURIComponent(sale.phone || 'none')}
 ---------------------------------------
-⚖️ *Statut:* ${status}
-🙏 _Merci de votre confiance !_
+⚖️ *${L('Status:', 'Statut :')}* ${status}
+🙏 _${L('Thank you for your business!', 'Merci de votre confiance !')}_
   `.trim();
 
   const phoneDigits = sale.phone ? sale.phone.replace(/\D/g, '') : '';
@@ -598,27 +604,28 @@ ${debt > 0 ? `🛑 *Solde Restant:* ${formatCurrency(debt)}` : ''}
   window.open(url, '_blank');
 };
 
-export const shareDebtSettlementReceipt = (data, operator, formatCurrency) => {
+export const shareDebtSettlementReceipt = (data, operator, formatCurrency, lang = 'en') => {
+  const L = (en, fr) => lang === 'fr' ? fr : en;
   const { client, phone, amount, paymentMethod, remainingBalance, date } = data;
-  const dateStr = new Date(date).toLocaleString('fr-FR', {
+  const dateStr = new Date(date).toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US', {
     day: '2-digit', month: '2-digit', year: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
 
   const text = `
-📜 *RECU DE REGLEMENT - MARC*
+📜 *${L('SETTLEMENT RECEIPT - MARC', 'RECU DE REGLEMENT - MARC')}*
 ---------------------------------------
-📅 *Date:* ${dateStr}
-👤 *Opérateur:* ${operator}
-🤝 *Client:* ${client.toUpperCase()}
+📅 *${L('Date:', 'Date :')}* ${dateStr}
+👤 *${L('Operator:', 'Opérateur :')}* ${operator}
+🤝 *${L('Client:', 'Client :')}* ${client.toUpperCase()}
 ---------------------------------------
-💰 *Montant Payé:* ${formatCurrency(amount)}
-💳 *Mode:* ${paymentMethod}
+💰 *${L('Amount Paid:', 'Montant Payé :')}* ${formatCurrency(amount)}
+💳 *${L('Method:', 'Mode :')}* ${paymentMethod}
 ---------------------------------------
-⚖️ *Nouveau Solde Wallet:* ${formatCurrency(remainingBalance)}
-🔗 *Lien Portail:* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(client)}/${encodeURIComponent(phone || 'none')}
+⚖️ *${L('New Wallet Balance:', 'Nouveau Solde Wallet :')}* ${formatCurrency(remainingBalance)}
+🔗 *${L('Portal Link:', 'Lien Portail :')}* ${(window.location.origin + window.location.pathname).replace(/\/$/, '')}/#/portal/${encodeURIComponent(client)}/${encodeURIComponent(phone || 'none')}
 ---------------------------------------
-🙏 _Merci pour votre règlement !_
+🙏 _${L('Thank you for your payment!', 'Merci pour votre règlement !')}_
   `.trim();
 
   const phoneDigits = phone ? phone.replace(/\D/g, '') : '';

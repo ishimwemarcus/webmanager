@@ -241,7 +241,7 @@ export default function Sales() {
     // Re-calculating correctly for receipt
     receiptData.remainingBalance = store.getClientGlobalBalance(newSale.client, newSale.phone);
 
-    printDebtSettlementReceipt(receiptData, store.currentOperator, store.formatCurrency);
+    printDebtSettlementReceipt(receiptData, store.currentOperator, store.formatCurrency, lang);
 
     setWalletSettleAmount('');
     setShowWalletModal(false);
@@ -519,13 +519,13 @@ export default function Sales() {
                       <p className="text-[8px] font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                    </div>
                    <button 
-                     onClick={() => printThermalReceipt(s, s.operator, store.formatCurrency)}
+                     onClick={() => printThermalReceipt(s, s.operator, store.formatCurrency, lang)}
                      className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm"
                    >
                       <Printer className="w-4 h-4" />
                    </button>
                    <button 
-                      onClick={() => shareReceipt(s, s.operator, store.formatCurrency)}
+                      onClick={() => shareReceipt(s, s.operator, store.formatCurrency, lang)}
                       className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
                    >
                       <MessageSquare className="w-4 h-4" />

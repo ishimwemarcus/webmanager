@@ -191,7 +191,7 @@ export default function Commander() {
                   const allSales = store.getSales();
                   if (allSales.length > 0) {
                      const lastSale = allSales[0];
-                     printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency);
+                     printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency, lang);
                   }
                }}
                className="p-4 bg-navy-950 text-white rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"

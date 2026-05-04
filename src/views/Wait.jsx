@@ -238,7 +238,7 @@ export default function Wait() {
                                      paid: 0,
                                      date: new Date().toISOString()
                                   };
-                                  import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency));
+                                  import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency, lang));
                                }}
                                className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
                              >

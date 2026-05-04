@@ -89,7 +89,7 @@ export default function Dashboard() {
                      ledger: store.getLedgerManual().filter(l => l.date && l.date.startsWith(new Date().toISOString().split('T')[0])),
                      inventory: store.getProducts(),
                      shifts: store.getShifts ? store.getShifts().filter(s => s.start && s.start.startsWith(new Date().toISOString().split('T')[0])) : []
-                  }, store.formatCurrency);
+                  }, store.formatCurrency, lang);
                }}
                className="flex items-center gap-2 px-6 py-4 bg-white border border-emerald-200 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-xl active:scale-95"
             >
@@ -98,7 +98,7 @@ export default function Dashboard() {
             <button 
                onClick={() => {
                   const summary = generateDailySummary(sales, store.getExpenses(), store.getLedgerManual(), losses);
-                  shareDailyReport(summary.raw, store.formatCurrency);
+                  shareDailyReport(summary.raw, store.formatCurrency, lang);
                }}
                className="flex items-center gap-2 px-6 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
             >
