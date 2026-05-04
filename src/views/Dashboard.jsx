@@ -299,7 +299,7 @@ export default function Dashboard() {
                <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">{L('Top Debtors (Unpaid)', 'Top Débiteurs (Impayés)')}</p>
             </div>
             <div className="space-y-3">
-               {sales.filter(s => (parseFloat(s.amount)||0) > (parseFloat(s.paid)||0)).slice(0, 3).map((s, i) => (
+               {sales.filter(s => (parseFloat(s.amount)||0) - (parseFloat(s.paid)||0) > 0).slice(0, 3).map((s, i) => (
                   <div key={i} className="flex items-center justify-between p-4 bg-navy-50/50 rounded-2xl border border-navy-50 group-hover:bg-rose-50/10 transition-colors">
                      <div>
                         <p className="text-xs font-black text-navy-950 uppercase">{s.client || L('Standard Client', 'Client Standard')}</p>

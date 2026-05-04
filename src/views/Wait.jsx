@@ -48,12 +48,14 @@ export default function Wait() {
   // Grouping Debts (Impayés)
   const debtMap = useMemo(() => {
     const map = {};
-    sales.filter(s => (parseFloat(s.amount)||0) > (parseFloat(s.paid)||0)).forEach(s => {
-      const key = s.client?.toLowerCase() || 'unknown';
-      if (!map[key]) map[key] = { client: s.client, records: [], total: 0, phone: s.phone || 'none' };
-      map[key].records.push(s);
-      map[key].total += (parseFloat(s.amount)||0) - (parseFloat(s.paid)||0);
-    });
+    sales
+      .filter(s => (parseFloat(s.amount) || 0) - (parseFloat(s.paid) || 0) >= 1) // Only show debts > 0
+      .forEach(s => {
+        const key = s.client?.toLowerCase() || 'unknown';
+        if (!map[key]) map[key] = { client: s.client, records: [], total: 0, phone: s.phone || 'none' };
+        map[key].records.push(s);
+        map[key].total += (parseFloat(s.amount) || 0) - (parseFloat(s.paid) || 0);
+      });
     return Object.values(map).sort((a,b) => b.total - a.total);
   }, [sales]);
 
