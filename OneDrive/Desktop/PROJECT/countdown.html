@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Countdown</title>
+</head>
+
+<body>
+    <div id="countdown-display"></div>
+
+    <script>
+        const display = document.getElementById('countdown-display');
+
+        for (let x = 10; x >= 1; x--) {
+            const line = document.createElement('div');
+
+            if (x === 5) {
+                line.textContent = "TRICK";
+                line.style.marginBottom = "20px"; // Use CSS for spacing instead of many spaces
+            } else {
+                line.textContent = x;
+            }
+            display.appendChild(line);
+        }
+    </script>
+</body>
+
+</html>

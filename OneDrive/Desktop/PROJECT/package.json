@@ -1,0 +1,12 @@
+{
+  "name": "sacha-taste",
+  "version": "1.0.0",
+  "description": "Sacha's Taste Premium Food Delivery",
+  "main": "index.html",
+  "scripts": {
+    "server": "live-server"
+  },
+  "dependencies": {
+    "live-server": "^1.2.2"
+  }
+}
