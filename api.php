@@ -18,6 +18,8 @@ if (!is_dir($dataDir)) mkdir($dataDir, 0777, true);
 $action = $_GET['action'] ?? '';
 $key = $_GET['key'] ?? '';
 
+if ($action === 'ping') { echo json_encode(["status"=>"pong"]); exit; }
+
 if (!$key) { echo json_encode(["error"=>"No key provided"]); exit; }
 $file = $dataDir . '/' . preg_replace('/[^a-z0-9_]/i', '', $key) . '.json';
 

@@ -23,8 +23,8 @@ import { Lock } from 'lucide-react';
 import BootScreen from './components/layout/BootScreen';
 import ShiftGateway from './components/layout/ShiftGateway';
 import QRModal from './components/layout/QRModal';
-import ShiftEndModal from './components/layout/ShiftEndModal';
 import FloatingCalculator from './components/layout/FloatingCalculator';
+import ShiftEndModal from './components/layout/ShiftEndModal';
 
 
 function App() {

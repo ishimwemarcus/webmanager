@@ -78,6 +78,9 @@ export const StoreProvider = ({ children }) => {
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
 
   // Network Sync Engine - Polls the central PHP server (with circuit breaker)
+  const [syncStatus, setSyncStatus] = useState('idle'); // idle, syncing, connected, error
+  const [lastSyncTime, setLastSyncTime] = useState(null);
+
   useEffect(() => {
     let failCount = 0;
     const MAX_FAILS = 3;
@@ -86,6 +89,7 @@ export const StoreProvider = ({ children }) => {
     let backoffId = null;
 
     const pullFromServer = async () => {
+      setSyncStatus('syncing');
       try {
         const keysList = [
           { k: 'biztrack_products', set: setProducts },
@@ -122,7 +126,10 @@ export const StoreProvider = ({ children }) => {
             });
           }
         }
+        setSyncStatus('connected');
+        setLastSyncTime(new Date());
       } catch (e) {
+        setSyncStatus('error');
         failCount++;
         if (failCount >= MAX_FAILS) {
           // Circuit open: stop polling, schedule a retry after backoff
@@ -822,7 +829,7 @@ export const StoreProvider = ({ children }) => {
       showQRModal, setShowQRModal,
       isShiftEndModalOpen, setIsShiftEndModalOpen,
       getLosses, getReconciliations, getShifts, getShiftTransactions,
-      API_URL, isReadOnly, syncUrl, setSyncUrl
+      API_URL, isReadOnly, syncUrl, setSyncUrl, syncStatus, lastSyncTime
     }}>
       {children}
     </StoreContext.Provider>

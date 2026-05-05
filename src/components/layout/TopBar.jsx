@@ -69,11 +69,24 @@ export default function TopBar({ onToggleSidebar }) {
             <p className="hidden sm:block text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-              <div className={`w-2 h-2 rounded-full animate-pulse ${store.getSystemStatus() === 'systemWarning' ? 'bg-rose-500' : 'bg-emerald-500'}`}></div>
-              <span className="text-[10px] font-black uppercase tracking-widest text-white">
-                {store.getSystemStatus() === 'systemWarning' ? L('Attention Required', 'Attention Requise') : L('System Nominal', 'Système Nominal')}
-              </span>
+          <div className="hidden sm:flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
+                  <div className={`w-2 h-2 rounded-full animate-pulse ${
+                    store.syncStatus === 'connected' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 
+                    store.syncStatus === 'syncing' ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 
+                    'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]'
+                  }`}></div>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                    {store.syncStatus === 'connected' ? L('Sync Active', 'Sync Actif') : 
+                     store.syncStatus === 'syncing' ? L('Syncing...', 'Synchronisation...') : 
+                     L('Connection Lost', 'Connexion Perdue')}
+                  </span>
+              </div>
+              {store.lastSyncTime && (
+                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40">
+                  {L('Last Sync:', 'Dernière Sync :')} {new Date(store.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                </span>
+              )}
           </div>
 
           {store.isReadOnly && (
