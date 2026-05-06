@@ -71,16 +71,14 @@ export const StoreProvider = ({ children }) => {
   })();
 
   
-  // Global Internet API URL (Detect Vercel hosting vs Local Tunnel)
+  // Global Internet API URL (Force Vercel hosting vs Local Tunnel)
   const [syncUrl, setSyncUrl] = useState(() => {
-    const saved = localStorage.getItem('biztrack_sync_url');
-    if (saved) return saved;
-    // If we are on Vercel or a live domain, use the local /api endpoint
+    // FORCE relative path if we are live on Vercel (ignore localStorage)
     if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')) {
       return '/api';
     }
-    // Default to the tunnel for local development
-    return 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
+    // Otherwise, use saved or default tunnel
+    return localStorage.getItem('biztrack_sync_url') || 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
   });
   
   const API_URL = syncUrl;
