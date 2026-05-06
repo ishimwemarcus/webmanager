@@ -35,7 +35,7 @@ export default function FloatingCalculator() {
 
   if (!isOpen) {
     return (
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-24 right-8 w-14 h-14 bg-navy-950 text-white rounded-2xl flex items-center justify-center shadow-2xl hover:bg-emerald-600 transition-all z-[150] active:scale-95 group"
       >

@@ -71,8 +71,17 @@ export const StoreProvider = ({ children }) => {
   })();
 
   
-  // Global Internet API URL (Tunnels straight to the shop's XAMPP Server)
-  const [syncUrl, setSyncUrl] = useState(() => localStorage.getItem('biztrack_sync_url') || 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php');
+  // Global Internet API URL (Detect Vercel hosting vs Local Tunnel)
+  const [syncUrl, setSyncUrl] = useState(() => {
+    const saved = localStorage.getItem('biztrack_sync_url');
+    if (saved) return saved;
+    // If we are on Vercel or a live domain, use the local /api endpoint
+    if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')) {
+      return '/api';
+    }
+    // Default to the tunnel for local development
+    return 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
+  });
   
   const API_URL = syncUrl;
   const FETCH_CONFIG = { headers: { 'Bypass-Tunnel-Reminder': 'true' } };
