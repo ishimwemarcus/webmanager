@@ -105,7 +105,7 @@ function App() {
           <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
         )}
 
-        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe [-webkit-overflow-scrolling:touch] ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-3 lg:p-6'}`}>
+        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe [-webkit-overflow-scrolling:touch] ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-2 lg:p-4'}`}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/stock" element={<Stock />} />

@@ -67,7 +67,7 @@ export default function Dashboard() {
            <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-8 shadow-xl shadow-rose-500/10 border-4 border-white">
               <Activity className="w-12 h-12 animate-pulse" />
            </div>
-           <h2 className="text-4xl font-black text-navy-950 uppercase tracking-tighter mb-4">{L('Sync Connection Lost', 'Connexion Sync Perdue')}</h2>
+           <h2 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-4">{L('Sync Connection Lost', 'Connexion Sync Perdue')}</h2>
            <p className="text-blue-gray font-bold uppercase tracking-widest text-xs mb-8 max-w-md leading-relaxed">
              {L('The terminal cannot reach the local XAMPP server. Please ensure the Sync Tunnel is active.', 'Le terminal ne peut pas atteindre le serveur XAMPP local. Veuillez vérifier que le Tunnel de Sync est actif.')}
            </p>
@@ -120,7 +120,7 @@ export default function Dashboard() {
                      shifts: store.getShifts ? store.getShifts().filter(s => s.start && s.start.startsWith(new Date().toISOString().split('T')[0])) : []
                   }, store.formatCurrency, lang);
                }}
-               className="flex items-center gap-2 px-6 py-4 bg-white border border-emerald-200 text-navy-950 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-xl active:scale-95"
+               className="flex items-center gap-2 px-4 py-3 bg-white border border-emerald-200 text-navy-950 rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-lg active:scale-95"
             >
                <Printer className="w-4 h-4" /> {L('Print Full Report', 'Imprimer Rapport Complet')}
             </button>
@@ -129,7 +129,7 @@ export default function Dashboard() {
                   const summary = generateDailySummary(sales, store.getExpenses(), store.getLedgerManual(), losses);
                   shareDailyReport(summary.raw, store.formatCurrency, lang);
                }}
-               className="flex items-center gap-2 px-6 py-4 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl shadow-emerald-500/20 active:scale-95"
+               className="flex items-center gap-2 px-4 py-3 bg-emerald-500 text-white rounded-xl font-black text-[9px] uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
             >
                <MessageSquare className="w-4 h-4" /> {L('WhatsApp Report', 'Rapport WhatsApp')}
             </button>
@@ -167,7 +167,7 @@ export default function Dashboard() {
         {/* Main Metrics Cards */}
         <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
            {/* Total Assets */}
-           <div className="glass-card bg-white p-6 rounded-[32px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
+           <div className="glass-card bg-white p-6 rounded-[24px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                  <Database className="w-24 h-24" />
               </div>
@@ -175,19 +175,19 @@ export default function Dashboard() {
                  <Database className="w-5 h-5" />
               </div>
               <p className="text-[9px] font-black text-blue-gray uppercase tracking-[0.2em] mb-2 italic">{L('Total Assets', 'Total des Actifs')}</p>
-              <p className="text-3xl font-black text-navy-950 mb-4 tracking-tighter">{store.formatCurrency(totalStockValue)}</p>
+              <p className="text-2xl font-black text-navy-950 mb-3 tracking-tighter">{store.formatCurrency(totalStockValue)}</p>
               <div className="flex items-center gap-2 text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100">
                  <ShieldCheck className="w-3 h-3" /> {L('Optimal Stock', 'Stock Optimal')}
               </div>
            </div>
 
            {/* Revenue Flow */}
-           <div className="glass-card bg-white p-6 rounded-[32px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
+           <div className="glass-card bg-white p-6 rounded-[24px] border-emerald-100 flex flex-col items-center justify-center text-center relative overflow-hidden group hover:scale-[1.01] transition-all">
               <div className="w-12 h-12 bg-navy-950 text-white rounded-xl flex items-center justify-center mb-4 shadow-xl shadow-navy-950/20">
                  <Zap className="w-6 h-6" />
               </div>
               <p className="text-[9px] font-black text-blue-gray uppercase tracking-[0.2em] mb-2 italic">{L('Revenue Flow', 'Flux de Revenus')}</p>
-              <p className="text-3xl font-black text-navy-950 mb-4 tracking-tighter">{store.formatCurrency(totalSales)}</p>
+              <p className="text-2xl font-black text-navy-950 mb-3 tracking-tighter">{store.formatCurrency(totalSales)}</p>
               <div className="flex items-center gap-2 text-emerald-500 text-[9px] font-black uppercase tracking-widest bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-100 mb-6">
                  <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
                  {L('Inbound Stream Active', 'Flux Entrant Actif')}
@@ -206,7 +206,7 @@ export default function Dashboard() {
            </div>
 
            {/* Revenue Chart */}
-           <div className="md:col-span-2 glass-card bg-white p-10 rounded-[48px] border-emerald-100 min-h-[400px] flex flex-col">
+           <div className="md:col-span-2 glass-card bg-white p-6 rounded-[24px] border-emerald-100 min-h-[300px] flex flex-col">
               <div className="flex justify-between items-center mb-10">
                  <div>
                     <h3 className="text-sm font-black text-navy-950 uppercase tracking-widest mb-1">{L('Revenue Growth', 'Croissance des Revenus')}</h3>
@@ -262,31 +262,31 @@ export default function Dashboard() {
         <div className="lg:col-span-4 space-y-6">
            
            {/* Client Credit */}
-           <div className="glass-card bg-white p-8 rounded-[40px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
+           <div className="glass-card bg-white p-6 rounded-[24px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
               <div className="w-12 h-12 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center">
                  <Clock className="w-6 h-6" />
               </div>
               <div>
                  <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Client Credit', 'Crédit Client')}</p>
-                 <p className="text-2xl font-black text-navy-950">{store.formatCurrency(totalCredit)}</p>
+                 <p className="text-xl font-black text-navy-950">{store.formatCurrency(totalCredit)}</p>
                  <p className="text-[8px] font-black text-indigo-500 uppercase tracking-widest mt-1">Pending / {waitCredits.filter(w => (parseFloat(w.balance)||0) > 0).length} Nodes</p>
               </div>
            </div>
 
            {/* Unpaid Debt */}
-           <div className="glass-card bg-white p-8 rounded-[40px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
+           <div className="glass-card bg-white p-6 rounded-[24px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
               <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center">
                  <CreditCard className="w-6 h-6" />
               </div>
               <div>
                  <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Unpaid Debt', 'Dette Impayée')}</p>
-                 <p className="text-2xl font-black text-navy-950">{store.formatCurrency(totalDebt)}</p>
+                 <p className="text-xl font-black text-navy-950">{store.formatCurrency(totalDebt)}</p>
                  <p className="text-[8px] font-black text-rose-500 uppercase tracking-widest mt-1">Unsettled / 0 Actions</p>
               </div>
            </div>
 
            {/* Declare Loss */}
-           <div className="glass-card bg-white p-8 rounded-[40px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
+           <div className="glass-card bg-white p-6 rounded-[24px] border-emerald-100 flex items-center gap-6 group hover:border-emerald-500 transition-all">
               <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
                  <AlertCircle className="w-6 h-6" />
               </div>

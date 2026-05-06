@@ -172,7 +172,7 @@ export default function Commander() {
       {/* Premium Header */}
       <div className="border-b border-navy-100 pb-4 flex items-center justify-between mb-4 no-print">
         <div>
-          <h1 className="text-[clamp(1.5rem,4vw,2.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-[clamp(1.2rem,3vw,2rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Take Order', 'Prendre Commande')}
           </h1>
           <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
@@ -194,10 +194,10 @@ export default function Commander() {
                      printThermalReceipt(lastSale, store.currentOperator, store.formatCurrency, lang);
                   }
                }}
-               className="p-4 bg-navy-950 text-white rounded-2xl shadow-xl hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
+               className="p-3 bg-navy-950 text-white rounded-xl shadow-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
              >
-                <Printer className="w-5 h-5" />
-                <span className="text-[10px] font-black uppercase">{L('Print Ticket', 'Imprimer Ticket')}</span>
+                <Printer className="w-4 h-4" />
+                <span className="text-[9px] font-black uppercase">{L('Print Ticket', 'Imprimer Ticket')}</span>
              </button>
           </div>
         )}
@@ -218,7 +218,7 @@ export default function Commander() {
                    placeholder={L('Search a product...', 'Rechercher un produit...')}
                    value={search}
                    onChange={e => setSearch(e.target.value)}
-                   className="w-full bg-white border border-emerald-100 rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-sm outline-none focus:border-emerald-500 transition-all uppercase"
+                   className="w-full bg-white border border-emerald-100 rounded-xl pl-12 pr-4 py-3 text-xs font-black text-navy-950 placeholder:text-blue-gray/30 shadow-sm outline-none focus:border-emerald-500 transition-all uppercase"
                  />
               </div>
 
@@ -227,7 +227,7 @@ export default function Commander() {
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-6 py-3 rounded-2xl font-black text-[9px] uppercase tracking-widest flex-shrink-0 transition-all ${
+                      className={`px-4 py-2.5 rounded-xl font-black text-[8px] uppercase tracking-widest flex-shrink-0 transition-all ${
                         activeCategory === cat
                           ? 'bg-navy-950 text-white shadow-lg'
                           : 'bg-white text-navy-950 border border-emerald-100 hover:border-emerald-500 shadow-sm'
@@ -282,7 +282,7 @@ export default function Commander() {
         <div className="lg:col-span-4 flex flex-col gap-6 min-h-0 pb-10">
            
            {/* Client Panel */}
-           <div className="glass-card bg-white p-6 rounded-[40px] border-emerald-50 shadow-sm">
+           <div className="glass-card bg-white p-4 rounded-[24px] border-emerald-50 shadow-sm">
               <div className="flex items-center gap-3 mb-6">
                  <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center">
                     <User className="w-5 h-5" />
@@ -296,14 +296,14 @@ export default function Commander() {
                    placeholder={L('CLIENT NAME...', 'NOM DU CLIENT...')}
                    value={clientName}
                    onChange={e => setClientName(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-[10px] font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                  />
                  <input
                    type="text"
                    placeholder={L('PHONE...', 'TÉLÉPHONE...')}
                    value={clientPhone}
                    onChange={e => setClientPhone(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-[10px] font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                  />
               </div>
 
@@ -324,7 +324,7 @@ export default function Commander() {
            </div>
 
            {/* Cart Terminal */}
-           <div className="flex-1 glass-card bg-white p-5 rounded-3xl border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
+           <div className="flex-1 glass-card bg-white p-4 rounded-2xl border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-8">
                  <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
@@ -377,7 +377,7 @@ export default function Commander() {
                       placeholder={L('AMOUNT RECEIVED...', 'MONTANT REÇU...')}
                       value={amountPaid}
                       onChange={e => setAmountPaid(e.target.value)}
-                      className="w-full bg-navy-50 border border-transparent rounded-2xl pl-14 pr-6 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                      className="w-full bg-navy-50 border border-transparent rounded-xl pl-12 pr-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                     />
                  </div>
 

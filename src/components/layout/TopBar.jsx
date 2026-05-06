@@ -46,19 +46,19 @@ export default function TopBar({ onToggleSidebar }) {
 
 
   return (
-    <header className="h-14 md:h-20 bg-navy-950 border-b border-white/5 flex items-center justify-between px-4 md:px-10 z-[100] no-print transition-all duration-500 shadow-xl">
+    <header className="h-12 md:h-16 bg-navy-950 border-b border-white/5 flex items-center justify-between px-3 md:px-6 z-[100] no-print transition-all duration-500 shadow-xl">
 
       <div className="flex items-center gap-4 md:gap-6">
         <button
           onClick={onToggleSidebar}
-          className="p-2 md:p-3 rounded-xl md:rounded-2xl bg-white/10 hover:bg-white/20 text-white lg:hidden transition-all border border-white/10"
+          className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-white/10 hover:bg-white/20 text-white lg:hidden transition-all border border-white/10"
         >
-          <Menu className="w-5 h-5 md:w-6 md:h-6 outline-none" />
+          <Menu className="w-4 h-4 md:w-5 md:h-5 outline-none" />
         </button>
         <div className="flex items-center gap-4 md:gap-6">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 md:gap-3">
-              <h2 className="text-xs md:text-lg font-black text-white uppercase tracking-tighter">
+              <h2 className="text-[10px] md:text-sm font-black text-white uppercase tracking-tighter">
                 {L('VIEW', 'VUE')} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
@@ -107,11 +107,11 @@ export default function TopBar({ onToggleSidebar }) {
           {currentOperator && (
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Operator name badge */}
-              <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-white/5 border border-white/10 rounded-xl sm:rounded-2xl">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-[10px] sm:text-xs shadow-[0_0_15px_rgba(16,185,129,0.4)]">
+              <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-[8px] sm:text-[10px] shadow-[0_0_10px_rgba(16,185,129,0.4)]">
                   {currentOperator.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block text-xs font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
+                <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
               </div>
 
               {/* Shift End Button — prominently red */}
@@ -127,9 +127,9 @@ export default function TopBar({ onToggleSidebar }) {
                   }
                 }}
                 title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-3 py-1 sm:py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-xl sm:rounded-2xl text-white font-black text-[7px] sm:text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-lg sm:rounded-xl text-white font-black text-[7px] sm:text-[9px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
               >
-                <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+                <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span className="inline">{L('End Shift', 'Fin Poste')}</span>
               </button>
             </div>
@@ -170,11 +170,11 @@ export default function TopBar({ onToggleSidebar }) {
              <div className="hidden sm:block px-2 py-1 bg-white/5 border border-white/10 rounded-lg">
                 <span className="text-[8px] sm:text-[10px] font-black text-white/40 uppercase tracking-widest">CUR</span>
              </div>
-             <button 
-               className="flex items-center justify-center w-6 h-6 sm:w-9 sm:h-9 bg-emerald-500 text-black rounded-lg sm:rounded-xl font-black text-xs sm:text-lg shadow-lg shadow-emerald-500/20 transition-all"
-             >
-               €
-             </button>
+              <button 
+                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 text-black rounded-lg sm:rounded-lg font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all"
+              >
+                €
+              </button>
           </div>
         </div>
       </div>

@@ -39,14 +39,14 @@ export default function Sidebar({ className }) {
   ];
 
   return (
-    <aside className={`w-64 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
-      <div className="p-6">
+    <aside className={`w-56 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
+      <div className="p-4">
         <div
           onClick={() => window.location.href = '/'}
-          className="flex flex-col items-center text-center gap-4 group/logo cursor-pointer hover:opacity-90 transition-all active:scale-95"
+          className="flex flex-col items-center text-center gap-2 group/logo cursor-pointer hover:opacity-90 transition-all active:scale-95"
         >
-          <div className="w-24 h-24 rounded-[2rem] bg-white/5 p-4 shadow-2xl border border-white/10 relative overflow-hidden group/logo-img flex items-center justify-center backdrop-blur-xl">
-            <svg viewBox="0 0 100 100" className="w-14 h-14 group-hover:scale-110 transition-transform duration-700 animate-bounce-gentle">
+          <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 p-3 shadow-2xl border border-white/10 relative overflow-hidden group/logo-img flex items-center justify-center backdrop-blur-xl">
+            <svg viewBox="0 0 100 100" className="w-10 h-10 group-hover:scale-110 transition-transform duration-700 animate-bounce-gentle">
               <defs>
                 <linearGradient id="sidebar-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" style={{ stopColor: '#10B981' }} />
@@ -64,31 +64,31 @@ export default function Sidebar({ className }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-[-0.05em] text-white uppercase leading-none">
+            <h1 className="text-xl font-black tracking-[-0.05em] text-white uppercase leading-none">
               MARC
             </h1>
-            <div className="h-1.5 w-12 bg-[#10B981] mx-auto mt-3 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)]"></div>
+            <div className="h-1 w-8 bg-[#10B981] mx-auto mt-2 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 mb-6 ml-4 italic">{t('systemArchitecture')}</p>
+      <div className="px-3 py-1 flex-1 overflow-y-auto scrollbar-hide">
+        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-3 italic">{t('systemArchitecture')}</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) => `
-                flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-500 group relative
+                flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-500 group relative
                 ${isActive 
-                  ? 'bg-[#10B981] text-black shadow-[0_10px_20px_rgba(16,185,129,0.3)] translate-x-1' 
+                  ? 'bg-[#10B981] text-black shadow-[0_6px_12px_rgba(16,185,129,0.3)] translate-x-1' 
                   : 'hover:bg-white/5 text-white/40 hover:text-white hover:translate-x-1'}
                 active:scale-95
               `}
             >
-              <item.icon className="w-5 h-5" />
-              <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
+              <item.icon className="w-4 h-4" />
+              <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
               <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
             </NavLink>
           ))}
