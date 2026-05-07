@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Database
 } from 'lucide-react';
+import Pagination from '../components/common/Pagination';
 
 export default function Spoilage() {
   const store = useStore();
@@ -23,6 +24,8 @@ export default function Spoilage() {
   const [showModal, setShowModal] = useState(false);
   const [editingLoss, setEditingLoss] = useState(null);
   const [newLoss, setNewLoss] = useState({ product_id: '', quantity: '', reason: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   const products = store.getProducts ? store.getProducts() : [];
   const losses = store.getLosses ? store.getLosses() : [];
@@ -94,6 +97,10 @@ export default function Spoilage() {
 
   const totalLossValue = losses.reduce((sum, l) => sum + (parseFloat(l.valuation) || 0), 0);
 
+  const totalPages = Math.ceil(losses.length / itemsPerPage);
+  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages === 0 ? 1 : totalPages));
+  const paginatedLosses = losses.slice((validCurrentPage - 1) * itemsPerPage, validCurrentPage * itemsPerPage);
+
   return (
     <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
       
@@ -154,7 +161,7 @@ export default function Spoilage() {
       {/* Loss Registry List */}
       <div className="space-y-4">
         {losses.length > 0 ? (
-          losses.map((l, i) => (
+          paginatedLosses.map((l, i) => (
             <div key={i} className="glass-card bg-white border border-rose-50 p-6 hover:border-rose-400 transition-all group shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
                <div className="flex items-center gap-6">
                   <div className="w-16 h-16 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-inner">
@@ -210,6 +217,16 @@ export default function Spoilage() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pt-4 border-t border-navy-50/20 mt-6">
+           <Pagination 
+              currentPage={validCurrentPage} 
+              totalPages={totalPages} 
+              onPageChange={(page) => setCurrentPage(page)} 
+           />
+        </div>
+      )}
 
       {/* Report Modal */}
       {showModal && (

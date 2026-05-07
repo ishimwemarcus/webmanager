@@ -2,12 +2,15 @@ import React, { useMemo, useState } from 'react';
 import { useStore } from '../context/StoreContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Users, Award, AlertTriangle, TrendingUp, Star, QrCode, Search, Filter, ShieldCheck, ChevronRight, ExternalLink } from 'lucide-react';
+import Pagination from '../components/common/Pagination';
 
 export default function Clients() {
   const store = useStore();
   const { t, L } = useLanguage();
   const [showPortalQR, setShowPortalQR] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
   
   const sales = store.getSales ? store.getSales() : [];
   
@@ -48,6 +51,10 @@ export default function Clients() {
   const totalClients = clientData.length;
   const vipCount = clientData.filter(c => c.trustScore >= 4).length;
   const riskCount = clientData.filter(c => c.globalBalance < 0 && Math.abs(c.globalBalance) > c.totalSpent * 0.3).length;
+
+  const totalPages = Math.ceil(clientData.length / itemsPerPage);
+  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages === 0 ? 1 : totalPages));
+  const paginatedClients = clientData.slice((validCurrentPage - 1) * itemsPerPage, validCurrentPage * itemsPerPage);
 
   const portalUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal`;
 
@@ -110,7 +117,7 @@ export default function Clients() {
         <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
         <input
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
           type="text"
           placeholder={L('Search a client or a number...', 'Rechercher un client ou un numéro...')}
           className="w-full bg-white border border-emerald-100 rounded-[28px] pl-16 pr-6 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
@@ -120,7 +127,7 @@ export default function Clients() {
       {/* Client Registry List */}
       <div className="space-y-4">
         {clientData.length > 0 ? (
-          clientData.map((c, i) => {
+          paginatedClients.map((c, i) => {
             const isVIP = c.totalSpent > 1000 && c.transactions > 2;
             const isRisk = c.currentDebt > c.totalSpent * 0.3 && c.currentDebt > 0;
             return (
@@ -186,6 +193,16 @@ export default function Clients() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pt-4 border-t border-navy-50/20 mt-6">
+           <Pagination 
+              currentPage={validCurrentPage} 
+              totalPages={totalPages} 
+              onPageChange={(page) => setCurrentPage(page)} 
+           />
+        </div>
+      )}
 
       {/* Portal QR Modal */}
       {showPortalQR && (

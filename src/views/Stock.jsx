@@ -22,6 +22,7 @@ import {
   Wallet
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
+import Pagination from '../components/common/Pagination';
 
 export default function Stock() {
   const store = useStore();
@@ -29,6 +30,8 @@ export default function Stock() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   const [newProduct, setNewProduct] = useState({
     name: '',
@@ -74,6 +77,10 @@ export default function Stock() {
     return matchesSearch && matchesCategory;
   });
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages === 0 ? 1 : totalPages));
+  const paginatedProducts = filteredProducts.slice((validCurrentPage - 1) * itemsPerPage, validCurrentPage * itemsPerPage);
+
   const totalValuation = products.reduce((acc, p) => acc + ((parseFloat(p.price) || 0) * (parseFloat(p.quantity) || 0)), 0);
 
   const toggleSelect = (id) => {
@@ -103,7 +110,7 @@ export default function Stock() {
       status: 'active',
       date: new Date().toISOString()
     });
-    setNewProduct({ name: '', category: '', packageType: '', quantity: 0, cost: 0, price: 0 });
+    setNewProduct({ name: '', category: '', packageType: 'U', quantity: 0, cost: 0, price: 0 });
     setShowModal(false);
   };
 
@@ -111,6 +118,7 @@ export default function Stock() {
     e.preventDefault();
     store.updateRecord({
       ...editProduct,
+      packageType: editProduct.packageType || 'U',
       quantity: parseFloat(editProduct.quantity) || 0,
       cost: parseFloat(editProduct.cost) || 0,
       price: parseFloat(editProduct.price) || 0,
@@ -210,13 +218,13 @@ export default function Stock() {
             type="text"
             placeholder={L('Search inventory...', 'Rechercher dans l\'inventaire...')}
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             className="w-full bg-white border border-emerald-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
           />
         </div>
         {selectedCategory && (
           <button 
-            onClick={() => setSelectedCategory(null)} 
+            onClick={() => { setSelectedCategory(null); setCurrentPage(1); }} 
             className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
           >
             <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> {L('Back to Sectors', 'Retour aux Secteurs')}
@@ -237,7 +245,7 @@ export default function Stock() {
               <div 
                 key={cat.id}
                 className={`glass-card bg-white p-8 rounded-[40px] border-2 flex flex-col items-center text-center group cursor-pointer transition-all shadow-sm relative overflow-hidden ${lowStockCount > 0 ? 'border-rose-100 hover:border-rose-500' : 'border-emerald-50 hover:border-emerald-500'}`}
-                onClick={() => setSelectedCategory(cat.name)}
+                onClick={() => { setSelectedCategory(cat.name); setCurrentPage(1); }}
               >
                 {lowStockCount > 0 && (
                    <div className="absolute top-6 left-6 px-3 py-1 bg-rose-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse z-10">
@@ -273,7 +281,7 @@ export default function Stock() {
            </div>
 
            <div className="space-y-3">
-              {filteredProducts.map((p) => (
+              {paginatedProducts.map((p) => (
                  <div key={p.id} className={`glass-card bg-white p-5 rounded-3xl border transition-all flex flex-col md:flex-row md:items-center gap-4 hover:border-emerald-400 group ${selectedIds.includes(p.id) ? 'border-emerald-500 bg-emerald-50/10' : 'border-emerald-50'}`}>
                     <div className="flex items-center gap-4">
                        <button onClick={() => toggleSelect(p.id)} className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${selectedIds.includes(p.id) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-emerald-100 hover:border-emerald-500'}`}>
@@ -292,7 +300,7 @@ export default function Stock() {
                        <div>
                           <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Available Stock', 'Stock Disponible')}</p>
                           <div className="flex items-center justify-center md:justify-start gap-2">
-                             <span className="text-xs font-black text-navy-950">{p.quantity}</span>
+                             <span className="text-xs font-black text-navy-950">{getFormattedQuantity(p)}</span>
                              <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
                                 {p.quantity <= 5 ? L('Low', 'Bas') : L('Optimal', 'Optimal')}
                              </span>
@@ -326,6 +334,16 @@ export default function Stock() {
                  </div>
               ))}
            </div>
+           
+           {totalPages > 1 && (
+             <div className="pt-4 border-t border-navy-50/20 mt-6">
+                <Pagination 
+                   currentPage={validCurrentPage} 
+                   totalPages={totalPages} 
+                   onPageChange={(page) => setCurrentPage(page)} 
+                />
+             </div>
+           )}
 
            {filteredProducts.length === 0 && (
               <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-20">
@@ -373,15 +391,34 @@ export default function Stock() {
                         {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                       </select>
                     </div>
-                    <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Initial Stock', 'Stock Initial')}</label>
-                      <input
-                        required
-                        type="number"
-                        value={editProduct ? editProduct.quantity : newProduct.quantity}
-                        onChange={e => editProduct ? setEditProduct({...editProduct, quantity: e.target.value}) : setNewProduct({...newProduct, quantity: e.target.value})}
-                        className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Initial Stock', 'Stock Initial')}</label>
+                        <input
+                          required
+                          type="number"
+                          step="0.01"
+                          value={editProduct ? editProduct.quantity : newProduct.quantity}
+                          onChange={e => editProduct ? setEditProduct({...editProduct, quantity: e.target.value}) : setNewProduct({...newProduct, quantity: e.target.value})}
+                          className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Unit', 'Unité')}</label>
+                        <select
+                          required
+                          value={editProduct ? editProduct.packageType : newProduct.packageType}
+                          onChange={e => editProduct ? setEditProduct({...editProduct, packageType: e.target.value}) : setNewProduct({...newProduct, packageType: e.target.value})}
+                          className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-xs sm:text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all truncate pr-10 cursor-pointer"
+                        >
+                          <option value="U">{L('Unit (Pcs)', 'Unité (Pcs)')}</option>
+                          <option value="Kg">Kilogram (Kg)</option>
+                          <option value="g">Gram (g)</option>
+                          <option value="L">Liter (L)</option>
+                          <option value="ml">Milliliter (ml)</option>
+                          <option value="Box">Box / Carton</option>
+                        </select>
+                      </div>
                     </div>
                  </div>
 

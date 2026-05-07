@@ -33,6 +33,7 @@ import {
   Star
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
+import Pagination from '../components/common/Pagination';
 
 export default function Sales() {
   const store = useStore();
@@ -48,6 +49,8 @@ export default function Sales() {
   const [showConfirmPop, setShowConfirmPop] = useState(false);
   const [showOverpayModal, setShowOverpayModal] = useState(false);
   const [pendingOverpay, setPendingOverpay] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
   const [editingSale, setEditingSale] = useState(null);
   const [debtPayment, setDebtPayment] = useState(0);
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -106,6 +109,10 @@ export default function Sales() {
       return true;
     }).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
   }, [sales, searchQuery, filterDate, customDates, filterShift, store.currentOperator]);
+
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
+  const validCurrentPage = Math.max(1, Math.min(currentPage, totalPages === 0 ? 1 : totalPages));
+  const paginatedSales = filteredSales.slice((validCurrentPage - 1) * itemsPerPage, validCurrentPage * itemsPerPage);
 
   useEffect(() => {
     if (newSale.product_id) {
@@ -414,7 +421,7 @@ export default function Sales() {
           <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
           <input
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
             type="text"
             placeholder="Rechercher des archives..."
             className="w-full bg-white border border-emerald-100 rounded-[24px] pl-16 pr-6 py-5 text-navy-950 font-black text-sm focus:border-emerald-500 outline-none transition-all shadow-xl placeholder:text-blue-gray/30 uppercase"
@@ -423,7 +430,7 @@ export default function Sales() {
 
         <div className="flex items-center gap-3 bg-white p-2 rounded-3xl border border-emerald-100 shadow-xl overflow-x-auto scrollbar-hide max-w-full">
           <button
-            onClick={() => setFilterShift(!filterShift)}
+            onClick={() => { setFilterShift(!filterShift); setCurrentPage(1); }}
             className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -440,7 +447,7 @@ export default function Sales() {
             ].map(time => (
               <button
                 key={time.id}
-                onClick={() => setFilterDate(time.id)}
+                onClick={() => { setFilterDate(time.id); setCurrentPage(1); }}
                 className={`px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex-shrink-0 ${filterDate === time.id ? 'bg-emerald-500 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
               >
                 {time.label}
@@ -478,7 +485,7 @@ export default function Sales() {
       {/* Main Table / List View */}
       <div className="space-y-4">
         {filteredSales.length > 0 ? (
-          filteredSales.map((s, idx) => (
+          paginatedSales.map((s, idx) => (
             <div key={s.id || idx} className="glass-card bg-white border border-emerald-50 border-b-4 border-b-emerald-100 p-6 hover:border-emerald-400 transition-all group shadow-sm">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div className="flex items-center gap-6">
@@ -565,6 +572,16 @@ export default function Sales() {
           </div>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="pt-4 border-t border-navy-50/20 mt-6">
+           <Pagination 
+              currentPage={validCurrentPage} 
+              totalPages={totalPages} 
+              onPageChange={(page) => setCurrentPage(page)} 
+           />
+        </div>
+      )}
 
       {/* Add Sale Modal */}
       {showModal && (
