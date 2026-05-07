@@ -78,6 +78,19 @@ export default function Dashboard() {
               >
                 {L('Retry Connection', 'Réessayer la Connexion')}
               </button>
+              <button 
+                onClick={() => {
+                  const newUrl = prompt(L('Enter new Sync API URL (e.g. from ngrok):', 'Entrez la nouvelle URL de l\'API de Sync (ex: depuis ngrok) :'), store.syncUrl);
+                  if (newUrl) {
+                     store.setSyncUrl(newUrl);
+                     localStorage.setItem('biztrack_sync_url', newUrl);
+                     window.location.reload();
+                  }
+                }}
+                className="w-full py-4 bg-white text-navy-950 border-2 border-navy-100 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-sm hover:border-emerald-500 hover:text-emerald-600 transition-all"
+              >
+                {L('Change Target URL', 'Changer l\'URL Cible')}
+              </button>
            </div>
         </div>
       )}
