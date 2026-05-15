@@ -63,12 +63,12 @@ export default function Dashboard() {
       
       {/* Sync Failure Overlay */}
       {store.syncStatus === 'error' && sales.length === 0 && (
-        <div className="fixed inset-0 z-[100] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center text-center p-10 animate-fade-in">
+        <div className="absolute inset-0 z-[100] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center text-center p-10 animate-fade-in" style={{ WebkitBackdropFilter: 'blur(24px)' }}>
            <div className="w-24 h-24 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-8 shadow-xl shadow-rose-500/10 border-4 border-white">
               <Activity className="w-12 h-12 animate-pulse" />
            </div>
-           <h2 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-4">{L('Sync Connection Lost', 'Connexion Sync Perdue')}</h2>
-           <p className="text-blue-gray font-bold uppercase tracking-widest text-xs mb-8 max-w-md leading-relaxed">
+           <h2 className="text-2xl md:text-3xl font-black text-navy-950 uppercase tracking-tighter mb-4">{L('Sync Connection Lost', 'Connexion Sync Perdue')}</h2>
+           <p className="text-blue-gray font-bold uppercase tracking-widest text-xs md:text-sm mb-8 max-w-md leading-relaxed">
              {L('The terminal cannot reach the local XAMPP server. Please ensure the Sync Tunnel is active.', 'Le terminal ne peut pas atteindre le serveur XAMPP local. Veuillez vérifier que le Tunnel de Sync est actif.')}
            </p>
            <div className="flex flex-col gap-4 w-full max-w-xs">
