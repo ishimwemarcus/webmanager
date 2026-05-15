@@ -101,7 +101,7 @@ export default function Wait() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Client Ledger', 'Grand Livre Clients')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Balance Audit — Client Liabilities & Assets', 'Audit des Soldes — Passifs & Actifs Clients')}
           </p>
         </div>
@@ -117,9 +117,9 @@ export default function Wait() {
             <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Credits (Balances)', 'Crédits (Reliquats)')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(totalCreditSum)}</p>
-            <p className="text-[9px] font-black text-emerald-600 uppercase mt-1 tracking-widest">{creditMap.length} {L('Affected Clients', 'Clients Concernés')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Credits (Balances)', 'Crédits (Reliquats)')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(totalCreditSum)}</p>
+            <p className="text-xs font-black text-emerald-600 uppercase mt-1 tracking-widest">{creditMap.length} {L('Affected Clients', 'Clients Concernés')}</p>
           </div>
         </button>
 
@@ -131,9 +131,9 @@ export default function Wait() {
             <TrendingDown className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Debts (Unpaid)', 'Dettes (Impayés)')}</p>
-            <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalDebtSum)}</p>
-            <p className="text-[9px] font-black text-rose-500 uppercase mt-1 tracking-widest">{debtMap.length} {L('Active Debtors', 'Débiteurs Actifs')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Debts (Unpaid)', 'Dettes (Impayés)')}</p>
+            <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalDebtSum)}</p>
+            <p className="text-xs font-black text-rose-500 uppercase mt-1 tracking-widest">{debtMap.length} {L('Active Debtors', 'Débiteurs Actifs')}</p>
           </div>
         </button>
       </div>
@@ -146,7 +146,7 @@ export default function Wait() {
            </h3>
            <div className="flex items-center gap-2 px-4 py-2 bg-navy-50 rounded-xl">
               <Filter className="w-3.5 h-3.5 text-blue-gray" />
-              <span className="text-[9px] font-black uppercase text-blue-gray tracking-widest">{L('Intelligent Filtering', 'Filtrage Intelligent')}</span>
+              <span className="text-xs font-black uppercase text-blue-gray tracking-widest">{L('Intelligent Filtering', 'Filtrage Intelligent')}</span>
            </div>
         </div>
 
@@ -161,11 +161,11 @@ export default function Wait() {
                           </div>
                           <div>
                              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{c.client}</h3>
-                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1">{L('Indexed Credit', 'Crédit Indexé')}</p>
+                             <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mt-1">{L('Indexed Credit', 'Crédit Indexé')}</p>
                           </div>
                        </div>
                        <div className="text-right">
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">{L('Positive Balance', 'Solde Positif')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">{L('Positive Balance', 'Solde Positif')}</p>
                           <p className="text-3xl font-black text-emerald-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
                        </div>
                     </div>
@@ -176,7 +176,7 @@ export default function Wait() {
                                 <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-lg"></div>
                                 <div>
                                    <p className="text-xs font-black text-navy-950 uppercase">{r.note || L('Automatic Balance', 'Reliquat Automatique')}</p>
-                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                                   <p className="text-xs font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                                 </div>
                              </div>
                              <div className="flex items-center gap-3">
@@ -210,12 +210,12 @@ export default function Wait() {
                           </div>
                           <div>
                              <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter">{c.client}</h3>
-                             <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || L('No contact indexed', 'Aucun contact indexé')}</p>
+                             <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mt-1 italic">{c.phone || L('No contact indexed', 'Aucun contact indexé')}</p>
                           </div>
                        </div>
                        <div className="text-right flex flex-col items-end gap-2">
                           <div>
-                             <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">{L('Client Liability', 'Passif Client')}</p>
+                             <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">{L('Client Liability', 'Passif Client')}</p>
                              <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(c.total)}</p>
                           </div>
                           <div className="flex items-center gap-2">
@@ -224,7 +224,7 @@ export default function Wait() {
                                   setShowPayModal(c);
                                   setPayAmount(c.total);
                                }}
-                               className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
+                               className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20"
                              >
                                 <Wallet className="w-3 h-3" /> {L('Settle Payment', 'Régler Paiement')}
                              </button>
@@ -240,7 +240,7 @@ export default function Wait() {
                                   };
                                   import('../utils/Reporter').then(m => m.printThermalReceipt(summary, store.currentOperator, store.formatCurrency, lang));
                                }}
-                               className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
+                               className="flex items-center gap-2 px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-black uppercase tracking-widest border border-rose-100 hover:bg-rose-500 hover:text-white transition-all"
                              >
                                 <Printer className="w-3 h-3" /> {L('Print Statement', 'Imprimer Relevé')}
                              </button>
@@ -254,11 +254,11 @@ export default function Wait() {
                                 <div className="w-3 h-3 rounded-full bg-rose-500 shadow-lg"></div>
                                 <div>
                                    <p className="text-xs font-black text-navy-950 uppercase">{L('Unpaid Sale', 'Vente Impayée')} : {r.name}</p>
-                                   <p className="text-[9px] font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                                   <p className="text-xs font-black text-blue-gray uppercase opacity-40">{new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                                 </div>
                              </div>
                              <div className="text-right">
-                                <p className="text-[8px] font-black text-blue-gray uppercase italic">{L('Remaining to pay', 'Reste à payer')}</p>
+                                <p className="text-xs font-black text-blue-gray uppercase italic">{L('Remaining to pay', 'Reste à payer')}</p>
                                 <p className="text-lg font-black text-rose-600">{store.formatCurrency((parseFloat(r.amount)||0) - (parseFloat(r.paid)||0))}</p>
                              </div>
                           </div>
@@ -280,12 +280,12 @@ export default function Wait() {
             <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
                <div className="text-center space-y-2 mb-10">
                   <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Manual Settlement', 'Règlement Manuel')}</h3>
-                  <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showPayModal.client}</p>
+                  <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showPayModal.client}</p>
                </div>
 
                <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
-                  <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">{L('Total Liability', 'Passif Total')}</p>
-                  <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(showPayModal.total)}</p>
+                  <p className="text-xs md:text-sm font-black text-rose-500 uppercase tracking-widest mb-2">{L('Total Liability', 'Passif Total')}</p>
+                  <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(showPayModal.total)}</p>
                </div>
 
                <form onSubmit={handleSettleDebt} className="space-y-8">
@@ -310,7 +310,7 @@ export default function Wait() {
                               key={m}
                               type="button"
                               onClick={() => setPayMethod(m)}
-                              className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
+                              className={`flex-1 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
                            >
                               {m}
                            </button>

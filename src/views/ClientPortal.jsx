@@ -80,14 +80,14 @@ export default function ClientPortal() {
               <ShieldCheck className="w-12 h-12" />
            </div>
            <div>
-              <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Client Space', 'Espace Client')}</h1>
-              <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">{L('Secure MARC Consultation', 'Consultation Sécurisée MARC')}</p>
+              <h1 className="text-3xl md:text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Client Space', 'Espace Client')}</h1>
+              <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">{L('Secure MARC Consultation', 'Consultation Sécurisée MARC')}</p>
            </div>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-6">
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">{L('Account Name', 'Nom de Compte')}</label>
+              <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-4">{L('Account Name', 'Nom de Compte')}</label>
               <input 
                 type="text" 
                 required
@@ -98,7 +98,7 @@ export default function ClientPortal() {
               />
            </div>
            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray ml-4">{L('Phone (Optional)', 'Téléphone (Optionnel)')}</label>
+              <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray ml-4">{L('Phone (Optional)', 'Téléphone (Optionnel)')}</label>
               <input 
                 type="text" 
                 placeholder="078..."
@@ -126,8 +126,8 @@ export default function ClientPortal() {
                  <ShieldCheck className="w-12 h-12" />
               </div>
               <div>
-                 <p className="text-[10px] font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">{L('MARC v4 Certified Client', 'Client Certifié MARC v4')}</p>
-                 <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
+                 <p className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">{L('MARC v4 Certified Client', 'Client Certifié MARC v4')}</p>
+                 <h1 className="text-3xl md:text-4xl md:text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
                  <p className="text-xs font-bold text-white/40 mt-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4" /> {L('Member since', 'Membre depuis')} {clientSales.length > 0 ? new Date(clientSales[clientSales.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : L('Today', 'Aujourd\'hui')}
                  </p>
@@ -155,7 +155,7 @@ export default function ClientPortal() {
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${m.color} bg-current/10`}>
                    <m.icon className="w-6 h-6" />
                 </div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1">{m.label}</p>
+                <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-1">{m.label}</p>
                 <p className={`text-2xl font-black ${m.color}`}>{store.formatCurrency(m.val)}</p>
              </div>
            ))}
@@ -166,7 +166,7 @@ export default function ClientPortal() {
            <div className="p-10 border-b border-navy-50 flex items-center justify-between">
               <div>
                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter">{L('Transaction History', 'Historique des Transactions')}</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">{L('Complete record of your activities', 'Registre complet de vos activités')}</p>
+                 <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic mt-1">{L('Complete record of your activities', 'Registre complet de vos activités')}</p>
               </div>
               <span className="px-6 py-2 bg-navy-50 text-navy-950 rounded-full text-xs font-black uppercase tracking-widest border border-navy-100">
                  {clientSales.length} {L('Operations', 'Opérations')}
@@ -186,7 +186,7 @@ export default function ClientPortal() {
                          </p>
                          <p className="text-xs font-bold text-blue-gray mt-2 flex items-center gap-2">
                             <Clock className="w-3.5 h-3.5 opacity-40" /> {new Date(s.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {day:'numeric', month:'short', year:'numeric'})}
-                            {s.timelineType === 'credit' && s.note && <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-[9px]">{s.note}</span>}
+                            {s.timelineType === 'credit' && s.note && <span className="ml-2 px-2 py-0.5 bg-amber-100 text-amber-700 rounded-lg text-xs">{s.note}</span>}
                          </p>
                       </div>
                    </div>
@@ -194,7 +194,7 @@ export default function ClientPortal() {
                       <p className={`text-xl font-black ${s.timelineType === 'credit' ? 'text-amber-500' : 'text-navy-950'}`}>
                          {s.timelineType === 'credit' ? '+' : ''}{store.formatCurrency(s.balance || s.amount)}
                       </p>
-                      <p className={`text-[10px] font-black uppercase tracking-widest mt-1 ${s.timelineType === 'credit' ? 'text-amber-500' : (s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500')}`}>
+                      <p className={`text-xs md:text-sm font-black uppercase tracking-widest mt-1 ${s.timelineType === 'credit' ? 'text-amber-500' : (s.paid >= s.amount ? 'text-emerald-500' : 'text-rose-500')}`}>
                          {s.timelineType === 'credit' ? (s.status === 'used' ? L('Used', 'Utilisé') : L('Available', 'Disponible')) : (s.paid >= s.amount ? L('Settled', 'Soldé') : `${L('Remaining:', 'Reste:')} ${store.formatCurrency(s.amount - s.paid)}`)}
                       </p>
                    </div>
@@ -209,7 +209,7 @@ export default function ClientPortal() {
         </div>
       </div>
       
-      <p className="text-center text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] mt-10 italic opacity-40">
+      <p className="text-center text-xs md:text-sm font-black text-blue-gray uppercase tracking-[0.4em] mt-10 italic opacity-40">
          {L('MARC v4.0 Client Transparency Platform', 'Plateforme de Transparence Client MARC v4.0')}
       </p>
     </div>

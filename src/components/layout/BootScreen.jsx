@@ -41,7 +41,7 @@ export default function BootScreen({ onComplete }) {
         </div>
 
         <div className={`space-y-4 transition-all duration-1000 ${phase >= 2 ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
-          <h1 className="text-6xl md:text-8xl font-black text-white uppercase tracking-tighter shadow-black drop-shadow-2xl">
+          <h1 className="text-4xl md:text-6xl md:text-8xl font-black text-white uppercase tracking-tighter shadow-black drop-shadow-2xl">
             MARC
           </h1>
           <p className="text-sm font-black uppercase tracking-[1em] text-[#2563eb]">{L('Enterprise Management System', 'Système de Gestion d\'Entreprise')}</p>

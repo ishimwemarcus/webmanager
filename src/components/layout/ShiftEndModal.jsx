@@ -115,7 +115,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                         </div>
                         <div>
                           <p className="text-sm font-black text-navy-950 uppercase">{s.name}</p>
-                          <p className="text-[10px] font-bold text-blue-gray">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                          <p className="text-xs md:text-sm font-bold text-blue-gray">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                         </div>
                      </div>
                      <p className="font-black text-navy-brand">{store.formatCurrency(s.amount)}</p>
@@ -147,7 +147,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                           </div>
                           <div>
                             <p className="text-xs font-black text-amber-900 uppercase">{t.client || L('Client', 'Client')}</p>
-                            <p className="text-[9px] font-bold text-amber-500/70">{new Date(t.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
+                            <p className="text-xs font-bold text-amber-500/70">{new Date(t.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US')}</p>
                           </div>
                        </div>
                        <p className="font-black text-amber-600">{store.formatCurrency(t.amount)}</p>
@@ -163,7 +163,7 @@ export default function ShiftEndModal({ isOpen, onClose }) {
               <div className="w-full flex flex-col items-center gap-4">
                  <div className="w-full max-w-md space-y-2">
                     <label className="text-xs font-black uppercase text-navy-950 tracking-widest text-center block">{L('Physical Cash Count', 'Comptage Physique Caisse')}</label>
-                    <p className="text-[10px] text-blue-gray uppercase tracking-widest text-center italic mb-4">{L('Exactly how much cash do you have in the drawer?', 'Combien d\'espèces avez-vous exactement en caisse ?')}</p>
+                    <p className="text-xs md:text-sm text-blue-gray uppercase tracking-widest text-center italic mb-4">{L('Exactly how much cash do you have in the drawer?', 'Combien d\'espèces avez-vous exactement en caisse ?')}</p>
                     <input 
                        type="number"
                        value={blindCount}
@@ -191,31 +191,31 @@ export default function ShiftEndModal({ isOpen, onClose }) {
                     {/* Breakdown */}
                     <div className="grid grid-cols-3 gap-3">
                        <div className="p-4 bg-emerald-50 rounded-2xl text-center">
-                          <p className="text-[9px] font-black uppercase text-emerald-600 tracking-widest mb-1">{L('Sales', 'Ventes')}</p>
+                          <p className="text-xs font-black uppercase text-emerald-600 tracking-widest mb-1">{L('Sales', 'Ventes')}</p>
                           <p className="text-lg font-black text-emerald-700">{store.formatCurrency(revenue)}</p>
                        </div>
                        <div className="p-4 bg-amber-50 rounded-2xl text-center">
-                          <p className="text-[9px] font-black uppercase text-amber-500 tracking-widest mb-1">{L('Tips', 'Pourboires')}</p>
+                          <p className="text-xs font-black uppercase text-amber-500 tracking-widest mb-1">{L('Tips', 'Pourboires')}</p>
                           <p className="text-lg font-black text-amber-600">{store.formatCurrency(tipTotal)}</p>
                        </div>
                        <div className="p-4 bg-rose-50 rounded-2xl text-center">
-                          <p className="text-[9px] font-black uppercase text-rose-500 tracking-widest mb-1">{L('Expenses', 'Dépenses')}</p>
+                          <p className="text-xs font-black uppercase text-rose-500 tracking-widest mb-1">{L('Expenses', 'Dépenses')}</p>
                           <p className="text-lg font-black text-rose-600">-{store.formatCurrency(expenseTotal)}</p>
                        </div>
                     </div>
                     {/* Main reconciliation row */}
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-white rounded-3xl border border-navy-50 shadow-sm">
                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase text-blue-gray tracking-widest mb-1">{L('Expected Net', 'Net Attendu')}</p>
+                          <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1">{L('Expected Net', 'Net Attendu')}</p>
                           <p className="text-2xl font-black text-navy-950">{store.formatCurrency(netCash)}</p>
                        </div>
                        <div className="text-2xl font-black text-navy-200">vs</div>
                        <div className="text-center">
-                          <p className="text-[9px] font-black uppercase text-blue-gray tracking-widest mb-1">{L('Your Count', 'Votre Comptage')}</p>
+                          <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1">{L('Your Count', 'Votre Comptage')}</p>
                           <p className="text-2xl font-black text-navy-950">{store.formatCurrency(parseFloat(blindCount) || 0)}</p>
                        </div>
                        <div className={`text-center px-5 py-3 rounded-2xl ${((parseFloat(blindCount) || 0) - netCash) < 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                          <p className="text-[9px] font-black uppercase tracking-widest mb-1">{L('Variance', 'Écart')}</p>
+                          <p className="text-xs font-black uppercase tracking-widest mb-1">{L('Variance', 'Écart')}</p>
                           <p className="text-xl font-black">
                              {((parseFloat(blindCount) || 0) - netCash) > 0 ? '+' : ''}
                              {store.formatCurrency((parseFloat(blindCount) || 0) - netCash)}

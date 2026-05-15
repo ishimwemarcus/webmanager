@@ -376,7 +376,7 @@ export default function Sales() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Sales Operations', 'Opérations de Vente')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Revenue Flow — Real-Time Archiving', 'Flux de Revenus — Archivage Temps Réel')}
           </p>
         </div>
@@ -395,8 +395,8 @@ export default function Sales() {
             <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Today's Revenue</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Today's Revenue</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
               {store.formatCurrency(sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0))}
             </p>
           </div>
@@ -407,8 +407,8 @@ export default function Sales() {
             <Calculator className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Total Transactions</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Total Transactions</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
               {sales.length} <span className="text-xs text-blue-gray opacity-40 font-black">Records</span>
             </p>
           </div>
@@ -431,7 +431,7 @@ export default function Sales() {
         <div className="flex items-center gap-3 bg-white p-2 rounded-3xl border border-emerald-100 shadow-xl overflow-x-auto scrollbar-hide max-w-full">
           <button
             onClick={() => { setFilterShift(!filterShift); setCurrentPage(1); }}
-            className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
+            className={`px-6 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
           >
             <Clock className="w-3.5 h-3.5" />
             {filterShift ? L('My Shift', 'Mon Poste') : L('All Shifts', 'Tous les Postes')}
@@ -448,7 +448,7 @@ export default function Sales() {
               <button
                 key={time.id}
                 onClick={() => { setFilterDate(time.id); setCurrentPage(1); }}
-                className={`px-5 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex-shrink-0 ${filterDate === time.id ? 'bg-emerald-500 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
+                className={`px-5 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex-shrink-0 ${filterDate === time.id ? 'bg-emerald-500 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
               >
                 {time.label}
               </button>
@@ -461,14 +461,14 @@ export default function Sales() {
                 type="date" 
                 value={customDates.start}
                 onChange={e => setCustomDates({...customDates, start: e.target.value})}
-                className="bg-transparent border-none text-[10px] font-black uppercase text-navy-950 outline-none"
+                className="bg-transparent border-none text-xs md:text-sm font-black uppercase text-navy-950 outline-none"
               />
-              <span className="text-[10px] font-black text-emerald-500/50 tracking-widest">→</span>
+              <span className="text-xs md:text-sm font-black text-emerald-500/50 tracking-widest">→</span>
               <input 
                 type="date" 
                 value={customDates.end}
                 onChange={e => setCustomDates({...customDates, end: e.target.value})}
-                className="bg-transparent border-none text-[10px] font-black uppercase text-navy-950 outline-none"
+                className="bg-transparent border-none text-xs md:text-sm font-black uppercase text-navy-950 outline-none"
               />
             </div>
           )}
@@ -494,9 +494,9 @@ export default function Sales() {
                    </div>
                    <div>
                       <h3 className="text-sm font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{s.name}</h3>
-                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'} | PAR: {s.operator || 'ADMIN'}</p>
+                      <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'} | PAR: {s.operator || 'ADMIN'}</p>
                       {s.phone && s.phone !== 'none' && (
-                         <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                         <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                             <Phone className="w-2 h-2" /> {s.phone}
                          </p>
                       )}
@@ -505,15 +505,15 @@ export default function Sales() {
 
                 <div className="grid grid-cols-3 gap-8 text-center flex-1 max-w-xl">
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Volume</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Volume</p>
                       <p className="text-xs font-black text-navy-950">{s.quantity} {s.unit || 'Kg'}</p>
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Total</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Total</p>
                       <p className="text-xs font-black text-navy-950">{store.formatCurrency(s.amount)}</p>
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1">Method</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Method</p>
                       <div className="flex items-center justify-center gap-1.5 text-xs font-black text-navy-950">
                          <Wallet className="w-3.5 h-3.5 text-emerald-500" /> {s.paymentMethod || 'Cash'}
                       </div>
@@ -522,8 +522,8 @@ export default function Sales() {
 
                 <div className="flex items-center justify-end gap-3">
                    <div className="text-right hidden sm:block">
-                      <p className="text-[10px] font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()} | {new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
-                      <p className="text-[8px] font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                      <p className="text-xs md:text-sm font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()} | {new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                      <p className="text-xs font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                    </div>
                    <button 
                      onClick={() => printThermalReceipt(s, s.operator, store.formatCurrency, lang)}
@@ -557,7 +557,7 @@ export default function Sales() {
                         }
                      }}
                      disabled={s.status?.toLowerCase() === 'paid'}
-                     className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${s.status?.toLowerCase() === 'paid' ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-default' : 'bg-rose-500 text-white hover:bg-rose-600 hover:scale-105 active:scale-95 shadow-lg shadow-rose-500/20'}`}
+                     className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${s.status?.toLowerCase() === 'paid' ? 'bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)] cursor-default' : 'bg-rose-500 text-white hover:bg-rose-600 hover:scale-105 active:scale-95 shadow-lg shadow-rose-500/20'}`}
                    >
                       {s.status?.toLowerCase() === 'partial' ? <span className="flex items-center gap-1"><Zap className="w-2 h-2" /> {s.status}</span> : s.status}
                    </button>
@@ -595,7 +595,7 @@ export default function Sales() {
             <form onSubmit={handleSalePreSubmit} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
                {/* Product Selection */}
                <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Product', 'Produit')}</label>
+                  <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Product', 'Produit')}</label>
                   <select
                     required
                     value={newSale.product_id}
@@ -611,7 +611,7 @@ export default function Sales() {
 
                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Quantity', 'Quantité')}</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Quantity', 'Quantité')}</label>
                     <input
                       type="number"
                       required
@@ -623,7 +623,7 @@ export default function Sales() {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Payment Method', 'Mode Paiement')}</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Payment Method', 'Mode Paiement')}</label>
                     <select
                       value={newSale.paymentMethod}
                       onChange={e => setNewSale({...newSale, paymentMethod: e.target.value})}
@@ -638,7 +638,7 @@ export default function Sales() {
 
                <div className="grid grid-cols-2 gap-6">
                   <div>
-                     <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Client', 'Client')}</label>
+                     <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Client', 'Client')}</label>
                      <input
                        type="text"
                        placeholder="Nom..."
@@ -649,7 +649,7 @@ export default function Sales() {
                      />
                   </div>
                   <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Phone', 'Téléphone')}</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block">{L('Phone', 'Téléphone')}</label>
                     <input
                       type="text"
                       placeholder="07..."
@@ -668,7 +668,7 @@ export default function Sales() {
                    
                    <div className="flex items-center justify-between relative z-10">
                      <div>
-                       <p className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400 italic mb-1">MARC Smart Wallet</p>
+                       <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-emerald-400 italic mb-1">MARC Smart Wallet</p>
                        <h4 className="text-lg font-black uppercase tracking-tighter">{newSale.client}</h4>
                      </div>
                      <div className="flex items-center gap-1">
@@ -680,7 +680,7 @@ export default function Sales() {
 
                    <div className="grid grid-cols-2 gap-4 relative z-10">
                      <div className="bg-white/5 rounded-2xl p-4 border border-white/10">
-                       <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1">{L('Net Balance', 'Solde Net')}</p>
+                       <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1">{L('Net Balance', 'Solde Net')}</p>
                        <p className={`text-xl font-black ${store.getClientGlobalBalance(newSale.client, newSale.phone) < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                          {store.formatCurrency(store.getClientGlobalBalance(newSale.client, newSale.phone))}
                        </p>
@@ -695,14 +695,14 @@ export default function Sales() {
                              setShowWalletModal(true);
                            }
                          }}
-                         className="flex-1 bg-white text-navy-950 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-400 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                         className="flex-1 bg-white text-navy-950 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-400 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                        >
                          <Zap className="w-3 h-3" /> {L('Settle All', 'Tout Solder')}
                        </button>
                        <button 
                          type="button"
                          onClick={() => sendWhatsAppReminder(newSale.client, newSale.phone, store.getClientGlobalBalance(newSale.client, newSale.phone))}
-                         className="flex-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                         className="flex-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
                        >
                          <MessageSquare className="w-3 h-3" /> {L('Remind', 'Rappeler')}
                        </button>
@@ -715,12 +715,12 @@ export default function Sales() {
                {newSale.client && clientDebt > 0 && (
                   <div className="bg-rose-50 border border-rose-200 p-6 rounded-3xl space-y-4 animate-scale-in">
                      <div className="flex items-center justify-between">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-rose-500">{L('Active Debt', 'Dette Active')}</p>
+                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-rose-500">{L('Active Debt', 'Dette Active')}</p>
                         <p className="text-2xl font-black text-rose-600">{store.formatCurrency(clientDebt)}</p>
                      </div>
                      
                      <div className="relative">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-rose-500 mb-2 block">{L('Pay toward debt', 'Payer vers la dette')}</label>
+                        <label className="text-xs font-black uppercase tracking-widest text-rose-500 mb-2 block">{L('Pay toward debt', 'Payer vers la dette')}</label>
                         <input
                           type="number"
                           min="0"
@@ -738,7 +738,7 @@ export default function Sales() {
 
                      {newSale.debtPaymentAmount > 0 && (
                         <div className="flex justify-between items-center p-3 bg-white rounded-xl border border-rose-100">
-                           <p className="text-[9px] font-black uppercase text-rose-500">{L('After payment', 'Après paiement')}</p>
+                           <p className="text-xs font-black uppercase text-rose-500">{L('After payment', 'Après paiement')}</p>
                            <p className="text-sm font-black text-emerald-600">{store.formatCurrency(clientDebt - newSale.debtPaymentAmount)}</p>
                         </div>
                      )}
@@ -748,18 +748,18 @@ export default function Sales() {
                {/* Pricing Summary */}
                <div className="bg-navy-950 p-6 rounded-3xl text-white space-y-3">
                   <div className="flex justify-between items-center opacity-60">
-                     <p className="text-[10px] font-black uppercase tracking-widest">Total HT</p>
+                     <p className="text-xs md:text-sm font-black uppercase tracking-widest">Total HT</p>
                      <p className="text-sm font-black">{store.formatCurrency(newSale.amount)}</p>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{L('Total Due', 'Total à Payer')}</p>
+                     <p className="text-xs md:text-sm font-black uppercase tracking-widest text-emerald-400">{L('Total Due', 'Total à Payer')}</p>
                      <p className="text-2xl font-black">{store.formatCurrency(newSale.amount)}</p>
                   </div>
                </div>
 
                {newSale.isAccepted && (
                   <div className="space-y-3 animate-scale-in">
-                     <label className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mb-2 block italic">{L('Payment (Amount Received)', 'Encaissement (Montant Reçu)')}</label>
+                     <label className="text-xs md:text-sm font-black uppercase tracking-widest text-emerald-600 mb-2 block italic">{L('Payment (Amount Received)', 'Encaissement (Montant Reçu)')}</label>
                      <div className="relative group">
                         <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
                         <input
@@ -775,7 +775,7 @@ export default function Sales() {
                      </div>
                      {(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0)) > 0 && (
                         <div className="flex justify-between items-center px-4 py-2 bg-rose-50 rounded-xl">
-                           <p className="text-[8px] font-black uppercase text-rose-500 tracking-widest">{L('Remaining (Debt)', 'Reste à payer (Dette)')}</p>
+                           <p className="text-xs font-black uppercase text-rose-500 tracking-widest">{L('Remaining (Debt)', 'Reste à payer (Dette)')}</p>
                            <p className="text-xs font-black text-rose-600">{store.formatCurrency(parseFloat(newSale.amount) - (parseFloat(newSale.paid) || 0))}</p>
                         </div>
                      )}
@@ -796,7 +796,7 @@ export default function Sales() {
                   <button 
                     type="button"
                     onClick={() => setNewSale(prev => ({ ...prev, isAccepted: false }))}
-                    className="w-full py-2 text-[9px] font-black uppercase text-blue-gray hover:text-rose-500 transition-all"
+                    className="w-full py-2 text-xs font-black uppercase text-blue-gray hover:text-rose-500 transition-all"
                   >
                      {L('Modify order', 'Modifier la commande')}
                   </button>
@@ -816,31 +816,31 @@ export default function Sales() {
             <h3 className="text-xl font-black text-navy-950 uppercase tracking-tighter mb-1">{L('Overpayment Detected', 'Trop-Perçu Détecté')}</h3>
             <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-2 opacity-60">{L('Client paid more than amount due', 'Le client a payé plus que le montant dû')}</p>
             <div className="my-4 py-4 px-6 bg-amber-50 rounded-2xl border border-amber-100">
-              <p className="text-[10px] font-black uppercase text-amber-600 tracking-widest mb-1">{L('Surplus', 'Excédent')}</p>
+              <p className="text-xs md:text-sm font-black uppercase text-amber-600 tracking-widest mb-1">{L('Surplus', 'Excédent')}</p>
               <p className="text-3xl font-black text-amber-600">{store.formatCurrency(pendingOverpay)}</p>
             </div>
-            <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-6 leading-relaxed opacity-60">
+            <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mb-6 leading-relaxed opacity-60">
               {L('Classify this surplus as:', 'Classer cet excédent comme :')}
             </p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => { setShowOverpayModal(false); registerSale('tip'); }}
-                className="flex flex-col items-center gap-2 py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-amber-500/30 active:scale-95"
+                className="flex flex-col items-center gap-2 py-5 bg-amber-500 hover:bg-amber-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-amber-500/30 active:scale-95"
               >
                 <Star className="w-6 h-6" />
                 {L('Tip', 'Pourboire')}
-                <span className="text-[8px] opacity-70 normal-case font-bold">{L('Given to operator', 'Offert à l\'opérateur')}</span>
+                <span className="text-xs opacity-70 normal-case font-bold">{L('Given to operator', 'Offert à l\'opérateur')}</span>
               </button>
               <button
                 onClick={() => { setShowOverpayModal(false); registerSale('credit'); }}
-                className="flex flex-col items-center gap-2 py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl font-black uppercase text-[9px] tracking-widest transition-all shadow-lg shadow-emerald-500/30 active:scale-95"
+                className="flex flex-col items-center gap-2 py-5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-3xl font-black uppercase text-xs tracking-widest transition-all shadow-lg shadow-emerald-500/30 active:scale-95"
               >
                 <Wallet className="w-6 h-6" />
                 {L('Client Credit', 'Crédit Client')}
-                <span className="text-[8px] opacity-70 normal-case font-bold">{L('Reserved for next purchase', 'Réservé au prochain achat')}</span>
+                <span className="text-xs opacity-70 normal-case font-bold">{L('Reserved for next purchase', 'Réservé au prochain achat')}</span>
               </button>
             </div>
-            <button onClick={() => setShowOverpayModal(false)} className="mt-4 text-[9px] font-black uppercase text-blue-gray tracking-widest opacity-40 hover:opacity-70 transition-all">
+            <button onClick={() => setShowOverpayModal(false)} className="mt-4 text-xs font-black uppercase text-blue-gray tracking-widest opacity-40 hover:opacity-70 transition-all">
               {L('Cancel', 'Annuler')}
             </button>
           </div>
@@ -858,8 +858,8 @@ export default function Sales() {
                <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-8 leading-relaxed opacity-60">{L(`Finalize this ${store.formatCurrency(newSale.amount)} operation?`, `Voulez-vous finaliser l'enregistrement de cette opération de ${store.formatCurrency(newSale.amount)} ?`)}</p>
                
                <div className="grid grid-cols-2 gap-4">
-                  <button onClick={() => setShowConfirmPop(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
-                  <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Confirm', 'Confirmer')}</button>
+                  <button onClick={() => setShowConfirmPop(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-xs md:text-sm tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                  <button onClick={() => { setShowConfirmPop(false); if (editingSale) updateSale(); else registerSale(); }} className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs md:text-sm tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Confirm', 'Confirmer')}</button>
                </div>
             </div>
          </div>
@@ -871,12 +871,12 @@ export default function Sales() {
            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
               <div className="text-center space-y-2 mb-10">
                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Debt Settlement', 'Règlement de Dette')}</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Clear Financial Obligation', 'Solder l\'Obligation Financière')}</p>
+                 <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Clear Financial Obligation', 'Solder l\'Obligation Financière')}</p>
               </div>
 
               <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
-                 <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">{L('Remaining', 'Reste à payer')}</p>
-                 <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
+                 <p className="text-xs md:text-sm font-black text-rose-500 uppercase tracking-widest mb-2">{L('Remaining', 'Reste à payer')}</p>
+                 <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
               </div>
 
               <form onSubmit={handlePayDebt} className="space-y-8">
@@ -900,7 +900,7 @@ export default function Sales() {
                              key={m}
                              type="button"
                              onClick={() => setPayMethod(m)}
-                             className={`flex-1 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
+                             className={`flex-1 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${payMethod === m ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray'}`}
                           >
                              {m}
                           </button>
@@ -924,11 +924,11 @@ export default function Sales() {
               <ShieldCheck className="w-10 h-10" />
             </div>
             <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-1">{L('Quick Settlement', 'Règlement Rapide')}</h3>
-            <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-8 italic opacity-60">{L('Clearing Global Wallet Balance', 'Solde du Compte Global')}</p>
+            <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mb-8 italic opacity-60">{L('Clearing Global Wallet Balance', 'Solde du Compte Global')}</p>
             
             <form onSubmit={handleSettleFullWallet} className="space-y-6">
                <div className="bg-navy-50 p-6 rounded-3xl border border-navy-100 mb-6">
-                  <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest mb-2">{L('Amount to Pay', 'Montant à Payer')}</p>
+                  <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-2">{L('Amount to Pay', 'Montant à Payer')}</p>
                   <input
                     type="number"
                     step="0.01"
@@ -942,8 +942,8 @@ export default function Sales() {
                </div>
 
                <div className="grid grid-cols-2 gap-4">
-                  <button type="button" onClick={() => setShowWalletModal(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
-                  <button type="submit" className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Validate', 'Valider')}</button>
+                  <button type="button" onClick={() => setShowWalletModal(false)} className="py-4 bg-navy-50 text-navy-950 rounded-2xl font-black uppercase text-xs md:text-sm tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                  <button type="submit" className="py-4 bg-emerald-500 text-white rounded-2xl font-black uppercase text-xs md:text-sm tracking-widest shadow-xl shadow-emerald-500/20 hover:bg-emerald-600 transition-all">{L('Validate', 'Valider')}</button>
                </div>
             </form>
           </div>

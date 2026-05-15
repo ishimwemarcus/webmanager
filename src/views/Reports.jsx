@@ -346,7 +346,7 @@ export default function Reports() {
           <h1 className="text-[clamp(1.6rem,5vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Business Intelligence', 'Intelligence d\'Affaires')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.3em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.3em] uppercase italic opacity-60">
             {L('Analytical Audit — High Fidelity Reporting', 'Audit Analytique — Reporting Haute Fidélité')}
           </p>
         </div>
@@ -357,11 +357,11 @@ export default function Reports() {
                      <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-navy-50" />
                      <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={106.8} strokeDashoffset={106.8 - (106.8 * bizHealthScore / 100)} className={`${bizHealthScore > 80 ? 'text-emerald-500' : bizHealthScore > 50 ? 'text-amber-500' : 'text-rose-500'} transition-all duration-1000`} />
                   </svg>
-                  <span className="absolute text-[9px] font-black text-navy-950">{bizHealthScore}%</span>
+                  <span className="absolute text-xs font-black text-navy-950">{bizHealthScore}%</span>
                </div>
                <div>
                   <p className="text-[7px] font-black uppercase text-blue-gray tracking-widest">{L('Health', 'Santé')}</p>
-                  <p className="text-[9px] font-black text-navy-950 uppercase">{bizHealthScore > 80 ? 'Optimal' : bizHealthScore > 50 ? 'Stable' : 'Critical'}</p>
+                  <p className="text-xs font-black text-navy-950 uppercase">{bizHealthScore > 80 ? 'Optimal' : bizHealthScore > 50 ? 'Stable' : 'Critical'}</p>
                </div>
             </div>
 
@@ -381,10 +381,10 @@ export default function Reports() {
             >
                <Printer className="w-4 h-4" />
             </button>
-           <button onClick={handleDownloadCSV} className="flex items-center justify-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-900 rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-emerald-100 transition-all shadow-sm">
+           <button onClick={handleDownloadCSV} className="flex items-center justify-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-900 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-100 transition-all shadow-sm">
              <FileText className="w-4 h-4 text-emerald-600" /> CSV
            </button>
-           <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 px-5 py-3 bg-navy-950 text-white rounded-2xl font-black uppercase tracking-widest text-[9px] hover:bg-emerald-600 transition-all shadow-xl active:scale-95">
+           <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 px-5 py-3 bg-navy-950 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-xl active:scale-95">
              <Download className="w-4 h-4 text-emerald-400" /> PDF
            </button>
         </div>
@@ -394,7 +394,7 @@ export default function Reports() {
       <div className="glass-card bg-white rounded-[var(--fluid-radius-lg)] border-emerald-100 shadow-xl no-print">
          <div className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
-               <p className="text-[9px] font-black uppercase tracking-widest text-blue-gray italic mr-1">{L('Domains:', 'Domaines :')}</p>
+               <p className="text-xs font-black uppercase tracking-widest text-blue-gray italic mr-1">{L('Domains:', 'Domaines :')}</p>
                {[
                  { id: 'sales', label: L('Sales', 'Ventes') },
                  { id: 'ledger', label: L('Finance', 'Finance') },
@@ -405,7 +405,7 @@ export default function Reports() {
                  <button
                    key={s.id}
                    onClick={() => toggleSector(s.id)}
-                   className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border font-black text-[8px] uppercase tracking-widest ${activeSectors.includes(s.id) ? 'bg-emerald-500 text-white border-emerald-500 shadow-md' : 'bg-white text-blue-gray border-emerald-100 hover:border-emerald-400'}`}
+                   className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all border font-black text-xs uppercase tracking-widest ${activeSectors.includes(s.id) ? 'bg-emerald-500 text-white border-emerald-500 shadow-md' : 'bg-white text-blue-gray border-emerald-100 hover:border-emerald-400'}`}
                  >
                    {activeSectors.includes(s.id) ? <CheckSquare className="w-3 h-3" /> : <Square className="w-3 h-3" />}
                    {s.label}
@@ -437,7 +437,7 @@ export default function Reports() {
               <div className={`w-8 h-8 ${m.bg} ${m.color} rounded-lg flex items-center justify-center mb-2 shadow-inner`}>
                  <m.icon className="w-4 h-4" />
               </div>
-              <p className="text-[9px] font-black uppercase tracking-widest text-blue-gray mb-1 italic">{m.label}</p>
+              <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-1 italic">{m.label}</p>
               <p className={`text-xl font-black ${m.valColor} tracking-tighter`}>{store.formatCurrency(m.val)}</p>
            </div>
          ))}
@@ -448,7 +448,7 @@ export default function Reports() {
             <div className="w-8 h-8 bg-white/10 backdrop-blur-xl rounded-lg flex items-center justify-center mb-2 border border-white/10">
                <Zap className="w-4 h-4 text-emerald-400" />
             </div>
-            <p className="text-[8px] font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Adjusted Net Profit', 'Profit Net Ajusté')}</p>
+            <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Adjusted Net Profit', 'Profit Net Ajusté')}</p>
             <p className="text-xl font-black text-white tracking-tighter">{store.formatCurrency(netCashCollected)}</p>
          </div>
       </div>
@@ -487,7 +487,7 @@ export default function Reports() {
                {intelligence.peakHour.hour !== null ? (
                   <div className="p-6 bg-indigo-50 rounded-[32px] text-center space-y-2 border border-indigo-100">
                      <p className="text-3xl font-black text-indigo-600">{intelligence.peakHour.hour}:00</p>
-                     <p className="text-[10px] font-black uppercase text-indigo-400 tracking-widest">{intelligence.peakHour.count} {L('Transactions', 'Transactions')}</p>
+                     <p className="text-xs md:text-sm font-black uppercase text-indigo-400 tracking-widest">{intelligence.peakHour.count} {L('Transactions', 'Transactions')}</p>
                   </div>
                ) : <p className="text-xs text-blue-gray italic">{L('No data available.', 'Aucune donnée disponible.')}</p>}
             </div>
@@ -504,11 +504,11 @@ export default function Reports() {
                   <div className="flex items-center gap-3">
                      <Clock className="w-5 h-5 text-emerald-400" />
                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-white/40">{L('Peak Traffic', 'Pic d\'Affluence')}</p>
+                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40">{L('Peak Traffic', 'Pic d\'Affluence')}</p>
                         <p className="text-sm font-black text-white">{intelligence.peakHour.hour}:00</p>
                      </div>
                   </div>
-                  <span className="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-lg">{intelligence.peakHour.count} Tx</span>
+                  <span className="text-xs md:text-sm font-black text-emerald-400 bg-emerald-400/10 px-3 py-1 rounded-lg">{intelligence.peakHour.count} Tx</span>
                </div>
             )}
             
@@ -516,19 +516,19 @@ export default function Reports() {
             <div className="space-y-3">
                {anomalies.lowStock.length > 0 && (
                   <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-rose-400">{L('Critical Stock', 'Stock Critique')}</span>
+                     <span className="text-xs md:text-sm font-black uppercase tracking-widest text-rose-400">{L('Critical Stock', 'Stock Critique')}</span>
                      <span className="text-xs font-black text-rose-500">{anomalies.lowStock.length} {L('Items', 'Articles')}</span>
                   </div>
                )}
                {anomalies.unpaidDebt.length > 0 && (
                   <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-amber-400">{L('Pending Debts', 'Dettes en Cours')}</span>
+                     <span className="text-xs md:text-sm font-black uppercase tracking-widest text-amber-400">{L('Pending Debts', 'Dettes en Cours')}</span>
                      <span className="text-xs font-black text-amber-500">{anomalies.unpaidDebt.length} {L('Files', 'Dossiers')}</span>
                   </div>
                )}
                {anomalies.lowStock.length === 0 && anomalies.unpaidDebt.length === 0 && (
                   <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl flex items-center justify-between">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">{L('Operational Status', 'Statut Opérationnel')}</span>
+                     <span className="text-xs md:text-sm font-black uppercase tracking-widest text-emerald-400">{L('Operational Status', 'Statut Opérationnel')}</span>
                      <span className="text-xs font-black text-emerald-500">OPTIMAL</span>
                   </div>
                )}
@@ -536,7 +536,7 @@ export default function Reports() {
 
             {/* Eco Impact */}
             <div className={`mt-auto p-5 rounded-2xl border ${ecoImpact.isOptimal ? 'bg-emerald-500/20 border-emerald-500/30' : 'bg-rose-500/20 border-rose-500/30'}`}>
-               <p className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50 mb-1">{L('Eco Impact (Losses)', 'Impact Éco (Pertes)')}</p>
+               <p className="text-xs font-black uppercase tracking-[0.2em] text-white/50 mb-1">{L('Eco Impact (Losses)', 'Impact Éco (Pertes)')}</p>
                <p className={`text-sm font-black uppercase ${ecoImpact.isOptimal ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {ecoImpact.wasteReduced}
                </p>
@@ -555,19 +555,19 @@ export default function Reports() {
                      </div>
                      <div>
                         <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">{L('Sales Log', 'Journal des Ventes')}</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Operational Transactions', 'Transactions Opérationnelles')}</p>
+                        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Operational Transactions', 'Transactions Opérationnelles')}</p>
                      </div>
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-navy-950">{dailySales.length} Tx</p>
-                     <p className="text-[9px] font-black uppercase text-emerald-500">Live Flow Audit</p>
+                     <p className="text-xs font-black uppercase text-emerald-500">Live Flow Audit</p>
                   </div>
                </div>
 
                <div className="overflow-x-auto">
                   <table className="w-full text-left">
                      <thead>
-                        <tr className="bg-navy-50/50 text-[9px] font-black uppercase tracking-widest text-blue-gray">
+                        <tr className="bg-navy-50/50 text-xs font-black uppercase tracking-widest text-blue-gray">
                            <th className="p-5">{L('Time', 'Heure')}</th>
                            <th className="p-5">{L('Operator', 'Opérateur')}</th>
                            <th className="p-5">{L('Client', 'Client')}</th>
@@ -580,14 +580,14 @@ export default function Reports() {
                      <tbody className="divide-y divide-navy-50">
                         {dailySales.map((s, i) => (
                            <tr key={i} className="hover:bg-navy-50/20 transition-colors">
-                              <td className="p-5 text-[10px] font-black text-navy-950">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</td>
-                              <td className="p-5 text-[9px] font-black text-blue-gray uppercase">{s.operator || 'ADMIN'}</td>
-                              <td className="p-5 text-[9px] font-black text-navy-950 uppercase">{s.client || L('STANDARD', 'STANDARD')}</td>
-                              <td className="p-5 text-[9px] font-black text-navy-950 uppercase">{s.name}</td>
-                              <td className="p-5 text-right text-[10px] font-black text-navy-950">{s.quantity}</td>
-                              <td className="p-5 text-right text-[10px] font-black text-navy-950">{store.formatCurrency(s.amount)}</td>
+                              <td className="p-5 text-xs md:text-sm font-black text-navy-950">{new Date(s.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</td>
+                              <td className="p-5 text-xs font-black text-blue-gray uppercase">{s.operator || 'ADMIN'}</td>
+                              <td className="p-5 text-xs font-black text-navy-950 uppercase">{s.client || L('STANDARD', 'STANDARD')}</td>
+                              <td className="p-5 text-xs font-black text-navy-950 uppercase">{s.name}</td>
+                              <td className="p-5 text-right text-xs md:text-sm font-black text-navy-950">{s.quantity}</td>
+                              <td className="p-5 text-right text-xs md:text-sm font-black text-navy-950">{store.formatCurrency(s.amount)}</td>
                               <td className="p-5 text-center">
-                                 <span className={`px-3 py-1 rounded-lg text-[8px] font-black uppercase ${
+                                 <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase ${
                                     s.status === 'paid' ? 'bg-emerald-50 text-emerald-600' : 
                                     s.status === 'waiting' ? 'bg-amber-50 text-amber-600 border border-amber-100' :
                                     'bg-rose-50 text-rose-500'
@@ -612,19 +612,19 @@ export default function Reports() {
                      </div>
                      <div>
                         <h3 className="text-lg font-black text-navy-950 uppercase tracking-widest">{L('Asset Valuation', 'Valorisation des Actifs')}</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Initial Stock Audit', 'Audit du Stock Initial')}</p>
+                        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-[0.4em] italic opacity-40">{L('Initial Stock Audit', 'Audit du Stock Initial')}</p>
                      </div>
                   </div>
                   <div className="text-right">
                      <p className="text-xl font-black text-emerald-600">{store.formatCurrency(totalStockValue)}</p>
-                     <p className="text-[9px] font-black uppercase text-blue-gray">{L('Total Asset Value', 'Valeur Asset Totale')}</p>
+                     <p className="text-xs font-black uppercase text-blue-gray">{L('Total Asset Value', 'Valeur Asset Totale')}</p>
                   </div>
                </div>
 
                <div className="overflow-x-auto">
                   <table className="w-full text-left">
                      <thead>
-                        <tr className="bg-navy-50/50 text-[9px] font-black uppercase tracking-widest text-blue-gray">
+                        <tr className="bg-navy-50/50 text-xs font-black uppercase tracking-widest text-blue-gray">
                            <th className="p-5">{L('Item', 'Article')}</th>
                            <th className="p-5">{L('Sector', 'Secteur')}</th>
                            <th className="p-5 text-right">{L('Qty', 'Qté')}</th>
@@ -635,11 +635,11 @@ export default function Reports() {
                      <tbody className="divide-y divide-navy-50">
                         {allProducts.map((p, i) => (
                            <tr key={i} className="hover:bg-navy-50/20 transition-colors">
-                              <td className="p-5 text-[10px] font-black text-navy-950 uppercase">{p.name}</td>
-                              <td className="p-5 text-[9px] font-black text-blue-gray uppercase">{p.category || L('GENERAL', 'GENERAL')}</td>
-                              <td className="p-5 text-right text-[10px] font-black text-navy-950">{p.quantity}</td>
-                              <td className="p-5 text-right text-[10px] font-black text-navy-950">{store.formatCurrency(p.cost)}</td>
-                              <td className="p-5 text-right text-[10px] font-black text-emerald-600">{store.formatCurrency(p.quantity * p.cost)}</td>
+                              <td className="p-5 text-xs md:text-sm font-black text-navy-950 uppercase">{p.name}</td>
+                              <td className="p-5 text-xs font-black text-blue-gray uppercase">{p.category || L('GENERAL', 'GENERAL')}</td>
+                              <td className="p-5 text-right text-xs md:text-sm font-black text-navy-950">{p.quantity}</td>
+                              <td className="p-5 text-right text-xs md:text-sm font-black text-navy-950">{store.formatCurrency(p.cost)}</td>
+                              <td className="p-5 text-right text-xs md:text-sm font-black text-emerald-600">{store.formatCurrency(p.quantity * p.cost)}</td>
                            </tr>
                         ))}
                      </tbody>

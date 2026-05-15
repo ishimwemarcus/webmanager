@@ -73,7 +73,7 @@ export default function Sidebar({ className }) {
       </div>
 
       <div className="px-3 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-3 italic">{t('systemArchitecture')}</p>
+        <p className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-3 italic">{t('systemArchitecture')}</p>
         <nav className="space-y-1">
           {navItems.map((item) => (
             <NavLink
@@ -88,7 +88,7 @@ export default function Sidebar({ className }) {
               `}
             >
               <item.icon className="w-4 h-4" />
-              <span className="text-[9px] font-black uppercase tracking-widest">{item.label}</span>
+              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
               <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
             </NavLink>
           ))}
@@ -109,7 +109,7 @@ export default function Sidebar({ className }) {
             <Users className="w-4 h-4" />
           </div>
           <div className="overflow-hidden">
-            <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">{t('active')}</p>
+            <p className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-1">{t('active')}</p>
             <p className="text-xs font-black text-white uppercase truncate">{store.currentOperator || 'Admin'}</p>
           </div>
         </div>

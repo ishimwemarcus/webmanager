@@ -175,13 +175,13 @@ export default function Commander() {
           <h1 className="text-[clamp(1.2rem,3vw,2rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Take Order', 'Prendre Commande')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
             {L('Active POS — ', 'Point de Vente Actif — ')} {store.currentOperator}
           </p>
         </div>
         {success && (
           <div className="flex items-center gap-3">
-             <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest animate-bounce-gentle shadow-2xl">
+             <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest animate-bounce-gentle shadow-2xl">
                <Check className="w-5 h-5" /> {L('Sale Recorded Successfully!', 'Vente Enregistrée avec Succès!')}
              </div>
              <button 
@@ -197,7 +197,7 @@ export default function Commander() {
                className="p-3 bg-navy-950 text-white rounded-xl shadow-lg hover:bg-emerald-600 transition-all flex items-center justify-center gap-2"
              >
                 <Printer className="w-4 h-4" />
-                <span className="text-[9px] font-black uppercase">{L('Print Ticket', 'Imprimer Ticket')}</span>
+                <span className="text-xs font-black uppercase">{L('Print Ticket', 'Imprimer Ticket')}</span>
              </button>
           </div>
         )}
@@ -227,7 +227,7 @@ export default function Commander() {
                     <button
                       key={cat}
                       onClick={() => setActiveCategory(cat)}
-                      className={`px-4 py-2.5 rounded-xl font-black text-[8px] uppercase tracking-widest flex-shrink-0 transition-all ${
+                      className={`px-4 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest flex-shrink-0 transition-all ${
                         activeCategory === cat
                           ? 'bg-navy-950 text-white shadow-lg'
                           : 'bg-white text-navy-950 border border-emerald-100 hover:border-emerald-500 shadow-sm'
@@ -254,7 +254,7 @@ export default function Commander() {
                           className={`glass-card bg-white p-3.5 rounded-2xl border-emerald-50 border-b-4 border-b-emerald-100 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer relative overflow-hidden group shadow-sm ${inCart ? 'border-emerald-500 ring-2 ring-emerald-500/10' : ''} ${checkoutStep > 0 ? 'opacity-50 grayscale cursor-not-allowed' : ''}`}
                         >
                           {inCart && (
-                             <div className="absolute top-4 right-4 w-7 h-7 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-black text-[10px] shadow-lg animate-scale-in">
+                             <div className="absolute top-4 right-4 w-7 h-7 bg-emerald-500 text-white rounded-xl flex items-center justify-center font-black text-xs md:text-sm shadow-lg animate-scale-in">
                                 {inCart.qty}
                              </div>
                           )}
@@ -262,11 +262,11 @@ export default function Commander() {
                              <Package className="w-6 h-6" />
                           </div>
                           <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight mb-1 group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
-                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || L('General', 'Général')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || L('General', 'Général')}</p>
                           
                           <div className="flex items-center justify-between mt-auto">
                              <p className="text-sm font-black text-navy-950">{store.formatCurrency(product.price)}</p>
-                             <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-[8px] font-black uppercase ${isLow ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-600'}`}>
+                             <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-black uppercase ${isLow ? 'bg-rose-50 text-rose-500' : 'bg-emerald-50 text-emerald-600'}`}>
                                 {isLow ? <AlertTriangle className="w-2.5 h-2.5" /> : <ShieldCheck className="w-2.5 h-2.5" />}
                                 {product.quantity}
                              </div>
@@ -287,7 +287,7 @@ export default function Commander() {
                  <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center">
                     <User className="w-5 h-5" />
                  </div>
-                 <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">{L('Client Profile', 'Profil Client')}</p>
+                 <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-950 italic">{L('Client Profile', 'Profil Client')}</p>
               </div>
 
               <div className="space-y-4">
@@ -296,26 +296,26 @@ export default function Commander() {
                    placeholder={L('CLIENT NAME...', 'NOM DU CLIENT...')}
                    value={clientName}
                    onChange={e => setClientName(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-[10px] font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-xs md:text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                  />
                  <input
                    type="text"
                    placeholder={L('PHONE...', 'TÉLÉPHONE...')}
                    value={clientPhone}
                    onChange={e => setClientPhone(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-[10px] font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-xs md:text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                  />
               </div>
 
               {clientName && (clientDebt > 0 || clientCredit > 0) && (
                  <div className="mt-6 flex flex-wrap gap-2">
                     {clientDebt > 0 && (
-                       <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-rose-100">
+                       <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-black uppercase tracking-widest border border-rose-100">
                           {L('Debt:', 'Dette:')} {store.formatCurrency(clientDebt)}
                        </div>
                     )}
                     {clientCredit > 0 && (
-                       <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-[9px] font-black uppercase tracking-widest border border-emerald-100">
+                       <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
                           {L('Credit:', 'Crédit:')} {store.formatCurrency(clientCredit)}
                        </div>
                     )}
@@ -330,10 +330,10 @@ export default function Commander() {
                     <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
                        <ShoppingCart className="w-5 h-5" />
                     </div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-navy-950 italic">{L('Cart', 'Panier')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-950 italic">{L('Cart', 'Panier')}</p>
                  </div>
                  {cart.length > 0 && (
-                    <button onClick={() => setCart([])} className="text-[9px] font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">{L('Purge', 'Purger')}</button>
+                    <button onClick={() => setCart([])} className="text-xs font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">{L('Purge', 'Purger')}</button>
                  )}
               </div>
 
@@ -348,7 +348,7 @@ export default function Commander() {
                     <div key={item.product.id || item.product.product_id} className="flex items-center gap-4 group">
                        <div className="flex-1 min-w-0">
                           <p className="text-[11px] font-black text-navy-950 uppercase truncate">{item.product.name}</p>
-                          <p className="text-[9px] font-black text-blue-gray uppercase opacity-60">{store.formatCurrency(item.unitPrice)}/u</p>
+                          <p className="text-xs font-black text-blue-gray uppercase opacity-60">{store.formatCurrency(item.unitPrice)}/u</p>
                        </div>
                         <div className="flex items-center gap-3">
                            {checkoutStep === 0 && (
@@ -366,7 +366,7 @@ export default function Commander() {
 
               <div className="mt-8 pt-8 border-t border-navy-50 space-y-4">
                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray italic">{L('Subtotal', 'Sous-total')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray italic">{L('Subtotal', 'Sous-total')}</p>
                     <p className="text-2xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(cartTotal)}</p>
                  </div>
 
@@ -383,7 +383,7 @@ export default function Commander() {
 
                  {paidInput > 0 && (
                     <div className={`p-4 rounded-2xl flex items-center justify-between border ${change >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
-                       <p className="text-[9px] font-black uppercase tracking-widest">{change >= 0 ? L('To return', 'À rendre') : L('Missing', 'Manquant')}</p>
+                       <p className="text-xs font-black uppercase tracking-widest">{change >= 0 ? L('To return', 'À rendre') : L('Missing', 'Manquant')}</p>
                        <p className="text-xl font-black">{store.formatCurrency(Math.abs(change))}</p>
                     </div>
                  )}
@@ -401,7 +401,7 @@ export default function Commander() {
                            </button>
                            <button
                              onClick={cancelPending}
-                             className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-[9px] text-rose-500 hover:bg-rose-50 transition-all"
+                             className="w-full py-4 rounded-2xl font-black uppercase tracking-widest text-xs text-rose-500 hover:bg-rose-50 transition-all"
                            >
                                {L('Cancel Acceptance', 'Annuler l\'Acceptation')}
                            </button>

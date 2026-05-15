@@ -105,7 +105,7 @@ export default function Cloture() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Cash Register', 'Clôture Caisse')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Daily Audit — Cash Drawer Reconciliation', 'Audit Journalier — Réconciliation du Tiroir-Caisse')}
           </p>
         </div>
@@ -122,26 +122,26 @@ export default function Cloture() {
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <div className="p-6 bg-navy-50 rounded-3xl border border-navy-100">
-                     <p className="text-[8px] font-black uppercase text-blue-gray mb-1 italic">{L('Cash Sales', 'Ventes Cash')}</p>
+                     <p className="text-xs font-black uppercase text-blue-gray mb-1 italic">{L('Cash Sales', 'Ventes Cash')}</p>
                      <p className="text-lg font-black text-navy-950 tracking-tighter">{store.formatCurrency(stats.salesCash)}</p>
                   </div>
                   <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100">
-                     <p className="text-[8px] font-black uppercase text-emerald-600 mb-1 italic">{L('Ledger (+)', 'Ledger (+)')}</p>
+                     <p className="text-xs font-black uppercase text-emerald-600 mb-1 italic">{L('Ledger (+)', 'Ledger (+)')}</p>
                      <p className="text-lg font-black text-emerald-600 tracking-tighter">{store.formatCurrency(stats.ledgerIncome)}</p>
                   </div>
                   <div className="p-6 bg-rose-50 rounded-3xl border border-rose-100">
-                     <p className="text-[8px] font-black uppercase text-rose-500 mb-1 italic">{L('Ledger (-)', 'Ledger (-)')}</p>
+                     <p className="text-xs font-black uppercase text-rose-500 mb-1 italic">{L('Ledger (-)', 'Ledger (-)')}</p>
                      <p className="text-lg font-black text-rose-500 tracking-tighter">-{store.formatCurrency(stats.ledgerExpense)}</p>
                   </div>
                   <div className="p-6 bg-navy-950 rounded-3xl text-white shadow-xl">
-                     <p className="text-[8px] font-black uppercase text-white/40 mb-1 italic">{L('Expected', 'Théorique')}</p>
+                     <p className="text-xs font-black uppercase text-white/40 mb-1 italic">{L('Expected', 'Théorique')}</p>
                      <p className="text-lg font-black text-emerald-400 tracking-tighter">{store.formatCurrency(stats.expected)}</p>
                   </div>
                </div>
 
                <form onSubmit={handleReconcile} className="space-y-8 pt-8 border-t border-navy-50">
                   <div className="space-y-4">
-                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Physical Cash Count', 'Somme Physique Comptée')}</p>
+                     <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Physical Cash Count', 'Somme Physique Comptée')}</p>
                      <div className="relative group">
                         <Wallet className="absolute left-8 top-1/2 -translate-y-1/2 w-8 h-8 text-navy-950" />
                         <input
@@ -149,7 +149,7 @@ export default function Cloture() {
                            required
                            value={actualCash}
                            onChange={e => setActualCash(e.target.value)}
-                           className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] pl-20 pr-10 py-8 text-4xl font-black text-navy-950 outline-none focus:border-navy-950 transition-all placeholder:text-blue-gray/20"
+                           className="w-full bg-navy-50 border-2 border-transparent rounded-[32px] pl-20 pr-10 py-8 text-3xl md:text-4xl font-black text-navy-950 outline-none focus:border-navy-950 transition-all placeholder:text-blue-gray/20"
                            placeholder="0.00"
                         />
                      </div>
@@ -162,11 +162,11 @@ export default function Cloture() {
                               {discrepancy === 0 ? <ShieldCheck className="w-8 h-8" /> : <AlertTriangle className="w-8 h-8" />}
                            </div>
                            <div>
-                              <p className="text-[10px] font-black uppercase tracking-widest opacity-60 italic">{L('Cash Discrepancy', 'Écart de Caisse')}</p>
+                              <p className="text-xs md:text-sm font-black uppercase tracking-widest opacity-60 italic">{L('Cash Discrepancy', 'Écart de Caisse')}</p>
                               <p className="text-3xl font-black tracking-tighter">{store.formatCurrency(discrepancy)}</p>
                            </div>
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest bg-white px-4 py-2 rounded-full shadow-sm">
+                        <span className="text-xs md:text-sm font-black uppercase tracking-widest bg-white px-4 py-2 rounded-full shadow-sm">
                            {discrepancy === 0 
                               ? L('SYSTEM BALANCED', 'SYSTÈME ÉQUILIBRÉ') 
                               : discrepancy > 0 
@@ -177,7 +177,7 @@ export default function Cloture() {
                   )}
 
                   <div className="space-y-4">
-                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Audit Comment', 'Commentaire d\'Audit')}</p>
+                     <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4 italic">{L('Audit Comment', 'Commentaire d\'Audit')}</p>
                      <textarea
                         rows="3"
                         value={note}
@@ -213,15 +213,15 @@ export default function Cloture() {
                               {new Date(r.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')}
                            </p>
                            <span className="w-1 h-1 rounded-full bg-blue-gray/30"></span>
-                           <p className="text-[10px] font-black text-blue-gray uppercase">{new Date(r.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</p>
+                           <p className="text-xs md:text-sm font-black text-blue-gray uppercase">{new Date(r.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}</p>
                         </div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{r.operator || L('SYSTEM ADMIN', 'SYSTEM ADMIN')}</p>
-                        {r.note && <p className="text-[10px] text-blue-gray italic font-bold mt-3 leading-relaxed border-l-2 border-navy-50 pl-4">"{r.note}"</p>}
+                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-emerald-600">{r.operator || L('SYSTEM ADMIN', 'SYSTEM ADMIN')}</p>
+                        {r.note && <p className="text-xs md:text-sm text-blue-gray italic font-bold mt-3 leading-relaxed border-l-2 border-navy-50 pl-4">"{r.note}"</p>}
                      </div>
                      
                      <div className="text-right space-y-4">
                         <div>
-                           <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Variance', 'Écart')}</p>
+                           <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Variance', 'Écart')}</p>
                            <p className={`text-xl font-black ${r.discrepancy === 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
                               {r.discrepancy > 0 ? '+' : ''}{store.formatCurrency(r.discrepancy)}
                            </p>

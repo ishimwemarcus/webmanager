@@ -82,7 +82,7 @@ export default function Shifts() {
               <div className="flex items-center gap-6">
                 <div className="w-20 h-20 bg-navy-50 rounded-3xl flex flex-col items-center justify-center text-navy-brand border border-navy-100 group-hover:bg-navy-brand group-hover:text-white transition-all">
                   <User className="w-8 h-8" />
-                  <p className="text-[10px] font-black uppercase mt-1">{shift.operator?.charAt(0)}</p>
+                  <p className="text-xs md:text-sm font-black uppercase mt-1">{shift.operator?.charAt(0)}</p>
                 </div>
                 <div>
                   <h3 className="text-2xl font-black uppercase tracking-tighter text-navy-950">{shift.operator}</h3>
@@ -103,15 +103,15 @@ export default function Shifts() {
 
               <div className="flex items-center gap-12">
                 <div className="text-right hidden sm:block">
-                    <p className="text-[10px] font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Sales', 'Ventes')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Sales', 'Ventes')}</p>
                     <p className="text-lg font-black text-navy-950">{store.formatCurrency(shift.revenue)}</p>
                 </div>
                 <div className="text-right hidden sm:block">
-                    <p className="text-[10px] font-black uppercase text-rose-500/60 tracking-widest mb-1 italic">{L('Expenses', 'Dépenses')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase text-rose-500/60 tracking-widest mb-1 italic">{L('Expenses', 'Dépenses')}</p>
                     <p className="text-lg font-black text-rose-600">-{store.formatCurrency(shift.expenses || 0)}</p>
                 </div>
                 <div className="text-right">
-                    <p className="text-[10px] font-black uppercase text-emerald-600 tracking-widest mb-1 italic">{L('Net Cash', 'Net Caisse')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase text-emerald-600 tracking-widest mb-1 italic">{L('Net Cash', 'Net Caisse')}</p>
                     <p className="text-2xl font-black text-emerald-600">{store.formatCurrency(shift.net || (shift.revenue - (shift.expenses || 0)))}</p>
                 </div>
                 <button 
@@ -125,12 +125,12 @@ export default function Shifts() {
             
             <div className="px-8 pb-8">
                <div className="bg-navy-50/50 rounded-3xl p-4 border border-navy-100/50">
-                  <p className="text-[10px] font-black uppercase text-blue-gray mb-3 tracking-widest flex items-center gap-2">
+                  <p className="text-xs md:text-sm font-black uppercase text-blue-gray mb-3 tracking-widest flex items-center gap-2">
                     <History className="w-3.5 h-3.5" /> {L('Preview of transactions linked to this shift', 'Aperçu des transactions liées à ce poste')}
                   </p>
                    <div className="flex flex-wrap gap-2 max-h-[200px] overflow-y-auto scrollbar-hide py-2">
                     {(shift.sales || allSales.filter(s => s.shiftId === (shift.shiftId || shift.start))).map((s, idx) => (
-                      <div key={idx} className="px-3 py-1.5 bg-white border border-navy-100 rounded-xl text-[10px] font-bold text-navy-900 shadow-sm flex items-center gap-2 hover:border-navy-brand transition-all">
+                      <div key={idx} className="px-3 py-1.5 bg-white border border-navy-100 rounded-xl text-xs md:text-sm font-bold text-navy-900 shadow-sm flex items-center gap-2 hover:border-navy-brand transition-all">
                         <span className="text-navy-brand font-black">{store.formatCurrency(s.amount)}</span>
                         <span className="opacity-30">|</span>
                         <span className="uppercase">{s.name}</span>

@@ -110,13 +110,13 @@ export default function Spoilage() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Losses & Spoilage', 'Pertes & Avaries')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Critical Loss Audit — Waste Valuation', 'Audit des Pertes Critiques — Valorisation du Gaspillage')}
           </p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-rose-700 transition-all shadow-2xl active:scale-95 shadow-rose-600/20"
+          className="flex items-center justify-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-rose-700 transition-all shadow-2xl active:scale-95 shadow-rose-600/20"
         >
           <Plus className="w-5 h-5" /> {L('Report a Loss', 'Signaler une Perte')}
         </button>
@@ -129,8 +129,8 @@ export default function Spoilage() {
             <TrendingDown className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Financial Impact', 'Impact Financier')}</p>
-            <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalLossValue)}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Financial Impact', 'Impact Financier')}</p>
+            <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalLossValue)}</p>
           </div>
         </div>
 
@@ -139,8 +139,8 @@ export default function Spoilage() {
             <ShieldAlert className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Incidents Detected', 'Incidents Détectés')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">{losses.length} <span className="text-xs">{L('Cases', 'Cas')}</span></p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Incidents Detected', 'Incidents Détectés')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">{losses.length} <span className="text-xs">{L('Cases', 'Cas')}</span></p>
           </div>
         </div>
 
@@ -152,7 +152,7 @@ export default function Spoilage() {
               <Clock className="w-8 h-8 text-rose-400" />
            </div>
            <div className="relative z-10">
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Last Loss', 'Dernière Perte')}</p>
+              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Last Loss', 'Dernière Perte')}</p>
               <p className="text-xl font-black text-white">{losses.length > 0 ? new Date(losses[losses.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : 'N/A'}</p>
            </div>
         </div>
@@ -169,28 +169,28 @@ export default function Spoilage() {
                   </div>
                   <div>
                      <h3 className="text-lg font-black text-navy-950 uppercase tracking-tighter group-hover:text-rose-600 transition-colors">{l.name}</h3>
-                     <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-60">{l.reason || L('Reason not specified', 'Raison non spécifiée')}</p>
+                     <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-60">{l.reason || L('Reason not specified', 'Raison non spécifiée')}</p>
                   </div>
                </div>
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-8 flex-1 max-w-2xl text-center md:text-left">
                   <div>
-                     <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Date / Time', 'Date / Heure')}</p>
+                     <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Date / Time', 'Date / Heure')}</p>
                      <p className="text-xs font-black text-navy-950 uppercase opacity-60">
                         {new Date(l.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')} — {new Date(l.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}
                      </p>
                   </div>
                   <div>
-                     <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Lost Volume', 'Volume Perdu')}</p>
+                     <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Lost Volume', 'Volume Perdu')}</p>
                      <p className="text-sm font-black text-rose-600">{l.quantity}</p>
                   </div>
                   <div>
-                     <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Impacted Value', 'Valeur Impactée')}</p>
+                     <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Impacted Value', 'Valeur Impactée')}</p>
                      <p className="text-sm font-black text-navy-950">{store.formatCurrency(l.valuation || 0)}</p>
                   </div>
                   <div>
-                     <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Operator', 'Opérateur')}</p>
-                     <p className="text-[10px] font-black text-navy-950 uppercase tracking-widest">{l.operator || 'ADMIN'}</p>
+                     <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Operator', 'Opérateur')}</p>
+                     <p className="text-xs md:text-sm font-black text-navy-950 uppercase tracking-widest">{l.operator || 'ADMIN'}</p>
                   </div>
                </div>
 
@@ -237,7 +237,7 @@ export default function Spoilage() {
                     <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">
                        {editingLoss ? L('Modify Spoilage', 'Modifier l\'Avarie') : L('New Report', 'Nouveau Signalement')}
                     </h3>
-                    <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Critical Loss Registry', 'Registre des Pertes Critiques')}</p>
+                    <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Critical Loss Registry', 'Registre des Pertes Critiques')}</p>
                  </div>
                  <button onClick={() => setShowModal(false)} className="p-3 hover:bg-navy-50 rounded-full transition-all">
                     <X className="w-6 h-6 text-blue-gray" />
@@ -246,7 +246,7 @@ export default function Spoilage() {
 
               <form onSubmit={handleSubmit} className="space-y-8">
                  <div className="space-y-2">
-                    <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Affected Item', 'Article Concerné')}</p>
+                    <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4">{L('Affected Item', 'Article Concerné')}</p>
                     <select
                       required
                       disabled={!!editingLoss}
@@ -261,7 +261,7 @@ export default function Spoilage() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Quantity', 'Quantité')}</p>
+                       <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4">{L('Quantity', 'Quantité')}</p>
                        <input
                          type="number"
                          required
@@ -271,7 +271,7 @@ export default function Spoilage() {
                        />
                     </div>
                     <div className="space-y-2">
-                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Cause', 'Cause')}</p>
+                       <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4">{L('Cause', 'Cause')}</p>
                        <input
                          type="text"
                          placeholder={L('Ex: EXPIRED...', 'Ex: PÉRIME...')}

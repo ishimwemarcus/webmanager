@@ -160,7 +160,7 @@ export default function Stock() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Stock Inventory', 'Inventaire Stock')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Asset Management — Centralized Registry', 'Gestion des Actifs — Registre Centralisé')}
           </p>
         </div>
@@ -169,14 +169,14 @@ export default function Stock() {
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="bg-rose-500 text-white px-8 py-4 rounded-[24px] font-black text-[10px] uppercase tracking-widest shadow-xl shadow-rose-500/20 flex items-center gap-2 hover:bg-rose-600 transition-all active:scale-95"
+              className="bg-rose-500 text-white px-8 py-4 rounded-[24px] font-black text-xs md:text-sm uppercase tracking-widest shadow-xl shadow-rose-500/20 flex items-center gap-2 hover:bg-rose-600 transition-all active:scale-95"
             >
               <Trash2 className="w-5 h-5" /> {L(`Delete ${selectedIds.length} Items`, `Supprimer ${selectedIds.length} Articles`)}
             </button>
           )}
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
+            className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
           >
             <Plus className="w-5 h-5 text-emerald-400" /> {L('Add an Asset', 'Ajouter un Actif')}
           </button>
@@ -190,8 +190,8 @@ export default function Stock() {
             <TrendingUp className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Total Valuation', 'Évaluation Totale')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Total Valuation', 'Évaluation Totale')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
               {store.formatCurrency(totalValuation)}
             </p>
           </div>
@@ -202,8 +202,8 @@ export default function Stock() {
             <Layers className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Operational Assets', 'Actifs Opérationnels')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Operational Assets', 'Actifs Opérationnels')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
               {products.length} <span className="text-xs text-blue-gray opacity-40 font-black">{L('Lines', 'Lignes')}</span>
             </p>
           </div>
@@ -225,7 +225,7 @@ export default function Stock() {
         {selectedCategory && (
           <button 
             onClick={() => { setSelectedCategory(null); setCurrentPage(1); }} 
-            className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
+            className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
           >
             <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> {L('Back to Sectors', 'Retour aux Secteurs')}
           </button>
@@ -248,7 +248,7 @@ export default function Stock() {
                 onClick={() => { setSelectedCategory(cat.name); setCurrentPage(1); }}
               >
                 {lowStockCount > 0 && (
-                   <div className="absolute top-6 left-6 px-3 py-1 bg-rose-500 text-white rounded-full text-[8px] font-black uppercase tracking-widest animate-pulse z-10">
+                   <div className="absolute top-6 left-6 px-3 py-1 bg-rose-500 text-white rounded-full text-xs font-black uppercase tracking-widest animate-pulse z-10">
                       {lowStockCount} {L('Critical', 'Critique')}
                    </div>
                 )}
@@ -259,8 +259,8 @@ export default function Stock() {
                    <Box className="w-8 h-8" />
                 </div>
                 <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">{L('Sector', 'Secteur')} {cat.name}</h4>
-                <p className="text-[10px] font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} {L('Items', 'Articles')}</p>
-                <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-navy-950">
+                <p className="text-xs md:text-sm font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} {L('Items', 'Articles')}</p>
+                <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-xs font-black uppercase tracking-widest text-navy-950">
                    <span>{L('Estimated Value', 'Valeur Estimée')}</span>
                    <span className={lowStockCount > 0 ? 'text-rose-600' : 'text-emerald-600'}>{store.formatCurrency(catValue)}</span>
                 </div>
@@ -292,26 +292,26 @@ export default function Stock() {
                        </div>
                        <div className="flex-1 min-w-0">
                           <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{p.name}</h4>
-                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || L('General', 'Général')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || L('General', 'Général')}</p>
                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1 text-center md:text-left">
                        <div>
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Available Stock', 'Stock Disponible')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Available Stock', 'Stock Disponible')}</p>
                           <div className="flex items-center justify-center md:justify-start gap-2">
                              <span className="text-xs font-black text-navy-950">{getFormattedQuantity(p)}</span>
-                             <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
+                             <span className={`px-2 py-0.5 rounded-full text-xs font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
                                 {p.quantity <= 5 ? L('Low', 'Bas') : L('Optimal', 'Optimal')}
                              </span>
                           </div>
                        </div>
                        <div>
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Unit Price', 'Prix Unitaire')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Unit Price', 'Prix Unitaire')}</p>
                           <p className="text-xs font-black text-navy-950">{store.formatCurrency(p.price)}</p>
                        </div>
                        <div className="hidden md:block">
-                          <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Asset Value', 'Valeur Assets')}</p>
+                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Asset Value', 'Valeur Assets')}</p>
                           <p className="text-xs font-black text-emerald-600">{store.formatCurrency(p.quantity * p.price)}</p>
                        </div>
                     </div>
@@ -367,7 +367,7 @@ export default function Stock() {
 
               <form onSubmit={editProduct ? handleEditProduct : handleAddProduct} className="p-8 space-y-6 overflow-y-auto scrollbar-hide">
                  <div>
-                    <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Item Name', 'Nom de l\'article')}</label>
+                    <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Item Name', 'Nom de l\'article')}</label>
                     <input
                       required
                       type="text"
@@ -380,7 +380,7 @@ export default function Stock() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Sector / Category', 'Secteur / Catégorie')}</label>
+                      <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Sector / Category', 'Secteur / Catégorie')}</label>
                       <select
                         required
                         value={editProduct ? editProduct.category : newProduct.category}
@@ -393,7 +393,7 @@ export default function Stock() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Initial Stock', 'Stock Initial')}</label>
+                        <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Initial Stock', 'Stock Initial')}</label>
                         <input
                           required
                           type="number"
@@ -404,7 +404,7 @@ export default function Stock() {
                         />
                       </div>
                       <div>
-                        <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Unit', 'Unité')}</label>
+                        <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Unit', 'Unité')}</label>
                         <select
                           required
                           value={editProduct ? editProduct.packageType : newProduct.packageType}
@@ -424,7 +424,7 @@ export default function Stock() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Purchase Price (Unit)', 'Prix d\'Achat (Unit)')}</label>
+                      <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Purchase Price (Unit)', 'Prix d\'Achat (Unit)')}</label>
                       <input
                         required
                         type="number"
@@ -434,7 +434,7 @@ export default function Stock() {
                       />
                     </div>
                     <div>
-                      <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Selling Price (Unit)', 'Prix de Vente (Unit)')}</label>
+                      <label className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-2 block italic">{L('Selling Price (Unit)', 'Prix de Vente (Unit)')}</label>
                       <input
                         required
                         type="number"
@@ -462,13 +462,13 @@ export default function Stock() {
             <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
                <div className="text-center space-y-2 mb-10">
                   <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Report Spoilage', 'Signaler Avarie')}</h3>
-                  <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showLossModal.name}</p>
+                  <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{showLossModal.name}</p>
                </div>
 
                <form onSubmit={handleReportLoss} className="space-y-8">
                   <div className="space-y-6">
                      <div className="space-y-2">
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Quantity Lost', 'Quantité Perdue')}</p>
+                        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4">{L('Quantity Lost', 'Quantité Perdue')}</p>
                         <input
                           autoFocus
                           value={lossData.quantity}
@@ -482,7 +482,7 @@ export default function Stock() {
                      </div>
                      
                      <div className="space-y-2">
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest ml-4">{L('Reason / Cause', 'Raison / Cause')}</p>
+                        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest ml-4">{L('Reason / Cause', 'Raison / Cause')}</p>
                         <input
                           value={lossData.reason}
                           onChange={e => setLossData({ ...lossData, reason: e.target.value })}
@@ -495,8 +495,8 @@ export default function Stock() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                     <button type="button" onClick={() => setShowLossModal(null)} className="py-6 bg-navy-50 text-navy-950 rounded-[32px] font-black uppercase text-[10px] tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
-                     <button type="submit" className="py-6 bg-rose-600 text-white rounded-[32px] font-black uppercase tracking-widest text-[10px] shadow-2xl shadow-rose-600/20 hover:bg-rose-700 transition-all active:scale-[0.98]">
+                     <button type="button" onClick={() => setShowLossModal(null)} className="py-6 bg-navy-50 text-navy-950 rounded-[32px] font-black uppercase text-xs md:text-sm tracking-widest hover:bg-navy-100 transition-all">{L('Cancel', 'Annuler')}</button>
+                     <button type="submit" className="py-6 bg-rose-600 text-white rounded-[32px] font-black uppercase tracking-widest text-xs md:text-sm shadow-2xl shadow-rose-600/20 hover:bg-rose-700 transition-all active:scale-[0.98]">
                         {L('Confirm Loss', 'Confirmer Perte')}
                      </button>
                   </div>

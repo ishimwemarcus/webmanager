@@ -12,7 +12,7 @@ const LiveClock = ({ lang }) => {
   return (
     <div className="flex items-center gap-2 text-2xl font-black text-navy-950 tracking-tighter">
        <Clock className="w-5 h-5 text-emerald-500" />
-       {time.toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' })} <span className="text-[10px] ml-1 opacity-40">GMT</span>
+       {time.toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' })} <span className="text-xs md:text-sm ml-1 opacity-40">GMT</span>
     </div>
   );
 };
@@ -73,14 +73,14 @@ export default function ShiftGateway() {
             <div className="w-24 h-24 bg-navy-brand rounded-[32px] mx-auto flex items-center justify-center mb-8 shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-500 border-4 border-white/20">
                 <ShieldCheck className="w-12 h-12 text-white" />
             </div>
-            <h1 className="text-4xl font-black text-navy-950 uppercase tracking-tighter mb-2">MARC GATEWAY</h1>
+            <h1 className="text-3xl md:text-4xl font-black text-navy-950 uppercase tracking-tighter mb-2">MARC GATEWAY</h1>
             <div className="flex items-center justify-center gap-2">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
               <p className="text-xs md:text-sm text-blue-gray uppercase tracking-[0.4em] font-black">{t('loginGateway')}</p>
             </div>
             
             <div className="mt-6 flex flex-col items-center">
-               <p className="text-[10px] font-black text-navy-950/40 uppercase tracking-[0.3em] mb-1 italic">
+               <p className="text-xs md:text-sm font-black text-navy-950/40 uppercase tracking-[0.3em] mb-1 italic">
                   {new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })}
                </p>
                <LiveClock lang={lang} />
@@ -129,7 +129,7 @@ export default function ShiftGateway() {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
             </button>
 
-            <p className="text-center text-[10px] text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
+            <p className="text-center text-xs md:text-sm text-blue-gray font-bold uppercase tracking-widest leading-relaxed">
               {L('MARC security protocol active. Selected currency:', 'Protocole de sécurité MARC actif. Devise sélectionnée:')} <span className="text-navy-brand">{selectedCurrency}</span>
             </p>
         </form>

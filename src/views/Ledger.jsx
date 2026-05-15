@@ -174,14 +174,14 @@ export default function Ledger() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Financial Audit', 'Audit Financier')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('General Ledger — Cash Flow & Obligations', 'Grand Livre — Flux de Trésorerie & Obligations')}
           </p>
         </div>
         <div className="flex gap-4">
            <button 
              onClick={() => setShowModal(true)}
-             className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-black transition-all shadow-xl active:scale-95"
+             className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-black transition-all shadow-xl active:scale-95"
            >
              <Plus className="w-5 h-5" /> {L('New Entry', 'Nouvelle Entrée')}
            </button>
@@ -191,22 +191,22 @@ export default function Ledger() {
       {/* Analytics Matrix */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 no-print">
          <div className="glass-card bg-white p-8 rounded-[48px] border-rose-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Debit (Expenses)', 'Débit (Dépenses)')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Debit (Expenses)', 'Débit (Dépenses)')}</p>
             <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(metrics.totalExpensed)}</p>
          </div>
          <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Client Credits', 'Crédit Clients')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Client Credits', 'Crédit Clients')}</p>
             <p className="text-3xl font-black text-emerald-600 tracking-tighter">{store.formatCurrency(metrics.totalClientCredits)}</p>
          </div>
          <div className="glass-card bg-white p-8 rounded-[48px] border-indigo-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Active Receivables', 'Créances Actives')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Active Receivables', 'Créances Actives')}</p>
             <p className="text-3xl font-black text-indigo-600 tracking-tighter">{store.formatCurrency(metrics.totalOutstanding)}</p>
          </div>
          <div className="glass-card bg-navy-950 p-8 rounded-[48px] text-white shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-125 transition-transform">
                <TrendingUp className="w-16 h-16" />
             </div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-white/40 mb-3 italic">{L('Tips', 'Pourboires')}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-3 italic">{L('Tips', 'Pourboires')}</p>
             <p className="text-3xl font-black text-white tracking-tighter">{store.formatCurrency(metrics.totalTips)}</p>
          </div>
       </div>
@@ -218,7 +218,7 @@ export default function Ledger() {
                <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-navy-950'}`}
+                  className={`px-8 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${activeTab === tab ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-navy-950'}`}
                >
                   {tab === 'general' ? L('Total View', 'Vue Totale') : tab === 'expense' ? L('Expenses', 'Dépenses') : L('Receivables', 'Créances')}
                </button>
@@ -230,7 +230,7 @@ export default function Ledger() {
                <button
                   key={time}
                   onClick={() => setFilterDate(time)}
-                  className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-white text-navy-950 shadow-sm' : 'text-blue-gray hover:text-navy-950'}`}
+                  className={`px-6 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all ${filterDate === time ? 'bg-white text-navy-950 shadow-sm' : 'text-blue-gray hover:text-navy-950'}`}
                >
                   {time === 'all' ? L('Archive', 'Archive') : time === 'today' ? L('Day', 'Journée') : L('Month', 'Mois')}
                </button>
@@ -249,9 +249,9 @@ export default function Ledger() {
                      </div>
                      <div>
                         <h3 className="text-lg font-black text-navy-950 uppercase tracking-tighter">{d.name}</h3>
-                        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-60">{d.client || L('INTERNAL OPERATION', 'OPÉRATION INTERNE')} | {L('BY', 'PAR')}: {d.operator || 'ADMIN'}</p>
+                        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-60">{d.client || L('INTERNAL OPERATION', 'OPÉRATION INTERNE')} | {L('BY', 'PAR')}: {d.operator || 'ADMIN'}</p>
                         {d.phone && d.phone !== 'none' && (
-                           <p className="text-[8px] font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
+                           <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                               <Phone className="w-2 h-2" /> {d.phone}
                            </p>
                         )}
@@ -260,21 +260,21 @@ export default function Ledger() {
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-8 flex-1 max-w-3xl text-center md:text-left">
                      <div>
-                        <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Date / Flow', 'Date / Flux')}</p>
+                        <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Date / Flow', 'Date / Flux')}</p>
                         <p className="text-xs font-black text-navy-950 uppercase opacity-60">
                            {new Date(d.date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US')} | {new Date(d.date).toLocaleTimeString(lang === 'fr' ? 'fr-FR' : 'en-US', {hour:'2-digit', minute:'2-digit'})}
                         </p>
                      </div>
                      <div>
-                        <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Valuation', 'Évaluation')}</p>
+                        <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Valuation', 'Évaluation')}</p>
                         <p className="text-sm font-black text-navy-950">{store.formatCurrency(d.amount)}</p>
                      </div>
                      <div>
-                        <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Settled Balance', 'Solde Réglé')}</p>
+                        <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Settled Balance', 'Solde Réglé')}</p>
                         <p className="text-sm font-black text-emerald-600">{store.formatCurrency(d.paid)}</p>
                      </div>
                      <div>
-                        <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Obligation', 'Obligation')}</p>
+                        <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Obligation', 'Obligation')}</p>
                         <p className={`text-sm font-black ${ (parseFloat(d.amount)||0) > (parseFloat(d.paid)||0) ? 'text-rose-600' : 'text-blue-gray/20' }`}>
                            {store.formatCurrency(Math.max(0, (parseFloat(d.amount)||0) - (parseFloat(d.paid)||0)))}
                         </p>
@@ -285,7 +285,7 @@ export default function Ledger() {
                      {d.status !== 'paid' && (parseFloat(d.amount) || 0) > (parseFloat(d.paid) || 0) && (
                         <button 
                           onClick={() => setShowPayModal(d)}
-                          className="px-6 py-3 bg-navy-950 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all shadow-md"
+                          className="px-6 py-3 bg-navy-950 text-white rounded-xl text-xs md:text-sm font-black uppercase tracking-widest hover:bg-black transition-all shadow-md"
                         >
                            {L('Settle', 'Solder')}
                         </button>
@@ -331,7 +331,7 @@ export default function Ledger() {
               <div className="flex items-center justify-between mb-10">
                  <div className="space-y-1">
                     <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Manual Entry', 'Entrée Manuelle')}</h3>
-                    <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Financial Data Injection', 'Injection de Données Financières')}</p>
+                    <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Financial Data Injection', 'Injection de Données Financières')}</p>
                  </div>
                  <button onClick={() => setShowModal(false)} className="p-3 hover:bg-navy-50 rounded-full transition-all">
                     <X className="w-6 h-6 text-blue-gray" />
@@ -346,7 +346,7 @@ export default function Ledger() {
                       className={`flex-1 p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${entry.type === 'expense' ? 'bg-rose-50 border-rose-500 text-rose-600' : 'bg-navy-50 border-transparent text-blue-gray opacity-40'}`}
                     >
                        <TrendingDown className="w-8 h-8" />
-                       <span className="text-[10px] font-black uppercase tracking-widest">{L('Debit', 'Débit')}</span>
+                       <span className="text-xs md:text-sm font-black uppercase tracking-widest">{L('Debit', 'Débit')}</span>
                     </button>
                     <button
                       type="button"
@@ -354,7 +354,7 @@ export default function Ledger() {
                       className={`flex-1 p-6 rounded-3xl border-2 transition-all flex flex-col items-center gap-3 ${entry.type === 'receivable' ? 'bg-emerald-50 border-emerald-500 text-emerald-600' : 'bg-navy-50 border-transparent text-blue-gray opacity-40'}`}
                     >
                        <TrendingUp className="w-8 h-8" />
-                       <span className="text-[10px] font-black uppercase tracking-widest">{L('Credit', 'Crédit')}</span>
+                       <span className="text-xs md:text-sm font-black uppercase tracking-widest">{L('Credit', 'Crédit')}</span>
                     </button>
                  </div>
 
@@ -371,11 +371,11 @@ export default function Ledger() {
 
                  <div className="grid grid-cols-2 gap-6">
                     <div className="bg-navy-50 p-6 rounded-3xl text-center border border-navy-100">
-                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-2">{L('Amount', 'Montant')}</p>
+                       <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mb-2">{L('Amount', 'Montant')}</p>
                        <input value={entry.amount} onChange={e => setEntry({ ...entry, amount: e.target.value })} type="number" required className="w-full bg-transparent text-2xl font-black text-navy-950 outline-none text-center" />
                     </div>
                     <div className="bg-navy-50 p-6 rounded-3xl text-center border border-navy-100">
-                       <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest mb-2">{L('Settled', 'Réglé')}</p>
+                       <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest mb-2">{L('Settled', 'Réglé')}</p>
                        <input value={entry.paid} onChange={e => setEntry({ ...entry, paid: e.target.value })} type="number" required className="w-full bg-transparent text-2xl font-black text-emerald-600 outline-none text-center" />
                     </div>
                  </div>
@@ -393,12 +393,12 @@ export default function Ledger() {
            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-md w-full scale-in" onClick={e => e.stopPropagation()}>
               <div className="text-center space-y-2 mb-10">
                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Settlement', 'Règlement')}</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Settle Financial Obligation', 'Solder l\'Obligation Financière')}</p>
+                 <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic opacity-40">{L('Settle Financial Obligation', 'Solder l\'Obligation Financière')}</p>
               </div>
 
               <div className="bg-rose-50 border border-rose-100 p-8 rounded-[40px] text-center mb-10">
-                 <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-2">{L('Open Balance', 'Balance Ouverte')}</p>
-                 <p className="text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
+                 <p className="text-xs md:text-sm font-black text-rose-500 uppercase tracking-widest mb-2">{L('Open Balance', 'Balance Ouverte')}</p>
+                 <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency((parseFloat(showPayModal.amount) || 0) - (parseFloat(showPayModal.paid) || 0))}</p>
               </div>
 
               <form onSubmit={handleMarkPaid} className="space-y-8">

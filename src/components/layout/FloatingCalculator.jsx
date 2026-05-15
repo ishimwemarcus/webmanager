@@ -50,7 +50,7 @@ export default function FloatingCalculator() {
       <div className="p-6 bg-navy-950 text-white flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Calculator className="w-4 h-4 text-emerald-400" />
-          <span className="text-[10px] font-black uppercase tracking-widest">{L('QUICK CALC', 'CALCUL RAPIDE')}</span>
+          <span className="text-xs md:text-sm font-black uppercase tracking-widest">{L('QUICK CALC', 'CALCUL RAPIDE')}</span>
         </div>
         <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/10 rounded-lg transition-all">
           <X className="w-4 h-4" />
@@ -59,8 +59,8 @@ export default function FloatingCalculator() {
 
       {/* Display */}
       <div className="p-8 bg-navy-50/50 text-right">
-        <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest h-4 mb-1">{formula}</p>
-        <p className="text-4xl font-black text-navy-950 tracking-tighter truncate">{display}</p>
+        <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest h-4 mb-1">{formula}</p>
+        <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter truncate">{display}</p>
       </div>
 
       {/* Keys */}

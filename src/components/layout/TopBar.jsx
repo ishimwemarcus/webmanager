@@ -58,15 +58,15 @@ export default function TopBar({ onToggleSidebar }) {
         <div className="flex items-center gap-4 md:gap-6">
           <div className="flex flex-col">
             <div className="flex items-center gap-2 md:gap-3">
-              <h2 className="text-[10px] md:text-sm font-black text-white uppercase tracking-tighter">
+              <h2 className="text-xs md:text-sm md:text-sm font-black text-white uppercase tracking-tighter">
                 {L('VIEW', 'VUE')} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
               </h2>
               <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
+                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
               </div>
             </div>
-            <p className="hidden sm:block text-[8px] md:text-[10px] text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
+            <p className="hidden sm:block text-xs md:text-xs md:text-sm text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
           </div>
 
           <div className="hidden sm:flex items-center gap-4">
@@ -76,14 +76,14 @@ export default function TopBar({ onToggleSidebar }) {
                     store.syncStatus === 'syncing' ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 
                     'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]'
                   }`}></div>
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white">
+                  <span className="text-xs md:text-sm font-black uppercase tracking-widest text-white">
                     {store.syncStatus === 'connected' ? L('Sync Active', 'Sync Actif') : 
                      store.syncStatus === 'syncing' ? L('Syncing...', 'Synchronisation...') : 
                      L('Connection Lost', 'Connexion Perdue')}
                   </span>
               </div>
               {store.lastSyncTime && (
-                <span className="text-[8px] font-black uppercase tracking-[0.2em] text-white/40">
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-white/40">
                   {L('Last Sync:', 'Dernière Sync :')} {new Date(store.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                 </span>
               )}
@@ -92,7 +92,7 @@ export default function TopBar({ onToggleSidebar }) {
           {store.isReadOnly && (
             <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] animate-fade-in">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-amber-400">
+                <span className="text-xs sm:text-xs font-black uppercase tracking-widest text-amber-400">
                   {L('Live View Mode', 'Mode Visionnage Direct')}
                 </span>
             </div>
@@ -108,10 +108,10 @@ export default function TopBar({ onToggleSidebar }) {
             <div className="flex items-center gap-1 sm:gap-2">
               {/* Operator name badge */}
               <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl">
-                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-[8px] sm:text-[10px] shadow-[0_0_10px_rgba(16,185,129,0.4)]">
+                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs sm:text-xs md:text-sm shadow-[0_0_10px_rgba(16,185,129,0.4)]">
                   {currentOperator.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block text-[10px] font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
+                <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
               </div>
 
               {/* Shift End Button — prominently red */}
@@ -127,7 +127,7 @@ export default function TopBar({ onToggleSidebar }) {
                   }
                 }}
                 title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-lg sm:rounded-xl text-white font-black text-[7px] sm:text-[9px] uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-lg sm:rounded-xl text-white font-black text-[7px] sm:text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
               >
                 <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span className="inline">{L('End Shift', 'Fin Poste')}</span>
@@ -143,7 +143,7 @@ export default function TopBar({ onToggleSidebar }) {
             className="flex items-center gap-1 sm:gap-2 px-1 sm:px-3 py-1 sm:py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all active:scale-90"
           >
             <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400" />
-            <span className="text-[8px] sm:text-[10px] font-black text-white">{lang.toUpperCase()}</span>
+            <span className="text-xs sm:text-xs md:text-sm font-black text-white">{lang.toUpperCase()}</span>
           </button>
 
           {/* Sync Button */}
@@ -168,7 +168,7 @@ export default function TopBar({ onToggleSidebar }) {
           {/* Currency Controls */}
           <div className="flex items-center gap-1 sm:gap-3">
              <div className="hidden sm:block px-2 py-1 bg-white/5 border border-white/10 rounded-lg">
-                <span className="text-[8px] sm:text-[10px] font-black text-white/40 uppercase tracking-widest">CUR</span>
+                <span className="text-xs sm:text-xs md:text-sm font-black text-white/40 uppercase tracking-widest">CUR</span>
              </div>
               <button 
                 className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 text-black rounded-lg sm:rounded-lg font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all"
@@ -192,7 +192,7 @@ export default function TopBar({ onToggleSidebar }) {
               <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
               <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/?pass=MARCUS&sync=' + encodeURIComponent(store.syncUrl))}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
             </div>
-            <p className="text-[10px] font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
+            <p className="text-xs md:text-sm font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
           </div>
         </div>
       )}

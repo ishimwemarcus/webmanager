@@ -67,13 +67,13 @@ export default function Clients() {
           <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
             {L('Client Base', 'Base Clients')}
           </h1>
-          <p className="text-[10px] font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
             {L('Loyalty & Risk Analysis — Loyalty Program', 'Fidélisation & Analyse de Risque — Programme Loyalty')}
           </p>
         </div>
         <button 
           onClick={() => setShowPortalQR(true)}
-          className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
+          className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
         >
           <QrCode className="w-5 h-5 text-emerald-400" /> {L('Generate Client Portal QR', 'Générer QR Portail Client')}
         </button>
@@ -86,8 +86,8 @@ export default function Clients() {
             <Users className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Database', 'Base de Données')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">{totalClients} <span className="text-xs font-black">{L('Clients', 'Clients')}</span></p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Database', 'Base de Données')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">{totalClients} <span className="text-xs font-black">{L('Clients', 'Clients')}</span></p>
           </div>
         </div>
 
@@ -96,8 +96,8 @@ export default function Clients() {
             <Star className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('VIP Elite', 'Élite VIP')}</p>
-            <p className="text-4xl font-black text-navy-950 tracking-tighter">{vipCount}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('VIP Elite', 'Élite VIP')}</p>
+            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">{vipCount}</p>
           </div>
         </div>
 
@@ -106,8 +106,8 @@ export default function Clients() {
             <AlertTriangle className="w-10 h-10" />
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Risk Analysis', 'Analyse de Risque')}</p>
-            <p className="text-4xl font-black text-rose-600 tracking-tighter">{riskCount}</p>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Risk Analysis', 'Analyse de Risque')}</p>
+            <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{riskCount}</p>
           </div>
         </div>
       </div>
@@ -143,32 +143,32 @@ export default function Clients() {
                           <Star key={i} className={`w-2.5 h-2.5 ${i < c.trustScore ? 'text-amber-400 fill-amber-400' : 'text-navy-100'}`} />
                         ))}
                       </div>
-                      <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest italic mt-1">{c.phone === 'none' ? L('No contact indexed', 'Aucun contact indexé') : c.phone}</p>
+                      <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic mt-1">{c.phone === 'none' ? L('No contact indexed', 'Aucun contact indexé') : c.phone}</p>
                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 flex-1 max-w-2xl text-center md:text-left">
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Transactions', 'Transactions')}</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Transactions', 'Transactions')}</p>
                       <p className="text-xs font-black text-navy-950">{c.transactions} {L('Sales', 'Ventes')}</p>
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Total Spent', 'Dépenses Totales')}</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Total Spent', 'Dépenses Totales')}</p>
                       <p className="text-xs font-black text-navy-950">{store.formatCurrency(c.totalSpent)}</p>
                    </div>
                    <div>
-                      <p className="text-[8px] font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Wallet Balance', 'Solde du Compte')}</p>
+                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Wallet Balance', 'Solde du Compte')}</p>
                       <p className={`text-xs font-black ${c.globalBalance < 0 ? 'text-rose-600' : c.globalBalance > 0 ? 'text-emerald-600' : 'text-blue-gray'}`}>
                          {c.globalBalance === 0 ? L('Neutral', 'Neutre') : store.formatCurrency(c.globalBalance)}
                       </p>
                    </div>
                    <div className="hidden md:flex items-center justify-center">
                       {isRisk ? (
-                         <span className="px-4 py-2 bg-rose-500 text-white rounded-xl text-[8px] font-black uppercase tracking-widest shadow-lg shadow-rose-500/20">{L('Risk Alert', 'Risque Alert')}</span>
+                         <span className="px-4 py-2 bg-rose-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20">{L('Risk Alert', 'Risque Alert')}</span>
                       ) : isVIP ? (
-                         <span className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-[8px] font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20">{L('Premium VIP', 'Premium VIP')}</span>
+                         <span className="px-4 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-500/20">{L('Premium VIP', 'Premium VIP')}</span>
                       ) : (
-                         <span className="px-4 py-2 bg-navy-50 text-blue-gray rounded-xl text-[8px] font-black uppercase tracking-widest">{L('Standard', 'Standard')}</span>
+                         <span className="px-4 py-2 bg-navy-50 text-blue-gray rounded-xl text-xs font-black uppercase tracking-widest">{L('Standard', 'Standard')}</span>
                       )}
                    </div>
                 </div>
@@ -178,7 +178,7 @@ export default function Clients() {
                      href={`#/portal/${encodeURIComponent(c.name)}/${encodeURIComponent(c.phone)}`} 
                      target="_blank" 
                      rel="noopener noreferrer"
-                     className="flex items-center gap-2 px-6 py-4 bg-navy-950 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95"
+                     className="flex items-center gap-2 px-6 py-4 bg-navy-950 text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-xl active:scale-95"
                    >
                      <ExternalLink className="w-4 h-4 text-emerald-400" /> {L('Portal Access', 'Accès Portail')}
                    </a>
@@ -210,7 +210,7 @@ export default function Clients() {
            <div className="bg-white p-12 rounded-[56px] shadow-3xl max-w-sm w-full text-center space-y-8 animate-scale-in" onClick={e => e.stopPropagation()}>
               <div className="space-y-2">
                  <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Store Poster', 'Affiche Boutique')}</h3>
-                 <p className="text-[10px] font-black text-blue-gray uppercase tracking-widest">{L('Client Consultation Space', 'Espace Consultation Client')}</p>
+                 <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest">{L('Client Consultation Space', 'Espace Consultation Client')}</p>
               </div>
               
               <div className="bg-emerald-50 p-6 rounded-[48px] border-4 border-emerald-100 shadow-inner relative overflow-hidden">
@@ -228,7 +228,7 @@ export default function Clients() {
                  </p>
                  <button 
                    onClick={() => window.print()}
-                   className="w-full py-5 bg-navy-950 text-white font-black rounded-3xl shadow-2xl hover:bg-emerald-600 transition-all uppercase tracking-widest text-[10px] active:scale-95 flex items-center justify-center gap-3"
+                   className="w-full py-5 bg-navy-950 text-white font-black rounded-3xl shadow-2xl hover:bg-emerald-600 transition-all uppercase tracking-widest text-xs md:text-sm active:scale-95 flex items-center justify-center gap-3"
                  >
                    <TrendingUp className="w-4 h-4 text-emerald-400" /> {L('Print Poster', 'Imprimer l\'Affiche')}
                  </button>
