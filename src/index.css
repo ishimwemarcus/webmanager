@@ -67,11 +67,11 @@
   }
 
   /* --- RESPONSIVE COMPACT FONT SCALING --- */
-  html { font-size: 14px; } /* Reduced from 16px default */
-  @media (max-width: 1024px) { html { font-size: 13.5px; } }
-  @media (max-width: 768px)  { html { font-size: 13px; } }
-  @media (max-width: 480px)  { html { font-size: 12px; } }
-  @media (max-width: 360px)  { html { font-size: 11px; } }
+  html { font-size: 15px; } /* Slightly reduced to keep compactness */
+  @media (max-width: 1024px) { html { font-size: 15px; } }
+  @media (max-width: 768px)  { html { font-size: 14px; } }
+  @media (max-width: 480px)  { html { font-size: 14px; } }
+  @media (max-width: 360px)  { html { font-size: 13px; } }
 
   /* --- GLASS CARD --- */
   .glass-card {
