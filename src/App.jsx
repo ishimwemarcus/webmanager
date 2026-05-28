@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Sidebar from './components/layout/Sidebar';
 import TopBar from './components/layout/TopBar';
 import Dashboard from './views/Dashboard';
@@ -30,7 +30,19 @@ import ShiftEndModal from './components/layout/ShiftEndModal';
 function App() {
   const store = useStore();
   const { t } = useLanguage();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
+  const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
+
+  React.useEffect(() => {
+    if (window.innerWidth < 1024) setSidebarOpen(false);
+  }, [location.pathname]);
+
+  React.useEffect(() => {
+    const close = () => setSidebarOpen(false);
+    document.addEventListener('marc-close-sidebar', close);
+    return () => document.removeEventListener('marc-close-sidebar', close);
+  }, []);
   const [currentUser] = useState({ username: 'admin', role: 'Master' });
   const [appBooted, setAppBooted] = useState(false);
   const handleBootComplete = React.useCallback(() => setAppBooted(true), []);
@@ -74,10 +86,10 @@ function App() {
       onClose={() => store.setIsShiftEndModalOpen(false)} 
     />
 
-    <div className={`fixed inset-0 w-full h-[100dvh] flex bg-transparent overflow-hidden transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-105 pointer-events-none'}`}>
+    <div className={`app-shell transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
       <GlobalAlerts />
       <ToastNotification />
-      <FloatingCalculator />
+      <FloatingCalculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
       <ConfirmModal 
         isOpen={store.confirmState.isOpen}
         message={store.confirmState.message}
@@ -95,17 +107,21 @@ function App() {
 
       {/* Slide-over / Fixed Sidebar */}
       {!window.location.hash.includes('/portal/') && (
-        <div className={`fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className={`app-sidebar-slot fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex shrink-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
           <Sidebar className="h-full shadow-2xl lg:shadow-none" />
         </div>
       )}
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden w-full relative">
+      <div className="app-main-column">
         {!window.location.hash.includes('/portal/') && (
-          <TopBar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+          <TopBar
+            onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+            onToggleCalculator={() => setIsCalculatorOpen(prev => !prev)}
+            isCalculatorOpen={isCalculatorOpen}
+          />
         )}
 
-        <main className={`flex-1 overflow-auto scrollbar-thin pb-safe [-webkit-overflow-scrolling:touch] ${window.location.hash.includes('/portal/') ? 'p-0' : 'p-2 lg:p-4'}`}>
+        <main className={`app-main-scroll pb-safe [-webkit-overflow-scrolling:touch] ${window.location.hash.includes('/portal/') ? 'p-0' : 'px-2 py-1 md:px-2 md:py-1.5'}`}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/stock" element={<Stock />} />

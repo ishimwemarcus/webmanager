@@ -24,53 +24,53 @@ export default function Shifts() {
   }, [filteredShifts]);
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
-        <div>
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+    <div className="page-shell page-shell--fit fade-in-up">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
+        <div className="space-y-1">
+          <h1 className="text-display">
             {L('Shift Journal', 'Journal des Postes')}
           </h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1">
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
             {L('Employee Performance Tracking', 'Suivi des Performances Employés')}
-          </h2>
+          </p>
         </div>
-        
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3 bg-white p-3 rounded-2xl border border-navy-100 shadow-xl">
-              <Calendar className="w-5 h-5 text-blue-gray" />
+
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-white p-2 rounded-xl border border-navy-100 shadow-sm">
+              <Calendar className="w-4 h-4 text-blue-gray" />
               <input 
                 type="date" 
                 value={filterDate}
                 onChange={e => { setFilterDate(e.target.value); setShowAll(false); }}
-                className="bg-transparent font-black text-navy-950 outline-none text-sm cursor-pointer"
+                className="bg-transparent font-bold text-navy-950 outline-none text-xs cursor-pointer"
               />
           </div>
           <button 
             onClick={() => setShowAll(!showAll)}
-            className={`px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all shadow-xl ${showAll ? 'bg-navy-950 text-white border-navy-950' : 'bg-white text-navy-950 border-navy-100 hover:border-navy-brand'}`}
+            className={`px-4 py-2 rounded-xl font-black text-xs uppercase tracking-widest border transition-all shadow-sm ${showAll ? 'bg-navy-950 text-white border-navy-950' : 'bg-white text-navy-950 border-navy-100 hover:border-navy-brand'}`}
           >
             {showAll ? L('View by Date', 'Voir par Date') : L('View All History', 'Voir Tout Historique')}
           </button>
         </div>
-      </div>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-16 h-16 bg-navy-brand/10 text-navy-brand rounded-2xl flex items-center justify-center">
-            <TrendingUp className="w-8 h-8" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 no-print">
+        <div className="glass-card p-4 bg-white border border-navy-100 shadow-sm flex items-center gap-4 group hover-elevate hover:border-navy-brand transition-all">
+          <div className="w-12 h-12 bg-navy-brand/10 text-navy-brand rounded-xl flex items-center justify-center">
+            <TrendingUp className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Global Revenue', 'Chiffre d\'Affaires Global')}</p>
-            <p className="text-3xl font-black text-navy-950">{store.formatCurrency(stats.totalRevenue)}</p>
+            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-0.5 italic">{L('Global Revenue', 'Chiffre d\'Affaires Global')}</p>
+            <p className="text-xl font-black text-navy-950">{store.formatCurrency(stats.totalRevenue)}</p>
           </div>
         </div>
-        <div className="glass-card p-8 bg-white border border-navy-100 shadow-xl flex items-center gap-6 group hover-elevate hover:border-navy-brand transition-all">
-          <div className="w-16 h-16 bg-blue-500/10 text-blue-400 rounded-2xl flex items-center justify-center">
-            <ShoppingBag className="w-8 h-8" />
+        <div className="glass-card p-4 bg-white border border-navy-100 shadow-sm flex items-center gap-4 group hover-elevate hover:border-navy-brand transition-all">
+          <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center">
+            <ShoppingBag className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-1 italic">{L('Total Transactions', 'Total Transactions')}</p>
-            <p className="text-3xl font-black text-navy-950">{stats.totalTransactions} <span className="text-sm">{L('Sales', 'Ventes')}</span></p>
+            <p className="text-xs font-black uppercase text-blue-gray tracking-widest mb-0.5 italic">{L('Total Transactions', 'Total Transactions')}</p>
+            <p className="text-xl font-black text-navy-950">{stats.totalTransactions} <span className="text-xs">{L('Sales', 'Ventes')}</span></p>
           </div>
         </div>
       </div>

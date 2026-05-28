@@ -1,18 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  BookOpen,
-  ChevronRight,
-  Clock,
-  BarChart2,
-  Users,
-  AlertTriangle,
-  Calculator,
-  Cpu,
-  LogOut
+  LayoutDashboard, Package, ShoppingCart, BookOpen,
+  Clock, BarChart2, Users, AlertTriangle, Calculator, Cpu, LogOut
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
@@ -26,37 +16,41 @@ export default function Sidebar({ className }) {
   })();
 
   const navItems = [
-    { to: '/', icon: LayoutDashboard, label: t('dashboard') },
-    { to: '/commander', icon: Cpu, label: t('commanderInterface') },
-    { to: '/stock', icon: Package, label: t('stock') },
-    { to: '/sales', icon: ShoppingCart, label: t('sales') },
-    { to: '/wait', icon: BookOpen, label: t('ledger') },
-    { to: '/reports', icon: BarChart2, label: t('intelligence') },
-    { to: '/clients', icon: Users, label: t('clientsDatabase') },
-    { to: '/shifts', icon: Clock, label: t('currentShift') },
-    { to: '/spoilage', icon: AlertTriangle, label: t('spoilage') },
-    { to: '/cloture', icon: Calculator, label: t('closeRegister') }
+    { to: '/',          icon: LayoutDashboard, label: t('dashboard') },
+    { to: '/commander', icon: Cpu,             label: t('commanderInterface') },
+    { to: '/stock',     icon: Package,         label: t('stock') },
+    { to: '/sales',     icon: ShoppingCart,    label: t('sales') },
+    { to: '/wait',      icon: BookOpen,        label: t('ledger') },
+    { to: '/reports',   icon: BarChart2,       label: t('intelligence') },
+    { to: '/clients',   icon: Users,           label: t('clientsDatabase') },
+    { to: '/shifts',    icon: Clock,           label: t('currentShift') },
+    { to: '/spoilage',  icon: AlertTriangle,   label: t('spoilage') },
+    { to: '/cloture',   icon: Calculator,      label: t('closeRegister') },
   ];
 
   return (
-    <aside className={`w-56 bg-[#0F172A] text-white flex flex-col flex-shrink-0 transition-all duration-300 no-print z-30 border-r border-white/5 ${className}`}>
-      <div className="p-4">
+    <aside className={`app-sidebar no-print ${className ?? ''}`}>
+
+      {/* ── Brand ── */}
+      <div className="app-sidebar__brand py-4">
         <div
           onClick={() => window.location.href = '/'}
-          className="flex flex-col items-center text-center gap-2 group/logo cursor-pointer hover:opacity-90 transition-all active:scale-95"
+          className="flex flex-col items-center text-center gap-2.5 cursor-pointer hover:opacity-90 active:scale-95 transition-all"
         >
-          <div className="w-16 h-16 rounded-[1.5rem] bg-white/5 p-3 shadow-2xl border border-white/10 relative overflow-hidden group/logo-img flex items-center justify-center backdrop-blur-xl">
-            <svg viewBox="0 0 100 100" className="w-10 h-10 group-hover:scale-110 transition-transform duration-700 animate-bounce-gentle">
+          <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shadow-lg shadow-emerald-500/10 relative overflow-hidden">
+            {/* Shimmer overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 to-transparent" />
+            <svg viewBox="0 0 100 100" className="w-12 h-12 relative z-10 animate-bounce-gentle">
               <defs>
-                <linearGradient id="sidebar-logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#10B981' }} />
-                  <stop offset="100%" style={{ stopColor: '#059669' }} />
+                <linearGradient id="sl-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%"   style={{ stopColor: '#10B981' }} />
+                  <stop offset="100%" style={{ stopColor: '#34D399' }} />
                 </linearGradient>
               </defs>
               <path
                 d="M20 75V25L50 55L80 25V75"
                 fill="none"
-                stroke="url(#sidebar-logo-gradient)"
+                stroke="url(#sl-grad)"
                 strokeWidth="14"
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -64,57 +58,57 @@ export default function Sidebar({ className }) {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-black tracking-[-0.05em] text-white uppercase leading-none">
-              MARC
-            </h1>
-            <div className="h-1 w-8 bg-[#10B981] mx-auto mt-2 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+            <h1 className="text-lg font-black tracking-[0.28em] text-white uppercase leading-none">MARC</h1>
+            <div className="h-px w-16 bg-gradient-to-r from-transparent via-emerald-500 to-transparent mx-auto mt-2 opacity-60" />
           </div>
         </div>
       </div>
 
-      <div className="px-3 py-1 flex-1 overflow-y-auto scrollbar-hide">
-        <p className="text-xs font-black uppercase tracking-[0.4em] text-slate-400 mb-4 ml-3 italic">{t('systemArchitecture')}</p>
-        <nav className="space-y-1">
+      {/* ── Nav ── */}
+      <div className="app-sidebar__nav scroll-panel flex-1 min-h-0">
+        <p className="text-label text-white/25 mb-2 px-2 tracking-widest">MENU</p>
+        <nav className="app-sidebar__nav-list">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
+              end={item.to === '/'}
+              onClick={() => window.innerWidth < 1024 && document.dispatchEvent(new CustomEvent('marc-close-sidebar'))}
               className={({ isActive }) => `
-                flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-500 group relative
-                ${isActive 
-                  ? 'bg-[#10B981] text-black shadow-[0_6px_12px_rgba(16,185,129,0.3)] translate-x-1' 
-                  : 'hover:bg-white/5 text-white/40 hover:text-white hover:translate-x-1'}
+                app-sidebar__link flex items-center gap-2.5 transition-all duration-200 group relative
+                ${isActive
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 shadow-[0_2px_12px_rgba(16,185,129,0.15)] translate-x-0.5'
+                  : 'text-white/40 hover:text-white/80 hover:bg-white/5 hover:translate-x-0.5 border border-transparent'}
                 active:scale-95
               `}
             >
-              <item.icon className="w-4 h-4" />
-              <span className="text-xs font-black uppercase tracking-widest">{item.label}</span>
-              <ChevronRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0" />
+              {({ isActive }) => (
+                <>
+                  {isActive && <span className="nav-active-bar" />}
+                  <item.icon className={`w-4 h-4 shrink-0 transition-all ${isActive ? 'text-emerald-400' : 'opacity-50 group-hover:opacity-80'}`} />
+                  <span className="text-body font-semibold truncate normal-case">{item.label}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
       </div>
 
-      <div className="p-4 mt-auto space-y-3">
-        <NavLink 
-          to="/cloture"
-          className="flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-white/10 transition-all group"
-        >
-          <Calculator className="w-4 h-4" />
-          <span>{t('closeRegister')}</span>
-        </NavLink>
-
-        <div className="px-6 py-4 bg-white/5 border border-white/10 rounded-2xl mb-3 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#10B981]/20 text-[#10B981] flex items-center justify-center">
-            <Users className="w-4 h-4" />
+      {/* ── Footer ── */}
+      <div className="app-sidebar__footer space-y-2">
+        {/* Operator badge */}
+        <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/8 rounded-xl">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-black text-xs flex-shrink-0">
+            {(store.currentOperator || 'A').charAt(0).toUpperCase()}
           </div>
-          <div className="overflow-hidden">
-            <p className="text-xs font-black text-slate-500 uppercase tracking-widest leading-none mb-1">{t('active')}</p>
-            <p className="text-xs font-black text-white uppercase truncate">{store.currentOperator || 'Admin'}</p>
+          <div className="overflow-hidden min-w-0">
+            <p className="text-label text-white/30 leading-none mb-0.5">ACTIVE</p>
+            <p className="text-xs font-black text-white uppercase truncate leading-none">{store.currentOperator || 'Admin'}</p>
           </div>
         </div>
 
-        <div 
+        {/* End shift */}
+        <div
           onClick={() => {
             if (store.isReadOnly) {
               localStorage.removeItem('biztrack_user');
@@ -125,10 +119,10 @@ export default function Sidebar({ className }) {
               store.setIsShiftEndModalOpen(true);
             }
           }}
-          className="flex items-center gap-3 px-6 py-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-500 font-black text-xs uppercase tracking-[0.3em] cursor-pointer hover:bg-rose-500/20 transition-all group"
+          className="flex items-center gap-2.5 px-3 py-2.5 bg-rose-500/8 border border-rose-500/20 rounded-xl text-rose-400 cursor-pointer hover:bg-rose-500/15 hover:border-rose-500/35 transition-all group min-h-[40px] active:scale-95"
         >
-          <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>{t('logOut')}</span>
+          <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform flex-shrink-0" />
+          <span className="text-body font-bold">{t('logOut')}</span>
         </div>
       </div>
     </aside>

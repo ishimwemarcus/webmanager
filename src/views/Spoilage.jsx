@@ -102,58 +102,55 @@ export default function Spoilage() {
   const paginatedLosses = losses.slice((validCurrentPage - 1) * itemsPerPage, validCurrentPage * itemsPerPage);
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+    <div className="page-shell page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display">
             {L('Losses & Spoilage', 'Pertes & Avaries')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
             {L('Critical Loss Audit — Waste Valuation', 'Audit des Pertes Critiques — Valorisation du Gaspillage')}
           </p>
         </div>
         <button 
           onClick={() => handleOpenModal()}
-          className="flex items-center justify-center gap-3 px-8 py-4 bg-rose-600 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-rose-700 transition-all shadow-2xl active:scale-95 shadow-rose-600/20"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-rose-600 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-rose-700 transition-all shadow-lg active:scale-95 shadow-rose-600/20"
         >
-          <Plus className="w-5 h-5" /> {L('Report a Loss', 'Signaler une Perte')}
+          <Plus className="w-4 h-4" /> {L('Report a Loss', 'Signaler une Perte')}
         </button>
-      </div>
+      </header>
 
       {/* Analytics Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 no-print">
-        <div className="glass-card bg-white p-8 rounded-[48px] border-rose-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-inner">
-            <TrendingDown className="w-10 h-10" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 no-print">
+        <div className="glass-card bg-white p-4 rounded-2xl border-rose-100 flex items-center gap-4 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shadow-inner">
+            <TrendingDown className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Financial Impact', 'Impact Financier')}</p>
-            <p className="text-3xl md:text-4xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalLossValue)}</p>
+            <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-0.5 italic">{L('Financial Impact', 'Impact Financier')}</p>
+            <p className="text-xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(totalLossValue)}</p>
           </div>
         </div>
 
-        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
-            <ShieldAlert className="w-10 h-10" />
+        <div className="glass-card bg-white p-4 rounded-2xl border-emerald-100 flex items-center gap-4 group hover:scale-[1.02] transition-all shadow-sm">
+          <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Incidents Detected', 'Incidents Détectés')}</p>
-            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">{losses.length} <span className="text-xs">{L('Cases', 'Cas')}</span></p>
+            <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-0.5 italic">{L('Incidents Detected', 'Incidents Détectés')}</p>
+            <p className="text-xl font-black text-navy-950 tracking-tighter">{losses.length} <span className="text-xs">{L('Cases', 'Cas')}</span></p>
           </div>
         </div>
 
-        <div className="glass-card bg-navy-950 p-8 rounded-[48px] text-white flex items-center gap-8 shadow-2xl relative overflow-hidden hidden lg:flex">
-           <div className="absolute top-0 right-0 p-6 opacity-10">
-              <Activity className="w-20 h-20" />
+        <div className="glass-card bg-navy-950 p-4 rounded-2xl text-white flex items-center gap-4 shadow-xl relative overflow-hidden">
+           <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center border border-white/10">
+              <Clock className="w-6 h-6 text-rose-400" />
            </div>
-           <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10 relative z-10">
-              <Clock className="w-8 h-8 text-rose-400" />
-           </div>
-           <div className="relative z-10">
-              <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-1 italic">{L('Last Loss', 'Dernière Perte')}</p>
-              <p className="text-xl font-black text-white">{losses.length > 0 ? new Date(losses[losses.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : 'N/A'}</p>
+           <div>
+              <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-0.5 italic">{L('Last Loss', 'Dernière Perte')}</p>
+              <p className="text-lg font-black text-white">{losses.length > 0 ? new Date(losses[losses.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : 'N/A'}</p>
            </div>
         </div>
       </div>

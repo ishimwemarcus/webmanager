@@ -166,48 +166,48 @@ export default function Ledger() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+    <div className="page-shell page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display">
             {L('Financial Audit', 'Audit Financier')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
             {L('General Ledger — Cash Flow & Obligations', 'Grand Livre — Flux de Trésorerie & Obligations')}
           </p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-3">
            <button 
              onClick={() => setShowModal(true)}
-             className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-black transition-all shadow-xl active:scale-95"
+             className="flex items-center justify-center gap-2 px-5 py-2.5 bg-navy-950 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-black transition-all shadow-lg active:scale-95"
            >
-             <Plus className="w-5 h-5" /> {L('New Entry', 'Nouvelle Entrée')}
+             <Plus className="w-4 h-4" /> {L('New Entry', 'Nouvelle Entrée')}
            </button>
         </div>
-      </div>
+      </header>
 
       {/* Analytics Matrix */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 no-print">
-         <div className="glass-card bg-white p-8 rounded-[48px] border-rose-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Debit (Expenses)', 'Débit (Dépenses)')}</p>
-            <p className="text-3xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(metrics.totalExpensed)}</p>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 no-print">
+         <div className="glass-card bg-white p-4 rounded-2xl border-rose-100 shadow-sm hover:scale-[1.02] transition-all">
+            <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-1.5 italic">{L('Debit (Expenses)', 'Débit (Dépenses)')}</p>
+            <p className="text-xl font-black text-rose-600 tracking-tighter">{store.formatCurrency(metrics.totalExpensed)}</p>
          </div>
-         <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Client Credits', 'Crédit Clients')}</p>
-            <p className="text-3xl font-black text-emerald-600 tracking-tighter">{store.formatCurrency(metrics.totalClientCredits)}</p>
+         <div className="glass-card bg-white p-4 rounded-2xl border-emerald-100 shadow-sm hover:scale-[1.02] transition-all">
+            <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-1.5 italic">{L('Client Credits', 'Crédit Clients')}</p>
+            <p className="text-xl font-black text-emerald-600 tracking-tighter">{store.formatCurrency(metrics.totalClientCredits)}</p>
          </div>
-         <div className="glass-card bg-white p-8 rounded-[48px] border-indigo-100 shadow-sm hover:scale-[1.02] transition-all">
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray mb-3 italic">{L('Active Receivables', 'Créances Actives')}</p>
-            <p className="text-3xl font-black text-indigo-600 tracking-tighter">{store.formatCurrency(metrics.totalOutstanding)}</p>
+         <div className="glass-card bg-white p-4 rounded-2xl border-indigo-100 shadow-sm hover:scale-[1.02] transition-all">
+            <p className="text-xs font-black uppercase tracking-widest text-blue-gray mb-1.5 italic">{L('Active Receivables', 'Créances Actives')}</p>
+            <p className="text-xl font-black text-indigo-600 tracking-tighter">{store.formatCurrency(metrics.totalOutstanding)}</p>
          </div>
-         <div className="glass-card bg-navy-950 p-8 rounded-[48px] text-white shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-125 transition-transform">
-               <TrendingUp className="w-16 h-16" />
+         <div className="glass-card bg-navy-950 p-4 rounded-2xl text-white shadow-xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
+               <TrendingUp className="w-10 h-10" />
             </div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mb-3 italic">{L('Tips', 'Pourboires')}</p>
-            <p className="text-3xl font-black text-white tracking-tighter">{store.formatCurrency(metrics.totalTips)}</p>
+            <p className="text-xs font-black uppercase tracking-widest text-white/40 mb-1.5 italic">{L('Tips', 'Pourboires')}</p>
+            <p className="text-xl font-black text-white tracking-tighter">{store.formatCurrency(metrics.totalTips)}</p>
          </div>
       </div>
 

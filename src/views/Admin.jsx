@@ -70,20 +70,21 @@ export default function Admin() {
   const report = store.generateDailySummary ? store.generateDailySummary(sales, store.getExpenses(), store.getLedgerManual()) : { whatsappText: 'N/A' };
 
   return (
-    <div className="max-w-[1600px] mx-auto min-h-[calc(100vh-6rem)] space-y-8 pb-20 fade-in-up">
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+    <div className="page-shell page-shell--fit fade-in-up">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2.5rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display">
             Master Governance
           </h1>
-          <h2 className="text-sm font-black text-blue-gray tracking-[0.4em] uppercase">
-            System Control & Audit
-          </h2>
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
+            System Control & Audit Protocol
+          </p>
         </div>
-        <button onClick={() => setShowInviteModal(true)} className="bg-navy-brand text-white font-black px-8 py-4 rounded-2xl shadow-xl flex items-center justify-center gap-2 hover:bg-navy-900 transition-all uppercase tracking-widest text-xs">
-          <UserPlus className="w-5 h-5" /> Provision Account
+
+        <button onClick={() => setShowInviteModal(true)} className="bg-navy-brand text-white font-black px-6 py-3 rounded-xl shadow-lg flex items-center justify-center gap-2 hover:bg-navy-900 transition-all uppercase tracking-widest text-xs">
+          <UserPlus className="w-4 h-4" /> Provision Account
         </button>
-      </div>
+      </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 no-print">
         <div className="glass-card flex items-center gap-8 bg-white border-l-8 border-navy-brand shadow-xl group hover:scale-[1.02] transition-all">
@@ -131,30 +132,32 @@ export default function Admin() {
 
         <div className="lg:col-span-3">
           {activeTab === 'accounts' && (
-            <div className="glass-card rounded-[24px] p-10 border border-white/10 bg-white/5 backdrop-blur-2xl shadow-2xl fade-in">
+            <div className="glass-card rounded-[32px] p-10 border border-navy-100 bg-white shadow-xl fade-in">
               <div className="flex items-center justify-between mb-10">
-                <h3 className="text-xl font-black text-white uppercase tracking-tight flex items-center gap-3">
-                  <Fingerprint className="w-6 h-6" /> Node Registry
+                <h3 className="text-lg font-bold text-navy-950 tracking-tight flex items-center gap-3">
+                  <Fingerprint className="w-6 h-6 text-emerald-500" /> Node Registry
                 </h3>
               </div>
 
+
               <div className="space-y-4">
                 {users.map((u, i) => (
-                  <div key={i} className="flex items-center justify-between p-6 rounded-[24px] bg-white/5 border border-white/5 group hover:border-[#F59E0B]/20 transition-all">
+                  <div key={i} className="flex items-center justify-between p-6 rounded-[24px] bg-navy-50/30 border border-navy-100 group hover:border-emerald-400/50 transition-all">
                     <div className="flex items-center gap-6">
-                      <div className="w-14 h-14 rounded-2xl bg-navy-50 text-navy-brand flex items-center justify-center font-black text-xl border border-navy-100 uppercase">
+                      <div className="w-14 h-14 rounded-2xl bg-white text-navy-brand flex items-center justify-center font-bold text-xl border border-navy-100 uppercase shadow-sm">
                         {u.name[0]}
                       </div>
                       <div>
-                        <p className="font-black text-white uppercase tracking-tight flex items-center gap-3 italic">
+                        <p className="font-bold text-navy-950 tracking-tight flex items-center gap-3">
                           {u.name}
                           {u.role === 'Master' && <Star className="w-4 h-4 text-[#F59E0B] fill-[#F59E0B]" />}
                         </p>
-                        <p className="text-xs md:text-sm font-black uppercase tracking-widest text-white/40 mt-1">
+                        <p className="text-xs font-medium uppercase tracking-widest text-blue-gray mt-1 opacity-60">
                           {u.role} Node • {u.status}
                         </p>
                       </div>
                     </div>
+
                     <div className="flex items-center gap-3">
                       {u.role !== 'Master' && (
                         <>

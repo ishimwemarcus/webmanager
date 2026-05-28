@@ -1,120 +1,117 @@
 import React, { useState } from 'react';
-import { Menu, Bell, Search, Settings, LogOut, Globe, QrCode, X, Eye, RefreshCw, LayoutGrid } from 'lucide-react';
+import { Menu, Globe, QrCode, X, LayoutGrid, LogOut, Cpu, Calculator, ZoomIn, ZoomOut } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useStore } from '../../context/StoreContext';
 
-export default function TopBar({ onToggleSidebar }) {
+export default function TopBar({ onToggleSidebar, onToggleCalculator, isCalculatorOpen }) {
   const store = useStore();
   const { lang, toggleLang, t, L } = useLanguage();
   const { currency, setCurrency, currentOperator } = store;
   const [showQR, setShowQR] = useState(false);
-  const [eyeCare, setEyeCare] = useState(() => localStorage.getItem('biztrack_eyecare') === 'true');
-  const [isSyncing, setIsSyncing] = useState(false);
-
-  React.useEffect(() => {
-    if (eyeCare) {
-      document.documentElement.classList.add('eye-care-mode');
-      localStorage.setItem('biztrack_eyecare', 'true');
-    } else {
-      document.documentElement.classList.remove('eye-care-mode');
-      localStorage.setItem('biztrack_eyecare', 'false');
-    }
-  }, [eyeCare]);
+  const [zoomLevel, setZoomLevel] = useState(() => {
+    const saved = Number(localStorage.getItem('biztrack_ui_zoom'));
+    if (Number.isFinite(saved) && saved >= 0.85 && saved <= 1.5) return saved;
+    return 1.1;
+  });
 
   const [currentTime, setCurrentTime] = React.useState(new Date());
-  
   React.useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const todayDate = currentTime.toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'UTC'
+  React.useEffect(() => {
+    document.documentElement.style.setProperty('--ui-zoom', String(zoomLevel));
+    localStorage.setItem('biztrack_ui_zoom', String(zoomLevel));
+  }, [zoomLevel]);
+
+  const increaseZoom = () => setZoomLevel(prev => Math.min(1.5, Math.round((prev + 0.05) * 100) / 100));
+  const decreaseZoom = () => setZoomLevel(prev => Math.max(0.85, Math.round((prev - 0.05) * 100) / 100));
+  const resetZoom = () => setZoomLevel(1.1);
+
+  const timeStr = currentTime.toLocaleTimeString([], {
+    hour: '2-digit', minute: '2-digit', hour12: false
   });
 
-  const timeStr = currentTime.toLocaleTimeString(lang === 'en' ? 'en-US' : 'fr-FR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: false,
-    timeZone: 'UTC'
-  }) + ' GMT';
+  const syncColor =
+    store.syncStatus === 'connected' ? 'bg-emerald-500 status-dot-green' :
+    store.syncStatus === 'syncing'   ? 'bg-amber-400 status-dot-amber' :
+                                       'bg-rose-500 status-dot-red';
 
+  const syncLabel =
+    store.syncStatus === 'connected' ? L('Sync Active', 'Sync Actif') :
+    store.syncStatus === 'syncing'   ? L('Syncing…',   'Sync…') :
+                                       L('Offline',    'Hors ligne');
 
   return (
-    <header className="h-12 md:h-16 bg-navy-950 border-b border-white/5 flex items-center justify-between px-3 md:px-6 z-[100] no-print transition-all duration-500 shadow-xl">
+    <>
+      <header className="app-topbar flex items-center justify-between gap-2 px-3 md:px-4 z-[100] no-print">
 
-      <div className="flex items-center gap-4 md:gap-6">
-        <button
-          onClick={onToggleSidebar}
-          className="p-1.5 md:p-2 rounded-lg md:rounded-xl bg-white/10 hover:bg-white/20 text-white lg:hidden transition-all border border-white/10"
-        >
-          <Menu className="w-4 h-4 md:w-5 md:h-5 outline-none" />
-        </button>
-        <div className="flex items-center gap-4 md:gap-6">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2 md:gap-3">
-              <h2 className="text-xs md:text-sm md:text-sm font-black text-white uppercase tracking-tighter">
-                {L('VIEW', 'VUE')} <span className="text-emerald-500 hidden xs:inline">{t('commandInterface')}</span><span className="text-emerald-500 xs:hidden">CONSOLE</span>
-              </h2>
-              <div className="hidden md:flex items-center gap-2 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-xs font-black uppercase tracking-widest text-emerald-400">{t('liveSync')}</span>
+        {/* ── LEFT ── */}
+        <div className="flex items-center gap-2 md:gap-3 min-w-0 flex-1">
+
+          {/* Hamburger (mobile only) */}
+          <button
+            onClick={onToggleSidebar}
+            aria-label="Toggle sidebar"
+            className="p-1.5 rounded-lg bg-white/8 hover:bg-white/15 text-white lg:hidden transition-all border border-white/10 active:scale-90 flex-shrink-0"
+          >
+            <Menu className="w-4 h-4" />
+          </button>
+
+          {/* Brand / Title */}
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 flex items-center justify-center font-black text-sm shadow-[0_0_10px_rgba(16,185,129,0.25)]">
+                M
+              </div>
+              <span className="text-white font-black uppercase tracking-[0.18em] text-sm sm:text-base truncate max-w-[150px] sm:max-w-none">
+                MARC
+              </span>
+              {/* Live badge */}
+              <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/15 border border-emerald-500/30 rounded-full">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-widest text-emerald-400" style={{ fontSize: '0.6rem' }}>
+                  LIVE
+                </span>
               </div>
             </div>
-            <p className="hidden sm:block text-xs md:text-xs md:text-sm text-white/40 font-black uppercase tracking-[0.4em] mt-0.5 italic leading-none">{todayDate} | {timeStr}</p>
+            <p className="hidden md:block text-white/30 leading-none truncate" style={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.07em' }}>
+              {timeStr} · {L('Business Management System', 'Système de Gestion')}
+            </p>
           </div>
 
-          <div className="hidden sm:flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full">
-                  <div className={`w-2 h-2 rounded-full animate-pulse ${
-                    store.syncStatus === 'connected' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 
-                    store.syncStatus === 'syncing' ? 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]' : 
-                    'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]'
-                  }`}></div>
-                  <span className="text-xs md:text-sm font-black uppercase tracking-widest text-white">
-                    {store.syncStatus === 'connected' ? L('Sync Active', 'Sync Actif') : 
-                     store.syncStatus === 'syncing' ? L('Syncing...', 'Synchronisation...') : 
-                     L('Connection Lost', 'Connexion Perdue')}
-                  </span>
-              </div>
-              {store.lastSyncTime && (
-                <span className="text-xs font-black uppercase tracking-[0.2em] text-white/40">
-                  {L('Last Sync:', 'Dernière Sync :')} {new Date(store.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </span>
-              )}
+          {/* Sync indicator (desktop) */}
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-full">
+            <div className={`w-2 h-2 rounded-full animate-pulse ${syncColor}`} />
+            <span className="text-white font-bold" style={{ fontSize: '0.7rem' }}>{syncLabel}</span>
           </div>
 
+          {/* Read-only badge */}
           {store.isReadOnly && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/20 border border-amber-500/40 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.2)] animate-fade-in">
-                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></div>
-                <span className="text-xs sm:text-xs font-black uppercase tracking-widest text-amber-400">
-                  {L('Live View Mode', 'Mode Visionnage Direct')}
-                </span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/15 border border-amber-500/30 rounded-full animate-fade-in">
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+              <span className="text-amber-400 font-black uppercase" style={{ fontSize: '0.6rem', letterSpacing: '0.08em' }}>
+                {L('Live View', 'Vue Direct')}
+              </span>
             </div>
           )}
         </div>
-      </div>
 
-      <div className="flex items-center gap-4 lg:gap-10">
+        {/* ── RIGHT ── */}
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-        <div className="flex items-center gap-1 sm:gap-3">
-          {/* Operator Badge */}
+          {/* Operator + End Shift */}
           {currentOperator && (
-            <div className="flex items-center gap-1 sm:gap-2">
-              {/* Operator name badge */}
-              <div className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-white/5 border border-white/10 rounded-lg sm:rounded-xl">
-                <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs sm:text-xs md:text-sm shadow-[0_0_10px_rgba(16,185,129,0.4)]">
+            <div className="flex items-center gap-1 sm:gap-1.5">
+              <div className="hidden xs:flex items-center gap-1.5 px-2 py-1 bg-white/8 border border-white/10 rounded-lg">
+                <div className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs shadow-[0_0_8px_rgba(16,185,129,0.4)] flex-shrink-0">
                   {currentOperator.charAt(0).toUpperCase()}
                 </div>
-                <span className="hidden sm:block text-xs md:text-sm font-black uppercase tracking-widest text-white max-w-[80px] truncate">{currentOperator}</span>
+                <span className="hidden sm:block font-black uppercase text-white" style={{ fontSize: '0.7rem', letterSpacing: '0.08em', maxWidth: 72 }} title={currentOperator}>
+                  {currentOperator.length > 8 ? currentOperator.slice(0, 7) + '…' : currentOperator}
+                </span>
               </div>
-
-              {/* Shift End Button — prominently red */}
               <button
                 onClick={() => {
                   if (store.isReadOnly) {
@@ -126,76 +123,119 @@ export default function TopBar({ onToggleSidebar }) {
                     store.setIsShiftEndModalOpen(true);
                   }
                 }}
-                title={L('End shift and pass hand', 'Terminer le poste et passer la main')}
-                className="flex items-center gap-1 sm:gap-2 px-1.5 sm:px-2.5 py-1 sm:py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500 rounded-lg sm:rounded-xl text-white font-black text-[7px] sm:text-xs uppercase tracking-widest transition-all shadow-lg shadow-rose-600/30"
+                title={L('End shift', 'Fin de poste')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500/50 rounded-lg text-white font-black uppercase transition-all shadow-lg shadow-rose-600/25"
+                style={{ fontSize: '0.75rem', letterSpacing: '0.06em' }}
               >
-                <LogOut className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span className="inline">{L('End Shift', 'Fin Poste')}</span>
+                <LogOut className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden xs:inline">{L('End', 'Fin')}</span>
               </button>
             </div>
           )}
 
-        </div>
-        <div className="flex items-center gap-1 sm:gap-4 ml-1 sm:ml-6 border-l border-white/10 pl-1 sm:pl-6">
-          {/* Language Toggle */}
+          <div className="w-px h-5 bg-white/10 mx-0.5 hidden sm:block" />
+
+          {/* Language */}
           <button
             onClick={toggleLang}
-            className="flex items-center gap-1 sm:gap-2 px-1 sm:px-3 py-1 sm:py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl transition-all active:scale-90"
+            title="Toggle language"
+            className="flex items-center gap-1 px-2 py-1.5 bg-white/5 hover:bg-white/12 border border-white/10 rounded-lg transition-all active:scale-90"
           >
-            <Globe className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-blue-400" />
-            <span className="text-xs sm:text-xs md:text-sm font-black text-white">{lang.toUpperCase()}</span>
+            <Globe className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+            <span className="font-black text-white hidden xs:inline" style={{ fontSize: '0.65rem' }}>{lang.toUpperCase()}</span>
           </button>
 
-          {/* Sync Button */}
-          <button 
-            onClick={() => {
-              setIsSyncing(true);
-              setTimeout(() => setIsSyncing(false), 2000);
-            }}
-            className={`p-1 sm:p-2 bg-white/5 border border-white/10 rounded-xl transition-all active:scale-90 hover:bg-white/10 ${isSyncing ? 'animate-spin text-emerald-400' : 'text-white/60'}`}
-          >
-            <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4" />
-          </button>
-
-          {/* Grid icon (QR Modal trigger) */}
-          <button 
+          {/* QR / Grid */}
+          <button
             onClick={() => setShowQR(true)}
-            className="p-1 sm:p-2 bg-white/5 border border-white/10 rounded-xl transition-all active:scale-90 hover:bg-white/10 text-white/60"
+            title={L('Boss Sync QR', 'QR Sync Boss')}
+            className="p-1.5 bg-white/5 border border-white/10 rounded-lg transition-all active:scale-90 hover:bg-white/12 text-white/50 hover:text-white"
           >
-            <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
+            <LayoutGrid className="w-3.5 h-3.5" />
           </button>
 
-          {/* Currency Controls */}
-          <div className="flex items-center gap-1 sm:gap-3">
-             <div className="hidden sm:block px-2 py-1 bg-white/5 border border-white/10 rounded-lg">
-                <span className="text-xs sm:text-xs md:text-sm font-black text-white/40 uppercase tracking-widest">CUR</span>
-             </div>
-              <button 
-                className="flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 bg-emerald-500 text-black rounded-lg sm:rounded-lg font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/20 transition-all"
-              >
-                €
-              </button>
-          </div>
-        </div>
-      </div>
+          {/* Calculator */}
+          <button
+            onClick={onToggleCalculator}
+            title={L('Calculator', 'Calculatrice')}
+            className={`p-1.5 border border-white/10 rounded-lg transition-all active:scale-90 ${
+              isCalculatorOpen
+                ? 'bg-emerald-500/20 text-emerald-300'
+                : 'bg-white/5 text-white/50 hover:bg-white/12 hover:text-white'
+            }`}
+          >
+            <Calculator className="w-3.5 h-3.5" />
+          </button>
 
+          {/* UI Zoom */}
+          <div className="flex items-center gap-1 px-1 py-1 bg-white/5 border border-white/10 rounded-lg">
+            <button
+              onClick={decreaseZoom}
+              title={L('Zoom out', 'Zoom arrière')}
+              className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+            >
+              <ZoomOut className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={resetZoom}
+              title={L('Reset zoom', 'Réinitialiser zoom')}
+              className="min-w-[3rem] px-1 text-center text-[0.62rem] font-black text-emerald-300"
+            >
+              {Math.round(zoomLevel * 100)}%
+            </button>
+            <button
+              onClick={increaseZoom}
+              title={L('Zoom in', 'Zoom avant')}
+              className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+            >
+              <ZoomIn className="w-3.5 h-3.5" />
+            </button>
+          </div>
+
+          {/* Currency chip */}
+          <button
+            className="flex items-center justify-center w-7 h-7 bg-emerald-500 text-black rounded-lg font-black text-sm shadow-lg shadow-emerald-500/25 transition-all hover:bg-emerald-400 active:scale-90"
+            title={`Currency: ${currency}`}
+          >
+            {String(currency?.val || currency || '€')}
+          </button>
+        </div>
+      </header>
+
+      {/* ── QR Modal ── */}
       {showQR && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setShowQR(false)}>
-          <div className="bg-white p-10 rounded-[40px] shadow-2xl relative scale-in max-w-sm w-full text-center" onClick={e => e.stopPropagation()}>
-            <button onClick={() => setShowQR(false)} className="absolute top-6 right-6 p-2 hover:bg-navy-50 rounded-full transition-all"><X className="w-6 h-6" /></button>
-            <div className="w-20 h-20 bg-navy-brand rounded-3xl mx-auto flex items-center justify-center text-white mb-6">
-              <QrCode className="w-10 h-10" />
+        <div
+          className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowQR(false)}
+        >
+          <div
+            className="bg-white p-8 rounded-3xl shadow-2xl relative scale-in max-w-xs w-full text-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <button onClick={() => setShowQR(false)} className="absolute top-4 right-4 p-2 hover:bg-slate-100 rounded-full transition-all">
+              <X className="w-5 h-5 text-slate-600" />
+            </button>
+            <div className="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto flex items-center justify-center text-white mb-5 shadow-lg shadow-emerald-500/30">
+              <QrCode className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-black text-navy-950 uppercase tracking-tighter mb-2">{L('Boss Live Sync', 'Sync Direct Boss')}</h3>
-            <p className="text-xs font-bold text-blue-gray uppercase tracking-widest mb-8 leading-relaxed">{L('Scan to mirror this terminal in real-time.', 'Scannez pour répliquer ce terminal en temps réel.')}</p>
-            <div className="bg-navy-50 p-6 rounded-3xl mb-4 border-2 border-dashed border-navy-200 relative overflow-hidden group">
-              <div className="absolute inset-0 bg-gradient-to-t from-navy-brand/0 via-navy-brand/10 to-navy-brand/0 h-2 top-0 animate-scan z-10"></div>
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(window.location.origin + window.location.pathname + '#/?pass=MARCUS&sync=' + encodeURIComponent(store.syncUrl))}`} alt="QR Code" className="w-full h-auto rounded-xl relative z-0" />
+            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight mb-1">{L('Boss Live Sync', 'Sync Direct Boss')}</h3>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-6 leading-relaxed">
+              {L('Scan to mirror this terminal in real-time.', 'Scannez pour répliquer ce terminal.')}
+            </p>
+            <div className="bg-slate-50 p-5 rounded-2xl mb-3 border-2 border-dashed border-slate-200 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/0 via-emerald-500/8 to-emerald-500/0 h-2 top-0 animate-scan z-10" />
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
+                  window.location.origin + window.location.pathname + '#/?pass=MARCUS&sync=' + encodeURIComponent(store.syncUrl)
+                )}`}
+                alt="QR Code"
+                className="w-full h-auto rounded-xl relative z-0"
+              />
             </div>
-            <p className="text-xs md:text-sm font-black uppercase text-navy-brand tracking-[0.3em]">MARC Protocol v4.0 Active</p>
+            <p className="text-xs font-black uppercase text-emerald-600 tracking-widest">MARC Protocol v4.0</p>
           </div>
         </div>
       )}
-    </header>
+    </>
   );
 }

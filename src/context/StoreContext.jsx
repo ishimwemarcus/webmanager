@@ -56,7 +56,14 @@ export const StoreProvider = ({ children }) => {
   });
   const [confirmState, setConfirmState] = useState({ isOpen: false, message: '', onConfirm: null, onCancel: null });
   const [notification, setNotification] = useState(null); // { message, type: 'success' | 'error' | 'warning' }
-  const [currency, setCurrency] = useState('€');
+  const [currency, setCurrency] = useState(() => {
+    const saved = localStorage.getItem('biztrack_currency');
+    if (saved && typeof saved === 'string' && saved.length <= 5 && !saved.includes('prev') && !saved.includes('function') && !saved.includes('=>')) {
+      return saved;
+    }
+    localStorage.setItem('biztrack_currency', '€');
+    return '€';
+  });
   const [currentOperator, setCurrentOperator] = useState(() => localStorage.getItem('biztrack_operator') || '');
   const [shiftStart, setShiftStart] = useState(() => localStorage.getItem('biztrack_shift_start') || '');
   const [showQRModal, setShowQRModal] = useState(false);
@@ -73,12 +80,12 @@ export const StoreProvider = ({ children }) => {
   
   // Global Internet API URL (Force Vercel hosting vs Local Tunnel)
   const [syncUrl, setSyncUrl] = useState(() => {
-    // FORCE relative path if we are live on Vercel (ignore localStorage)
-    if (window.location.hostname !== 'localhost' && !window.location.hostname.includes('127.0.0.1')) {
-      return '/api';
+    // Use the Vite proxy '/api' when running locally on any dev port (5173, 5174, etc.)
+    if (window.location.hostname === 'localhost' && window.location.port !== '') {
+       return '/api';
     }
-    // Otherwise, use saved or default tunnel
-    return localStorage.getItem('biztrack_sync_url') || 'https://marcus-live-sync-v2.loca.lt/manager%20web/api.php';
+    // Otherwise, use saved or default tunnel/local path
+    return localStorage.getItem('biztrack_sync_url') || 'http://localhost/manager web/api.php';
   });
   
   const API_URL = syncUrl;
@@ -110,8 +117,10 @@ export const StoreProvider = ({ children }) => {
           { k: 'biztrack_shifts', set: setShifts },
           { k: 'biztrack_categories', set: setCategories },
           { k: 'biztrack_reports', set: setReportArchive },
-          { k: 'biztrack_currency', set: (val) => {
-            const clean = Array.isArray(val) ? (val[0]?.val || val[0] || '€') : (val?.val || val || '€');
+          // raw:true = custom handler; must receive actual data, not a React updater function
+          { k: 'biztrack_currency', raw: true, set: (serverData) => {
+            const val = Array.isArray(serverData) ? serverData[0] : serverData;
+            const clean = val?.val || val || '€';
             setCurrency(String(clean));
           }}
         ];
@@ -127,10 +136,16 @@ export const StoreProvider = ({ children }) => {
           if (!res.ok) continue;
           const serverData = await res.json();
           if (serverData && serverData.length > 0) {
-            item.set(prev => {
-              if (JSON.stringify(prev) !== JSON.stringify(serverData)) return serverData;
-              return prev;
-            });
+            if (item.raw) {
+              // Custom handler — call with raw server data directly
+              item.set(serverData);
+            } else {
+              // React state setter — functional updater skips re-render when data unchanged
+              item.set(prev => {
+                if (JSON.stringify(prev) !== JSON.stringify(serverData)) return serverData;
+                return prev;
+              });
+            }
           }
         }
         setSyncStatus('connected');
@@ -509,10 +524,12 @@ export const StoreProvider = ({ children }) => {
 
   const formatCurrency = (value) => {
     const val = parseFloat(value || 0);
-    const curStr = String(currency?.val || currency || '€');
+    // Safety guard: if currency is a function/object (sync bug), fall back to '€'
+    const rawCur = currency?.val || currency;
+    const curStr = (typeof rawCur === 'string' && rawCur.length <= 5) ? rawCur : '€';
     const noDecimals = curStr === 'RWF' || curStr === 'TZS' || curStr === 'UGX';
     return `${val.toLocaleString(undefined, {
-      minimumFractionDigits: noDecimals ? 0 : 2, 
+      minimumFractionDigits: noDecimals ? 0 : 2,
       maximumFractionDigits: noDecimals ? 0 : 2
     })} ${curStr}`;
   };

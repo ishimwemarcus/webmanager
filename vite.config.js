@@ -17,11 +17,19 @@ export default defineConfig({
   server: {
     origin: 'http://localhost:5173',
     host: true,
-    strictPort: true,
+    strictPort: false,
     hmr: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost/manager%20web/api.php',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
     watch: {
       usePolling: true,
       interval: 100,
+      ignored: ['**/server_data/**'],
     },
   },
 })

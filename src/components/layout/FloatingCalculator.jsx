@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Calculator, X, Minus, Plus, Delete, RotateCcw } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 
-export default function FloatingCalculator() {
-  const [isOpen, setIsOpen] = useState(false);
+export default function FloatingCalculator({ isOpen, onClose }) {
   const [display, setDisplay] = useState('0');
   const [formula, setFormula] = useState('');
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [dragging, setDragging] = useState(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
   const { L } = useLanguage();
 
   const handleNumber = (num) => {
@@ -33,26 +35,64 @@ export default function FloatingCalculator() {
     setFormula('');
   };
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-8 w-14 h-14 bg-navy-950 text-white rounded-2xl flex items-center justify-center shadow-2xl hover:bg-emerald-600 transition-all z-[150] active:scale-95 group"
-      >
-        <Calculator className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-      </button>
-    );
-  }
+  useEffect(() => {
+    if (!isOpen) return;
+    const x = Math.max(window.innerWidth - 360, 16);
+    const y = 96;
+    setPosition({ x, y });
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!dragging) return;
+
+    const handlePointerMove = (event) => {
+      const maxX = Math.max(window.innerWidth - 320, 16);
+      const maxY = Math.max(window.innerHeight - 120, 16);
+      const nextX = Math.min(Math.max(event.clientX - dragOffsetRef.current.x, 16), maxX);
+      const nextY = Math.min(Math.max(event.clientY - dragOffsetRef.current.y, 16), maxY);
+      setPosition({ x: nextX, y: nextY });
+    };
+
+    const handlePointerUp = () => setDragging(false);
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [dragging]);
+
+  const startDrag = (event) => {
+    if (event.button !== 0) return;
+    dragOffsetRef.current = {
+      x: event.clientX - position.x,
+      y: event.clientY - position.y,
+    };
+    setDragging(true);
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-24 right-8 w-80 bg-white rounded-[32px] shadow-[0_30px_100px_rgba(0,0,0,0.3)] z-[200] overflow-hidden border border-navy-50 animate-scale-in">
+    <div
+      className="fixed w-80 bg-white rounded-[32px] shadow-[0_30px_100px_rgba(0,0,0,0.3)] z-[200] overflow-hidden border border-navy-50 animate-scale-in"
+      style={{ left: `${position.x}px`, top: `${position.y}px` }}
+    >
       {/* Header */}
-      <div className="p-6 bg-navy-950 text-white flex items-center justify-between">
+      <div
+        className={`p-6 bg-navy-950 text-white flex items-center justify-between ${dragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+        onPointerDown={startDrag}
+      >
         <div className="flex items-center gap-3">
           <Calculator className="w-4 h-4 text-emerald-400" />
           <span className="text-xs md:text-sm font-black uppercase tracking-widest">{L('QUICK CALC', 'CALCUL RAPIDE')}</span>
         </div>
-        <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-white/10 rounded-lg transition-all">
+        <button
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={onClose}
+          className="p-1 hover:bg-white/10 rounded-lg transition-all"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>

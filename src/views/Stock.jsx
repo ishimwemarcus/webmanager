@@ -152,89 +152,91 @@ export default function Stock() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+    <div className="page-shell page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+      <header className="page-header border-b border-navy-100 pb-1.5 flex flex-col md:flex-row md:items-end justify-between gap-2 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display leading-none">
             {L('Stock Inventory', 'Inventaire Stock')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-[10px] font-medium text-blue-gray tracking-[0.14em] uppercase opacity-60">
             {L('Asset Management — Centralized Registry', 'Gestion des Actifs — Registre Centralisé')}
           </p>
+
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center justify-start md:justify-end gap-3 md:gap-4">
           {selectedIds.length > 0 && (
             <button
               onClick={handleBulkDelete}
-              className="bg-rose-500 text-white px-8 py-4 rounded-[24px] font-black text-xs md:text-sm uppercase tracking-widest shadow-xl shadow-rose-500/20 flex items-center gap-2 hover:bg-rose-600 transition-all active:scale-95"
+              className="bg-rose-500 text-white px-4 py-2 rounded-xl font-black text-[9px] md:text-[10px] uppercase tracking-wide shadow-xl shadow-rose-500/20 flex items-center gap-1.5 hover:bg-rose-600 transition-all active:scale-95"
             >
-              <Trash2 className="w-5 h-5" /> {L(`Delete ${selectedIds.length} Items`, `Supprimer ${selectedIds.length} Articles`)}
+              <Trash2 className="w-3.5 h-3.5" /> {L(`Delete ${selectedIds.length} Items`, `Supprimer ${selectedIds.length} Articles`)}
             </button>
           )}
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 bg-navy-950 text-white rounded-xl font-black uppercase tracking-wide text-[9px] md:text-[10px] hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
           >
-            <Plus className="w-5 h-5 text-emerald-400" /> {L('Add an Asset', 'Ajouter un Actif')}
+            <Plus className="w-3.5 h-3.5 text-emerald-400" /> {L('Add Asset', 'Ajouter un Actif')}
           </button>
+
         </div>
-      </div>
+      </header>
 
       {/* Metrics Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
-        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
-            <TrendingUp className="w-10 h-10" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 no-print">
+        <div className="glass-card bg-white p-3 rounded-2xl border-emerald-100 flex items-center gap-3 group hover:scale-[1.01] transition-all shadow-sm min-h-[74px]">
+          <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
+            <TrendingUp className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Total Valuation', 'Évaluation Totale')}</p>
-            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
+            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.12em] text-blue-gray mb-0 italic">{L('Total Valuation', 'Évaluation Totale')}</p>
+            <p className="text-base md:text-lg font-black text-navy-950 tracking-tight leading-none">
               {store.formatCurrency(totalValuation)}
             </p>
           </div>
         </div>
 
-        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
-            <Layers className="w-10 h-10" />
+        <div className="glass-card bg-white p-3 rounded-2xl border-emerald-100 flex items-center gap-3 group hover:scale-[1.01] transition-all shadow-sm min-h-[74px]">
+          <div className="w-9 h-9 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
+            <Layers className="w-4 h-4" />
           </div>
           <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">{L('Operational Assets', 'Actifs Opérationnels')}</p>
-            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
-              {products.length} <span className="text-xs text-blue-gray opacity-40 font-black">{L('Lines', 'Lignes')}</span>
+            <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.12em] text-blue-gray mb-0 italic">{L('Operational Assets', 'Actifs Opérationnels')}</p>
+            <p className="text-base md:text-lg font-black text-navy-950 tracking-tight leading-none">
+              {products.length} <span className="text-[9px] text-blue-gray opacity-40 font-black">{L('Lines', 'Lignes')}</span>
             </p>
           </div>
         </div>
       </div>
 
       {/* Search & Back Button */}
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 no-print">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2 no-print">
         <div className="relative flex-1 w-full group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500" />
           <input
             type="text"
             placeholder={L('Search inventory...', 'Rechercher dans l\'inventaire...')}
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            className="w-full bg-white border border-emerald-100 rounded-[28px] pl-16 pr-8 py-5 text-sm font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
+            className="w-full bg-white border border-emerald-100 rounded-xl pl-10 pr-3 py-2.5 text-[10px] md:text-xs font-black text-navy-950 placeholder:text-blue-gray/30 shadow-xl outline-none focus:border-emerald-500 transition-all uppercase"
           />
         </div>
         {selectedCategory && (
           <button 
             onClick={() => { setSelectedCategory(null); setCurrentPage(1); }} 
-            className="px-8 py-4 bg-navy-950 text-white rounded-2xl text-xs md:text-sm font-black uppercase tracking-[0.2em] flex items-center gap-3 shadow-lg hover:bg-emerald-600 transition-all"
+            className="w-full md:w-auto px-4 py-2.5 bg-navy-950 text-white rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.1em] flex items-center justify-center gap-1.5 shadow-lg hover:bg-emerald-600 transition-all"
           >
-            <ArrowRight className="w-4 h-4 rotate-180 text-emerald-400" /> {L('Back to Sectors', 'Retour aux Secteurs')}
+            <ArrowRight className="w-3.5 h-3.5 rotate-180 text-emerald-400" /> {L('Back to Sectors', 'Retour aux Secteurs')}
           </button>
         )}
       </div>
 
       {/* Categories Grid */}
       {!searchQuery && !selectedCategory && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 no-print animate-scale-in">
+        <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 no-print animate-scale-in">
           {categories.map((cat) => {
             const catProducts = products.filter(p => p.category === cat.name);
             const catCount = catProducts.length;
@@ -244,23 +246,24 @@ export default function Stock() {
             return (
               <div 
                 key={cat.id}
-                className={`glass-card bg-white p-8 rounded-[40px] border-2 flex flex-col items-center text-center group cursor-pointer transition-all shadow-sm relative overflow-hidden ${lowStockCount > 0 ? 'border-rose-100 hover:border-rose-500' : 'border-emerald-50 hover:border-emerald-500'}`}
+                className={`glass-card bg-white p-3 rounded-2xl border-2 flex flex-col items-center text-center group cursor-pointer transition-all shadow-sm relative overflow-hidden min-h-[138px] ${lowStockCount > 0 ? 'border-rose-100 hover:border-rose-500' : 'border-emerald-50 hover:border-emerald-500'}`}
                 onClick={() => { setSelectedCategory(cat.name); setCurrentPage(1); }}
               >
                 {lowStockCount > 0 && (
-                   <div className="absolute top-6 left-6 px-3 py-1 bg-rose-500 text-white rounded-full text-xs font-black uppercase tracking-widest animate-pulse z-10">
+                   <div className="absolute top-3 left-3 px-2 py-0.5 bg-rose-500 text-white rounded-full text-[10px] font-black uppercase tracking-wide animate-pulse z-10">
                       {lowStockCount} {L('Critical', 'Critique')}
                    </div>
                 )}
                 <div className="absolute top-0 right-0 p-6 opacity-[0.03] group-hover:opacity-10 transition-opacity">
                    <Box className="w-24 h-24" />
                 </div>
-                <div className={`w-16 h-16 rounded-3xl flex items-center justify-center mb-4 shadow-inner ${lowStockCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
-                   <Box className="w-8 h-8" />
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-1.5 shadow-inner ${lowStockCount > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>
+                   <Box className="w-4 h-4" />
                 </div>
-                <h4 className="text-lg font-black uppercase tracking-tighter text-navy-950">{L('Sector', 'Secteur')} {cat.name}</h4>
-                <p className="text-xs md:text-sm font-black text-blue-gray mt-1 uppercase tracking-widest opacity-60 italic">{catCount} {L('Items', 'Articles')}</p>
-                <div className="mt-6 pt-4 border-t border-navy-50 w-full flex justify-between items-center text-xs font-black uppercase tracking-widest text-navy-950">
+                <h4 className="text-xs font-bold text-navy-950 tracking-tight leading-tight">{L('Sector', 'Secteur')} {cat.name}</h4>
+                <p className="text-[9px] font-medium text-blue-gray mt-0.5 uppercase tracking-wide opacity-60">{catCount} {L('Items', 'Articles')}</p>
+
+                <div className="mt-2 pt-1.5 border-t border-navy-50 w-full flex justify-between items-center text-[9px] font-black uppercase tracking-wide text-navy-950">
                    <span>{L('Estimated Value', 'Valeur Estimée')}</span>
                    <span className={lowStockCount > 0 ? 'text-rose-600' : 'text-emerald-600'}>{store.formatCurrency(catValue)}</span>
                 </div>
@@ -282,53 +285,53 @@ export default function Stock() {
 
            <div className="space-y-3">
               {paginatedProducts.map((p) => (
-                 <div key={p.id} className={`glass-card bg-white p-5 rounded-3xl border transition-all flex flex-col md:flex-row md:items-center gap-4 hover:border-emerald-400 group ${selectedIds.includes(p.id) ? 'border-emerald-500 bg-emerald-50/10' : 'border-emerald-50'}`}>
-                    <div className="flex items-center gap-4">
-                       <button onClick={() => toggleSelect(p.id)} className={`w-6 h-6 rounded-lg flex items-center justify-center border-2 transition-all ${selectedIds.includes(p.id) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-emerald-100 hover:border-emerald-500'}`}>
-                          {selectedIds.includes(p.id) && <CheckSquare className="w-4 h-4" />}
+                 <div key={p.id} className={`glass-card bg-white p-2.5 rounded-xl border transition-all flex flex-col md:flex-row md:items-center gap-2.5 hover:border-emerald-400 group ${selectedIds.includes(p.id) ? 'border-emerald-500 bg-emerald-50/10' : 'border-emerald-50'}`}>
+                    <div className="flex items-center gap-2.5 md:min-w-[240px]">
+                       <button onClick={() => toggleSelect(p.id)} className={`w-5 h-5 rounded-md flex items-center justify-center border-2 transition-all ${selectedIds.includes(p.id) ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-emerald-100 hover:border-emerald-500'}`}>
+                          {selectedIds.includes(p.id) && <CheckSquare className="w-3 h-3" />}
                        </button>
-                       <div className="w-12 h-12 bg-navy-50 text-navy-950 rounded-xl flex items-center justify-center font-black">
-                          <Package className="w-6 h-6" />
+                       <div className="w-9 h-9 bg-navy-50 text-navy-950 rounded-lg flex items-center justify-center font-black">
+                          <Package className="w-4 h-4" />
                        </div>
-                       <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight group-hover:text-emerald-600 transition-colors">{p.name}</h4>
-                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest opacity-60 italic">{p.category || L('General', 'Général')}</p>
-                       </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold text-navy-950 tracking-tight group-hover:text-emerald-600 transition-colors truncate">{p.name}</h4>
+                          <p className="text-[9px] font-medium text-blue-gray uppercase tracking-wide opacity-60">{p.category || L('General', 'Général')}</p>
+                        </div>
                     </div>
 
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 flex-1 text-center md:text-left">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 md:gap-3 flex-1 text-left">
                        <div>
-                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Available Stock', 'Stock Disponible')}</p>
-                          <div className="flex items-center justify-center md:justify-start gap-2">
-                             <span className="text-xs font-black text-navy-950">{getFormattedQuantity(p)}</span>
-                             <span className={`px-2 py-0.5 rounded-full text-xs font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-wide mb-0.5 italic">{L('Available Stock', 'Stock Disponible')}</p>
+                          <div className="flex items-center justify-start gap-1.5">
+                             <span className="text-[10px] font-black text-navy-950">{getFormattedQuantity(p)}</span>
+                             <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
                                 {p.quantity <= 5 ? L('Low', 'Bas') : L('Optimal', 'Optimal')}
                              </span>
                           </div>
                        </div>
                        <div>
-                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Unit Price', 'Prix Unitaire')}</p>
-                          <p className="text-xs font-black text-navy-950">{store.formatCurrency(p.price)}</p>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-wide mb-0.5 italic">{L('Unit Price', 'Prix Unitaire')}</p>
+                          <p className="text-[10px] font-black text-navy-950">{store.formatCurrency(p.price)}</p>
                        </div>
                        <div className="hidden md:block">
-                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1 italic">{L('Asset Value', 'Valeur Assets')}</p>
-                          <p className="text-xs font-black text-emerald-600">{store.formatCurrency(p.quantity * p.price)}</p>
+                          <p className="text-[9px] font-black text-blue-gray uppercase tracking-wide mb-0.5 italic">{L('Asset Value', 'Valeur Assets')}</p>
+                          <p className="text-[10px] font-black text-emerald-600">{store.formatCurrency(p.quantity * p.price)}</p>
                        </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-start md:justify-end gap-1.5 md:ml-auto">
                        <button 
                          onClick={() => setShowLossModal(p)} 
-                         className="p-3 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+                         className="p-2 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-600 hover:text-white transition-all shadow-sm"
                          title={L('Report Loss', 'Signaler Perte')}
                        >
-                          <AlertTriangle className="w-4 h-4" />
+                          <AlertTriangle className="w-3.5 h-3.5" />
                        </button>
-                       <button onClick={() => setEditProduct(p)} className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm">
-                          <Pencil className="w-4 h-4" />
+                       <button onClick={() => setEditProduct(p)} className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-navy-950 hover:text-white transition-all shadow-sm">
+                          <Pencil className="w-3.5 h-3.5" />
                        </button>
-                       <button onClick={() => confirmDelete(p)} className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm">
-                          <Trash2 className="w-4 h-4" />
+                       <button onClick={() => confirmDelete(p)} className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-rose-500 hover:text-white transition-all shadow-sm">
+                          <Trash2 className="w-3.5 h-3.5" />
                        </button>
                     </div>
                  </div>

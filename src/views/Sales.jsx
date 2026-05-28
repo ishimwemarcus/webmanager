@@ -34,10 +34,11 @@ import {
 } from 'lucide-react';
 import { getFormattedQuantity } from '../utils/ProductUtils';
 import Pagination from '../components/common/Pagination';
+import DesktopPageLayout from '../components/layout/DesktopPageLayout';
 
 export default function Sales() {
   const store = useStore();
-  const { t, L } = useLanguage();
+  const { t, L, lang } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [showPayModal, setShowPayModal] = useState(null);
   const [payAmount, setPayAmount] = useState('');
@@ -50,7 +51,7 @@ export default function Sales() {
   const [showOverpayModal, setShowOverpayModal] = useState(false);
   const [pendingOverpay, setPendingOverpay] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 15;
+  const itemsPerPage = 8;
   const [editingSale, setEditingSale] = useState(null);
   const [debtPayment, setDebtPayment] = useState(0);
   const [showWalletModal, setShowWalletModal] = useState(false);
@@ -367,134 +368,119 @@ export default function Sales() {
     });
   };
 
+  const todayRevenue = sales.filter(s => s.date?.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0);
+
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
-      
-      {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
-        <div className="space-y-1">
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
-            {L('Sales Operations', 'Opérations de Vente')}
-          </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
-            {L('Revenue Flow — Real-Time Archiving', 'Flux de Revenus — Archivage Temps Réel')}
-          </p>
-        </div>
-        <button
-          onClick={() => setShowModal(true)}
-          className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-2xl hover:shadow-emerald-500/20 active:scale-95"
-        >
-          <Plus className="w-5 h-5 text-emerald-400" /> + New Sale
+    <>
+    <DesktopPageLayout
+      title={L('Sales Operations', 'Opérations de Vente')}
+      subtitle={L('Revenue flow — live archive', 'Flux revenus — archive directe')}
+      actions={
+        <button type="button" onClick={() => setShowModal(true)} className="btn-action bg-navy-950 text-white hover:bg-emerald-600">
+          <Plus className="w-3.5 h-3.5 text-emerald-400" /> {L('Add Sale', 'Ajouter Vente')}
         </button>
-      </div>
-
-      {/* Metrics Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 no-print">
-        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center shadow-inner">
-            <TrendingUp className="w-10 h-10" />
+      }
+      utilityPanel={null}
+    >
+      {/* Balanced 3-column Stat Grid */}
+      <div className="panel-stat-grid shrink-0" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}>
+        <div className="panel-stat">
+          <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="w-4 h-4 text-emerald-600" />
           </div>
-          <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Today's Revenue</p>
-            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
-              {store.formatCurrency(sales.filter(s => s.date && s.date.startsWith(new Date().toISOString().split('T')[0])).reduce((acc, s) => acc + (parseFloat(s.paid) || 0), 0))}
-            </p>
-          </div>
-        </div>
-
-        <div className="glass-card bg-white p-8 rounded-[48px] border-emerald-100 flex items-center gap-8 group hover:scale-[1.02] transition-all shadow-sm">
-          <div className="w-20 h-20 rounded-3xl bg-navy-50 text-navy-950 flex items-center justify-center shadow-inner">
-            <Calculator className="w-10 h-10" />
-          </div>
-          <div>
-            <p className="text-xs md:text-sm font-black uppercase tracking-[0.3em] text-blue-gray mb-1 italic">Total Transactions</p>
-            <p className="text-3xl md:text-4xl font-black text-navy-950 tracking-tighter">
-              {sales.length} <span className="text-xs text-blue-gray opacity-40 font-black">Records</span>
-            </p>
+          <div className="min-w-0">
+            <p className="text-label">{L("Today's Revenue", 'Revenus Jour')}</p>
+            <p className="text-stat text-emerald-700 truncate">{store.formatCurrency(todayRevenue)}</p>
           </div>
         </div>
+        <div className="panel-stat">
+          <div className="w-9 h-9 rounded-lg bg-rose-50 flex items-center justify-center flex-shrink-0">
+            <CreditCard className="w-4 h-4 text-rose-500" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-label">{L('Outstanding Debt', 'Dette Totale')}</p>
+            <p className="text-stat text-rose-600 truncate">{store.formatCurrency(sales.reduce((sum, s) => sum + Math.max(0, (parseFloat(s.amount) || 0) - (parseFloat(s.paid) || 0)), 0))}</p>
+          </div>
+        </div>
+        <div className="panel-stat">
+          <div className="w-9 h-9 rounded-lg bg-slate-50 flex items-center justify-center flex-shrink-0">
+            <Calculator className="w-4 h-4 text-slate-600" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-label">{L('Records', 'Enregistrements')}</p>
+            <p className="text-stat text-slate-700 truncate">{sales.length}</p>
+          </div>
+        </div>
       </div>
 
-      {/* Filters Section */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 no-print">
-        <div className="flex-1 w-full relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500" />
+      {/* Horizontal Toolbar: Filters + Search */}
+      <div className="flex flex-col md:flex-row md:items-center gap-3 shrink-0 my-2 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm no-print">
+        {/* Search */}
+        <div className="relative flex-1 group">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500 pointer-events-none" />
           <input
             value={searchQuery}
             onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-            type="text"
-            placeholder="Rechercher des archives..."
-            className="w-full bg-white border border-emerald-100 rounded-[24px] pl-16 pr-6 py-5 text-navy-950 font-black text-sm focus:border-emerald-500 outline-none transition-all shadow-xl placeholder:text-blue-gray/30 uppercase"
+            type="search"
+            placeholder={L('Search archives...', 'Rechercher...')}
+            className="w-full bg-slate-50 border-0 rounded-xl pl-10 pr-4 py-2.5 text-body placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all normal-case"
           />
         </div>
 
-        <div className="flex items-center gap-3 bg-white p-2 rounded-3xl border border-emerald-100 shadow-xl overflow-x-auto scrollbar-hide max-w-full">
+        {/* Date Filters */}
+        <div className="flex flex-wrap items-center gap-2">
           <button
+            type="button"
             onClick={() => { setFilterShift(!filterShift); setCurrentPage(1); }}
-            className={`px-6 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex items-center gap-2 flex-shrink-0 ${filterShift ? 'bg-navy-950 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
+            className={`px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest flex items-center gap-1.5 transition-all ${filterShift ? 'bg-navy-950 text-white shadow-sm' : 'bg-slate-50 border border-slate-100 text-slate-600 hover:bg-slate-100'}`}
           >
             <Clock className="w-3.5 h-3.5" />
-            {filterShift ? L('My Shift', 'Mon Poste') : L('All Shifts', 'Tous les Postes')}
+            {filterShift ? L('My Shift', 'Mon Poste') : L('All Shifts', 'Tous Postes')}
           </button>
           
-          <div className="w-px h-6 bg-emerald-100 mx-1 flex-shrink-0"></div>
+          <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
 
-          <div className="flex items-center gap-1">
-            {[
-              { id: 'today', label: 'Today' },
-              { id: 'month', label: 'Month' },
-              { id: 'custom', label: 'Custom' }
-            ].map(time => (
-              <button
-                key={time.id}
-                onClick={() => { setFilterDate(time.id); setCurrentPage(1); }}
-                className={`px-5 py-3 rounded-2xl text-xs md:text-sm font-black uppercase tracking-widest transition-all flex-shrink-0 ${filterDate === time.id ? 'bg-emerald-500 text-white shadow-lg' : 'text-blue-gray hover:text-emerald-500'}`}
-              >
-                {time.label}
-              </button>
-            ))}
-          </div>
-
-          {filterDate === 'custom' && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50/50 rounded-2xl border border-emerald-100 animate-fade-in flex-shrink-0">
-              <input 
-                type="date" 
-                value={customDates.start}
-                onChange={e => setCustomDates({...customDates, start: e.target.value})}
-                className="bg-transparent border-none text-xs md:text-sm font-black uppercase text-navy-950 outline-none"
-              />
-              <span className="text-xs md:text-sm font-black text-emerald-500/50 tracking-widest">→</span>
-              <input 
-                type="date" 
-                value={customDates.end}
-                onChange={e => setCustomDates({...customDates, end: e.target.value})}
-                className="bg-transparent border-none text-xs md:text-sm font-black uppercase text-navy-950 outline-none"
-              />
-            </div>
-          )}
+          {['today', 'month', 'custom'].map((id) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => { setFilterDate(id); setCurrentPage(1); }}
+              className={`px-3 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${filterDate === id ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/20' : 'bg-slate-50 border border-slate-100 text-slate-600 hover:bg-slate-100'}`}
+            >
+              {id === 'today' ? L('Today', 'Aujourd\'hui') : id === 'month' ? L('Month', 'Mois') : L('Custom', 'Perso')}
+            </button>
+          ))}
         </div>
+
+        {/* Custom Range Picker */}
+        {filterDate === 'custom' && (
+          <div className="flex items-center gap-2 bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+            <input type="date" value={customDates.start} onChange={e => setCustomDates({ ...customDates, start: e.target.value })} className="bg-transparent border-0 text-xs font-black text-slate-700 outline-none p-0 w-28" />
+            <span className="text-slate-400 text-xs font-bold">to</span>
+            <input type="date" value={customDates.end} onChange={e => setCustomDates({ ...customDates, end: e.target.value })} className="bg-transparent border-0 text-xs font-black text-slate-700 outline-none p-0 w-28" />
+          </div>
+        )}
       </div>
 
-      {/* Success Notification */}
       {showSuccess && (
-         <div className="bg-emerald-500 text-white p-4 rounded-2xl flex items-center gap-3 shadow-2xl animate-bounce-gentle font-black text-xs uppercase tracking-widest no-print">
-            <CheckCircle2 className="w-5 h-5" /> {L('Sale recorded successfully!', 'Vente enregistrée avec succès !')}
-         </div>
+        <div className="shrink-0 mb-2 px-3 py-2 rounded-lg bg-emerald-500 text-white text-body flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          {L('Sale recorded!', 'Vente enregistrée!')}
+        </div>
       )}
 
-      {/* Main Table / List View */}
-      <div className="space-y-4">
+      <div className="section-stack">
         {filteredSales.length > 0 ? (
           paginatedSales.map((s, idx) => (
-            <div key={s.id || idx} className="glass-card bg-white border border-emerald-50 border-b-4 border-b-emerald-100 p-6 hover:border-emerald-400 transition-all group shadow-sm">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-center gap-6">
-                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center font-black ${s.status?.includes('paid') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
-                      {s.status?.includes('paid') ? <ShieldCheck className="w-7 h-7" /> : <AlertCircle className="w-7 h-7" />}
+            <div key={s.id || idx} className="panel-card !mb-2 p-2.5 hover:border-emerald-300 transition-colors group">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.status?.includes('paid') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-500'}`}>
+                      {s.status?.includes('paid') ? <ShieldCheck className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                    </div>
-                   <div>
-                      <h3 className="text-sm font-black text-navy-950 uppercase tracking-tighter group-hover:text-emerald-600 transition-colors">{s.name}</h3>
-                      <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-widest italic">{s.client || 'Client Anonyme'} | PAR: {s.operator || 'ADMIN'}</p>
+                   <div className="min-w-0">
+                      <h3 className="text-body font-bold text-navy-950 uppercase truncate group-hover:text-emerald-600 transition-colors">{s.name}</h3>
+                      <p className="text-label truncate">{s.client || 'Client Anonyme'} | {s.operator || 'ADMIN'}</p>
                       {s.phone && s.phone !== 'none' && (
                          <p className="text-xs font-bold text-emerald-500 uppercase tracking-widest flex items-center gap-1 mt-0.5">
                             <Phone className="w-2 h-2" /> {s.phone}
@@ -503,51 +489,51 @@ export default function Sales() {
                    </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-8 text-center flex-1 max-w-xl">
+                <div className="grid grid-cols-3 gap-3 text-center flex-1 max-w-md text-sm">
                    <div>
-                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Volume</p>
-                      <p className="text-xs font-black text-navy-950">{s.quantity} {s.unit || 'Kg'}</p>
+                      <p className="text-label mb-0.5">Vol.</p>
+                      <p className="text-body font-bold text-navy-950">{s.quantity} {s.unit || 'Kg'}</p>
                    </div>
                    <div>
-                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Total</p>
-                      <p className="text-xs font-black text-navy-950">{store.formatCurrency(s.amount)}</p>
+                      <p className="text-label mb-0.5">Total</p>
+                      <p className="text-body font-bold text-navy-950">{store.formatCurrency(s.amount)}</p>
                    </div>
                    <div>
-                      <p className="text-xs font-black text-blue-gray uppercase tracking-widest mb-1">Method</p>
-                      <div className="flex items-center justify-center gap-1.5 text-xs font-black text-navy-950">
-                         <Wallet className="w-3.5 h-3.5 text-emerald-500" /> {s.paymentMethod || 'Cash'}
+                      <p className="text-label mb-0.5">Method</p>
+                      <div className="flex items-center justify-center gap-1 text-body font-semibold text-navy-950">
+                         <Wallet className="w-3 h-3 text-emerald-500" /> {s.paymentMethod || 'Cash'}
                       </div>
                    </div>
                 </div>
 
-                <div className="flex items-center justify-end gap-3">
+                <div className="flex flex-wrap items-center justify-end gap-1.5">
                    <div className="text-right hidden sm:block">
                       <p className="text-xs md:text-sm font-black text-navy-950 uppercase">{new Date(s.date).toLocaleDateString()} | {new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                       <p className="text-xs font-bold text-blue-gray uppercase tracking-widest opacity-60">{new Date(s.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
                    </div>
                    <button 
                      onClick={() => printThermalReceipt(s, s.operator, store.formatCurrency, lang)}
-                     className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-navy-950 hover:text-white transition-all shadow-sm"
+                     className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-navy-950 hover:text-white transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
                    >
-                      <Printer className="w-4 h-4" />
+                      <Printer className="w-3.5 h-3.5" />
                    </button>
                    <button 
                       onClick={() => shareReceipt(s, s.operator, store.formatCurrency, lang)}
-                      className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                      className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
                    >
-                      <MessageSquare className="w-4 h-4" />
+                      <MessageSquare className="w-3.5 h-3.5" />
                    </button>
                    <button 
                       onClick={() => handleEditSale(s)}
-                      className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                      className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-emerald-500 hover:text-white transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
                    >
-                      <Edit2 className="w-4 h-4" />
+                      <Edit2 className="w-3.5 h-3.5" />
                    </button>
                    <button 
                       onClick={() => handleDeleteSale(s)}
-                      className="p-3 bg-navy-50 text-navy-950 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                      className="p-2 bg-navy-50 text-navy-950 rounded-lg hover:bg-rose-500 hover:text-white transition-all min-h-[32px] min-w-[32px] flex items-center justify-center"
                    >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                    </button>
                    <button 
                      onClick={() => {
@@ -566,22 +552,19 @@ export default function Sales() {
             </div>
           ))
         ) : (
-          <div className="py-32 text-center glass-card border-dashed border-2 border-emerald-100 opacity-30">
-             <ShoppingCart className="w-20 h-20 mx-auto text-blue-gray mb-6" />
-             <p className="text-xs font-black uppercase text-blue-gray tracking-[0.5em]">{L('No transactions recorded', 'Aucune transaction enregistrée')}</p>
+          <div className="panel-card text-center py-8 border-dashed">
+            <ShoppingCart className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+            <p className="text-caption normal-case">{L('No transactions recorded', 'Aucune transaction')}</p>
           </div>
         )}
       </div>
 
       {totalPages > 1 && (
-        <div className="pt-4 border-t border-navy-50/20 mt-6">
-           <Pagination 
-              currentPage={validCurrentPage} 
-              totalPages={totalPages} 
-              onPageChange={(page) => setCurrentPage(page)} 
-           />
+        <div className="shrink-0 pt-2 mt-2 border-t border-slate-100">
+          <Pagination currentPage={validCurrentPage} totalPages={totalPages} onPageChange={(page) => setCurrentPage(page)} />
         </div>
       )}
+    </DesktopPageLayout>
 
       {/* Add Sale Modal */}
       {showModal && (
@@ -949,7 +932,6 @@ export default function Sales() {
           </div>
         </div>
       )}
-
-    </div>
+    </>
   );
 }

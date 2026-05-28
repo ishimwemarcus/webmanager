@@ -338,33 +338,19 @@ export default function Reports() {
 
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+    <div className="page-shell page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 no-print">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(1.6rem,5vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display">
             {L('Business Intelligence', 'Intelligence d\'Affaires')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.3em] uppercase italic opacity-60">
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
             {L('Analytical Audit — High Fidelity Reporting', 'Audit Analytique — Reporting Haute Fidélité')}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-xl border border-emerald-100 shadow-sm">
-               <div className="relative w-10 h-10 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90">
-                     <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" className="text-navy-50" />
-                     <circle cx="20" cy="20" r="17" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={106.8} strokeDashoffset={106.8 - (106.8 * bizHealthScore / 100)} className={`${bizHealthScore > 80 ? 'text-emerald-500' : bizHealthScore > 50 ? 'text-amber-500' : 'text-rose-500'} transition-all duration-1000`} />
-                  </svg>
-                  <span className="absolute text-xs font-black text-navy-950">{bizHealthScore}%</span>
-               </div>
-               <div>
-                  <p className="text-[7px] font-black uppercase text-blue-gray tracking-widest">{L('Health', 'Santé')}</p>
-                  <p className="text-xs font-black text-navy-950 uppercase">{bizHealthScore > 80 ? 'Optimal' : bizHealthScore > 50 ? 'Stable' : 'Critical'}</p>
-               </div>
-            </div>
-
+        <div className="flex flex-wrap items-center gap-3">
             <button 
                onClick={() => {
                   printFullMasterReport({
@@ -381,14 +367,14 @@ export default function Reports() {
             >
                <Printer className="w-4 h-4" />
             </button>
-           <button onClick={handleDownloadCSV} className="flex items-center justify-center gap-2 px-5 py-3 bg-emerald-50 text-emerald-900 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-100 transition-all shadow-sm">
+           <button onClick={handleDownloadCSV} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-900 rounded-xl font-black uppercase tracking-widest text-xs hover:bg-emerald-100 transition-all shadow-sm">
              <FileText className="w-4 h-4 text-emerald-600" /> CSV
            </button>
-           <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 px-5 py-3 bg-navy-950 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-xl active:scale-95">
+           <button onClick={handleDownloadPDF} className="flex items-center justify-center gap-2 px-4 py-2.5 bg-navy-950 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-lg active:scale-95">
              <Download className="w-4 h-4 text-emerald-400" /> PDF
            </button>
         </div>
-      </div>
+      </header>
 
       {/* Report Controls */}
       <div className="glass-card bg-white rounded-[var(--fluid-radius-lg)] border-emerald-100 shadow-xl no-print">
@@ -564,7 +550,7 @@ export default function Reports() {
                   </div>
                </div>
 
-               <div className="overflow-x-auto">
+               <div className="table-scroll overflow-x-auto">
                   <table className="w-full text-left">
                      <thead>
                         <tr className="bg-navy-50/50 text-xs font-black uppercase tracking-widest text-blue-gray">
@@ -621,7 +607,7 @@ export default function Reports() {
                   </div>
                </div>
 
-               <div className="overflow-x-auto">
+               <div className="table-scroll overflow-x-auto">
                   <table className="w-full text-left">
                      <thead>
                         <tr className="bg-navy-50/50 text-xs font-black uppercase tracking-widest text-blue-gray">

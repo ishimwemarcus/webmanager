@@ -5,11 +5,11 @@
   "homepage": "https://ishimwemarcus.github.io/webmanager",
   "type": "module",
   "scripts": {
-    "dev": "vite --open",
-    "build": "vite build",
+    "dev": "node node_modules/vite/bin/vite.js --open",
+    "build": "node node_modules/vite/bin/vite.js build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "server": "vite --host 0.0.0.0 --port 5173 --open",
+    "preview": "node node_modules/vite/bin/vite.js preview",
+    "server": "node node_modules/vite/bin/vite.js --host localhost --port 5173 --open",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist --repo https://github.com/ishimwemarcus/webmanager.git"
   },

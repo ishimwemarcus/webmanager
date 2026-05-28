@@ -59,25 +59,25 @@ export default function Clients() {
   const portalUrl = `${window.location.origin}${window.location.pathname.replace(/\/$/, '')}/#/portal`;
 
   return (
-    <div className="max-w-[1600px] mx-auto space-y-8 pb-20 animate-fade-in px-4 lg:px-0">
+    <div className="page-shell page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-8 flex flex-col md:flex-row md:items-end justify-between gap-6 no-print">
+      <header className="page-header border-b border-navy-100 pb-4 flex flex-col md:flex-row md:items-end justify-between gap-4 no-print shrink-0">
         <div className="space-y-1">
-          <h1 className="text-[clamp(2rem,6vw,3.5rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+          <h1 className="text-display">
             {L('Client Base', 'Base Clients')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase italic opacity-60">
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
             {L('Loyalty & Risk Analysis — Loyalty Program', 'Fidélisation & Analyse de Risque — Programme Loyalty')}
           </p>
         </div>
         <button 
           onClick={() => setShowPortalQR(true)}
-          className="flex items-center justify-center gap-3 px-8 py-4 bg-navy-950 text-white rounded-[24px] font-black uppercase tracking-widest text-xs md:text-sm hover:bg-emerald-600 transition-all shadow-2xl active:scale-95"
+          className="flex items-center justify-center gap-2 px-5 py-2.5 bg-navy-950 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-emerald-600 transition-all shadow-lg active:scale-95"
         >
-          <QrCode className="w-5 h-5 text-emerald-400" /> {L('Generate Client Portal QR', 'Générer QR Portail Client')}
+          <QrCode className="w-4 h-4 text-emerald-400" /> {L('Generate Client Portal QR', 'Générer QR Portail Client')}
         </button>
-      </div>
+      </header>
 
       {/* Metrics Section */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 no-print">
@@ -223,7 +223,7 @@ export default function Clients() {
               </div>
 
               <div className="space-y-4">
-                 <p className="text-[11px] font-bold text-navy-950/40 leading-relaxed px-4 italic">
+                 <p className="text-sm font-bold text-navy-950/40 leading-relaxed px-4 italic">
                     {L('Scan to access the portal and consult your transactions in real time.', 'Scannez pour accéder au portail et consulter vos transactions en temps réel.')}
                  </p>
                  <button 

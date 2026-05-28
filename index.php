@@ -1,3 +1,4 @@
+
 <?php
 // BizTrack - Hybrid PHP/React Startup Engine
 // This file bridges the gap between Apache (XAMPP) and Vite (Dev Server) automatically.
@@ -8,7 +9,7 @@ session_start();
  * Automatically detect if the Vite development server is running.
  */
 function isViteRunning($port = 5173) {
-    $connection = @fsockopen('localhost', $port, $errno, $errstr, 0.05); // Very fast timeout
+    $connection = @fsockopen('127.0.0.1', $port, $errno, $errstr, 0.05); // Very fast timeout
     if ($connection) {
         fclose($connection);
         return true;

@@ -25,6 +25,7 @@ export default function Commander() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(0); // 0: Preparing, 1: Waiting Payment
   const [pendingSales, setPendingSales] = useState([]);
+  const [showClientProfile, setShowClientProfile] = useState(false);
 
   // Categories
   const categories = useMemo(() => {
@@ -167,18 +168,19 @@ export default function Commander() {
   };
 
   return (
-    <div className="max-w-[1800px] mx-auto h-[calc(100vh-6rem)] flex flex-col animate-fade-in px-4 lg:px-0">
+    <div className="page-shell-tall page-shell--fit animate-fade-in">
       
       {/* Premium Header */}
-      <div className="border-b border-navy-100 pb-4 flex items-center justify-between mb-4 no-print">
-        <div>
-          <h1 className="text-[clamp(1.2rem,3vw,2rem)] font-black uppercase tracking-tighter text-navy-950 leading-none">
+      <header className="page-header border-b border-navy-100 pb-2 flex items-center justify-between shrink-0 no-print">
+        <div className="space-y-1">
+          <h1 className="text-display">
             {L('Take Order', 'Prendre Commande')}
           </h1>
-          <p className="text-xs md:text-sm font-black text-blue-gray tracking-[0.4em] uppercase mt-1 italic opacity-60">
-            {L('Active POS — ', 'Point de Vente Actif — ')} {store.currentOperator}
+          <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase opacity-60">
+            {L('Active POS Terminal — ', 'Terminal PDV Actif — ')} {store.currentOperator}
           </p>
         </div>
+
         {success && (
           <div className="flex items-center gap-3">
              <div className="flex items-center gap-3 px-6 py-3 bg-emerald-500 text-white rounded-2xl font-black text-xs md:text-sm uppercase tracking-widest animate-bounce-gentle shadow-2xl">
@@ -201,10 +203,10 @@ export default function Commander() {
              </button>
           </div>
         )}
-      </div>
+      </header>
 
       {/* Main Grid */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-2 min-h-0 overflow-hidden">
 
         {/* Product Catalog — Left Side (8 cols) */}
         <div className="lg:col-span-8 flex flex-col gap-4 min-h-0">
@@ -261,8 +263,8 @@ export default function Commander() {
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 shadow-inner ${inCart ? 'bg-emerald-500 text-white' : 'bg-emerald-50 text-emerald-600'}`}>
                              <Package className="w-6 h-6" />
                           </div>
-                          <h4 className="text-xs font-black text-navy-950 uppercase tracking-tight mb-1 group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
-                          <p className="text-xs font-black text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || L('General', 'Général')}</p>
+                          <h4 className="text-sm font-bold text-navy-950 tracking-tight group-hover:text-emerald-600 transition-colors truncate">{product.name}</h4>
+                          <p className="text-xs font-medium text-blue-gray uppercase tracking-widest opacity-40 mb-4">{product.category || L('General', 'Général')}</p>
                           
                           <div className="flex items-center justify-between mt-auto">
                              <p className="text-sm font-black text-navy-950">{store.formatCurrency(product.price)}</p>
@@ -278,79 +280,93 @@ export default function Commander() {
            </div>
         </div>
 
-        {/* Checkout Terminal — Right Side (4 cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-6 min-h-0 pb-10">
+        {/* Combined Checkout Terminal — Right Side (4 cols) */}
+        <div className="lg:col-span-4 flex flex-col min-h-0 pb-10">
            
-           {/* Client Panel */}
-           <div className="glass-card bg-white p-4 rounded-[24px] border-emerald-50 shadow-sm">
-              <div className="flex items-center gap-3 mb-6">
-                 <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-950 flex items-center justify-center">
-                    <User className="w-5 h-5" />
-                 </div>
-                 <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-950 italic">{L('Client Profile', 'Profil Client')}</p>
-              </div>
-
-              <div className="space-y-4">
-                 <input
-                   type="text"
-                   placeholder={L('CLIENT NAME...', 'NOM DU CLIENT...')}
-                   value={clientName}
-                   onChange={e => setClientName(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-xs md:text-sm font-black text-navy-950 uppercase outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
-                 />
-                 <input
-                   type="text"
-                   placeholder={L('PHONE...', 'TÉLÉPHONE...')}
-                   value={clientPhone}
-                   onChange={e => setClientPhone(e.target.value)}
-                   className="w-full bg-navy-50 border border-transparent rounded-xl px-4 py-3 text-xs md:text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
-                 />
-              </div>
-
-              {clientName && (clientDebt > 0 || clientCredit > 0) && (
-                 <div className="mt-6 flex flex-wrap gap-2">
-                    {clientDebt > 0 && (
-                       <div className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-xs font-black uppercase tracking-widest border border-rose-100">
-                          {L('Debt:', 'Dette:')} {store.formatCurrency(clientDebt)}
-                       </div>
-                    )}
-                    {clientCredit > 0 && (
-                       <div className="px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-xs font-black uppercase tracking-widest border border-emerald-100">
-                          {L('Credit:', 'Crédit:')} {store.formatCurrency(clientCredit)}
-                       </div>
-                    )}
-                 </div>
-              )}
-           </div>
-
-           {/* Cart Terminal */}
-           <div className="flex-1 glass-card bg-white p-4 rounded-2xl border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
-              <div className="flex items-center justify-between mb-8">
-                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
-                       <ShoppingCart className="w-5 h-5" />
+           {/* Unified Cart & Client Terminal Container */}
+           <div className="flex-1 glass-card bg-white p-4 rounded-[24px] border-emerald-50 shadow-xl overflow-hidden flex flex-col min-h-0">
+              {/* Header Title */}
+              <div className="flex items-center justify-between mb-4 shrink-0">
+                 <div className="flex items-center gap-2">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-md">
+                       <ShoppingCart className="w-4 h-4" />
                     </div>
-                    <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-950 italic">{L('Cart', 'Panier')}</p>
+                    <p className="text-xs md:text-sm font-black uppercase tracking-widest text-navy-950 italic">{L('Checkout Cart', 'Panier de Caisse')}</p>
                  </div>
                  {cart.length > 0 && (
-                    <button onClick={() => setCart([])} className="text-xs font-black uppercase text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-all">{L('Purge', 'Purger')}</button>
+                    <button onClick={() => setCart([])} className="text-xs font-black uppercase text-rose-500 hover:bg-rose-50 px-2.5 py-1.5 rounded-lg transition-all">{L('Purge', 'Purger')}</button>
                  )}
               </div>
 
-              <div className="flex-1 overflow-y-auto scrollbar-hide space-y-4">
+              {/* Collapsible Client Details Section inside the Cart */}
+              <div className="mb-4 shrink-0 no-print">
+                 <button
+                   type="button"
+                   onClick={() => setShowClientProfile(!showClientProfile)}
+                   className="w-full flex items-center justify-between p-2.5 bg-slate-50 border border-slate-100 hover:border-emerald-300 rounded-xl transition-all outline-none animate-scale-in"
+                 >
+                    <div className="flex items-center gap-2 min-w-0">
+                       <User className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                       <span className="text-xs font-bold text-navy-950 truncate uppercase tracking-wider">
+                          {clientName ? `${L('Client:', 'Client:')} ${clientName}` : L('Anonymous Walk-In', 'Passager Anonyme')}
+                       </span>
+                    </div>
+                    <span className="text-[10px] font-black uppercase text-emerald-600 hover:text-emerald-700 select-none">
+                       {showClientProfile ? L('Hide', 'Masquer') : L('Add details', 'Détails')}
+                    </span>
+                 </button>
+
+                 {showClientProfile && (
+                    <div className="mt-2 p-3 bg-slate-50/50 border border-slate-100 rounded-xl space-y-2 animate-scale-in">
+                       <input
+                         type="text"
+                         placeholder={L('CLIENT NAME...', 'NOM DU CLIENT...')}
+                         value={clientName}
+                         onChange={e => setClientName(e.target.value)}
+                         className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-navy-950 uppercase outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-blue-gray/30"
+                       />
+                       <input
+                         type="text"
+                         placeholder={L('PHONE...', 'TÉLÉPHONE...')}
+                         value={clientPhone}
+                         onChange={e => setClientPhone(e.target.value)}
+                         className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-navy-950 outline-none focus:ring-2 focus:ring-emerald-500/20 placeholder:text-blue-gray/30"
+                       />
+                    </div>
+                 )}
+
+                 {/* Debt/Credit badges shown instantly if client name has balance */}
+                 {clientName && (clientDebt > 0 || clientCredit > 0) && (
+                    <div className="mt-2 flex flex-wrap gap-1.5 animate-scale-in">
+                       {clientDebt > 0 && (
+                          <div className="px-2.5 py-1 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-rose-100">
+                             {L('Debt:', 'Dette:')} {store.formatCurrency(clientDebt)}
+                          </div>
+                       )}
+                       {clientCredit > 0 && (
+                          <div className="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-black uppercase tracking-wider border border-emerald-100">
+                             {L('Credit:', 'Crédit:')} {store.formatCurrency(clientCredit)}
+                          </div>
+                       )}
+                    </div>
+                 )}
+              </div>
+
+              {/* Cart List Scrollable Area */}
+              <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3.5 pr-1">
                  {cart.length === 0 && (
                     <div className="h-full flex flex-col items-center justify-center opacity-10 text-center py-10">
-                       <ShoppingCart className="w-16 h-16 mb-4" />
+                       <ShoppingCart className="w-16 h-16 mb-4 animate-bounce-gentle" />
                        <p className="text-xs font-black uppercase tracking-widest">{L('Cart Empty', 'Panier Vide')}</p>
                     </div>
                  )}
                  {cart.map(item => (
-                    <div key={item.product.id || item.product.product_id} className="flex items-center gap-4 group">
+                    <div key={item.product.id || item.product.product_id} className="flex items-center gap-3 group">
                        <div className="flex-1 min-w-0">
-                          <p className="text-[11px] font-black text-navy-950 uppercase truncate">{item.product.name}</p>
+                          <p className="text-sm font-black text-navy-950 uppercase truncate">{item.product.name}</p>
                           <p className="text-xs font-black text-blue-gray uppercase opacity-60">{store.formatCurrency(item.unitPrice)}/u</p>
                        </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 shrink-0">
                            {checkoutStep === 0 && (
                               <button onClick={() => updateQty(item.product.id || item.product.product_id, -1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-rose-500 hover:text-white transition-all"><Minus className="w-3.5 h-3.5" /></button>
                            )}
@@ -359,30 +375,31 @@ export default function Commander() {
                               <button onClick={() => updateQty(item.product.id || item.product.product_id, 1)} className="w-8 h-8 rounded-xl bg-navy-50 flex items-center justify-center hover:bg-emerald-500 hover:text-white transition-all"><Plus className="w-3.5 h-3.5" /></button>
                            )}
                         </div>
-                       <p className="text-[11px] font-black text-navy-950 w-20 text-right">{store.formatCurrency(item.qty * item.unitPrice)}</p>
+                       <p className="text-sm font-black text-navy-950 w-20 text-right shrink-0">{store.formatCurrency(item.qty * item.unitPrice)}</p>
                     </div>
                  ))}
               </div>
 
-              <div className="mt-8 pt-8 border-t border-navy-50 space-y-4">
+              {/* Total Calculation & Payments */}
+              <div className="mt-4 pt-4 border-t border-navy-50 space-y-3.5 shrink-0">
                  <div className="flex items-center justify-between">
                     <p className="text-xs md:text-sm font-black uppercase tracking-widest text-blue-gray italic">{L('Subtotal', 'Sous-total')}</p>
                     <p className="text-2xl font-black text-navy-950 tracking-tighter">{store.formatCurrency(cartTotal)}</p>
                  </div>
 
                  <div className="relative group">
-                    <div className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-500"><Wallet className="w-4 h-4" /></div>
                     <input
                       type="number"
                       placeholder={L('AMOUNT RECEIVED...', 'MONTANT REÇU...')}
                       value={amountPaid}
                       onChange={e => setAmountPaid(e.target.value)}
-                      className="w-full bg-navy-50 border border-transparent rounded-xl pl-12 pr-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
+                      className="w-full bg-navy-50 border border-transparent rounded-xl pl-10 pr-4 py-2.5 text-xs font-black text-navy-950 outline-none focus:border-emerald-500 transition-all placeholder:text-blue-gray/30"
                     />
                  </div>
 
                  {paidInput > 0 && (
-                    <div className={`p-4 rounded-2xl flex items-center justify-between border ${change >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'}`}>
+                    <div className={`p-3 rounded-xl flex items-center justify-between border ${change >= 0 ? 'bg-emerald-50 border-emerald-100 text-emerald-600' : 'bg-rose-50 border-rose-100 text-rose-600'} animate-scale-in`}>
                        <p className="text-xs font-black uppercase tracking-widest">{change >= 0 ? L('To return', 'À rendre') : L('Missing', 'Manquant')}</p>
                        <p className="text-xl font-black">{store.formatCurrency(Math.abs(change))}</p>
                     </div>
@@ -394,7 +411,7 @@ export default function Commander() {
                            <button
                              onClick={handleFinalCheckout}
                              disabled={isProcessing}
-                             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
+                             className="w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 transition-all shadow-2xl bg-emerald-500 text-white hover:bg-emerald-600 shadow-emerald-500/20 active:scale-[0.98]"
                            >
                              {isProcessing ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                              <span>{isProcessing ? L('Validating...', 'Validation...') : L('Confirm Payment', 'Confirmer Paiement')}</span>
@@ -411,7 +428,7 @@ export default function Commander() {
                           key="step-0-action"
                           onClick={handleAcceptance}
                           disabled={cart.length === 0 || isProcessing}
-                          className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-3 transition-all shadow-2xl ${
+                          className={`w-full py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-sm flex items-center justify-center gap-3 transition-all shadow-2xl ${
                             cart.length === 0 || isProcessing
                               ? 'bg-navy-100 text-blue-gray cursor-not-allowed opacity-50'
                               : 'bg-navy-950 text-white hover:bg-emerald-600 shadow-navy-950/20 active:scale-[0.98]'

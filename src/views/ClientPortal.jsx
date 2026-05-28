@@ -79,10 +79,10 @@ export default function ClientPortal() {
            <div className="w-24 h-24 bg-navy-brand rounded-[2.5rem] flex items-center justify-center text-white shadow-2xl animate-bounce-gentle">
               <ShieldCheck className="w-12 h-12" />
            </div>
-           <div>
-              <h1 className="text-3xl md:text-4xl font-black text-navy-950 uppercase tracking-tighter leading-none">{L('Client Space', 'Espace Client')}</h1>
-              <p className="text-xs md:text-sm font-black text-blue-gray uppercase tracking-[0.4em] mt-2 italic">{L('Secure MARC Consultation', 'Consultation Sécurisée MARC')}</p>
-           </div>
+            <div>
+               <h1 className="text-display">{L('Client Space', 'Espace Client')}</h1>
+               <p className="text-xs font-medium text-blue-gray tracking-[0.2em] uppercase mt-2 opacity-60">{L('Secure MARC Consultation', 'Consultation Sécurisée MARC')}</p>
+            </div>
         </div>
 
         <form onSubmit={handleSearch} className="space-y-6">
@@ -126,12 +126,13 @@ export default function ClientPortal() {
                  <ShieldCheck className="w-12 h-12" />
               </div>
               <div>
-                 <p className="text-xs md:text-sm font-black uppercase tracking-[0.5em] text-navy-brand mb-2 italic">{L('MARC v4 Certified Client', 'Client Certifié MARC v4')}</p>
-                 <h1 className="text-3xl md:text-4xl md:text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">{decodedName}</h1>
+                 <p className="text-xs font-medium text-emerald-400 tracking-[0.2em] uppercase opacity-60 mb-2 italic">{L('MARC Certified Client', 'Client Certifié MARC')}</p>
+                 <h1 className="text-display text-white uppercase">{decodedName}</h1>
                  <p className="text-xs font-bold text-white/40 mt-3 flex items-center gap-2">
                     <Calendar className="w-4 h-4" /> {L('Member since', 'Membre depuis')} {clientSales.length > 0 ? new Date(clientSales[clientSales.length-1].date).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US') : L('Today', 'Aujourd\'hui')}
                  </p>
               </div>
+
            </div>
            <button 
              onClick={() => window.location.hash = '#/portal'}
