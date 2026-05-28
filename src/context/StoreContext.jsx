@@ -70,12 +70,12 @@ export const StoreProvider = ({ children }) => {
   const [isShiftEndModalOpen, setIsShiftEndModalOpen] = useState(false);
   const [purgeUnlocked, setPurgeUnlocked] = useState(false);
 
-  const isReadOnly = (() => {
+  const [isReadOnly] = useState(() => {
     try {
       const u = JSON.parse(localStorage.getItem('biztrack_user'));
       return u?.readOnly === true;
     } catch { return false; }
-  })();
+  });
 
   
   // Global Internet API URL (Force Vercel hosting vs Local Tunnel)

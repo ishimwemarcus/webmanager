@@ -31,6 +31,7 @@ function App() {
   const store = useStore();
   const { t } = useLanguage();
   const location = useLocation();
+  const { isReadOnly } = store;
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
   const [isCalculatorOpen, setIsCalculatorOpen] = useState(false);
 
@@ -89,7 +90,7 @@ function App() {
     <div className={`app-shell transition-all duration-1000 ${appBooted && (store.currentOperator || window.location.hash.includes('/portal/')) ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
       <GlobalAlerts />
       <ToastNotification />
-      <FloatingCalculator isOpen={isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
+      <FloatingCalculator isOpen={!isReadOnly && isCalculatorOpen} onClose={() => setIsCalculatorOpen(false)} />
       <ConfirmModal 
         isOpen={store.confirmState.isOpen}
         message={store.confirmState.message}
@@ -130,10 +131,11 @@ function App() {
             <Route path="/ledger" element={<Ledger />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/clients" element={<Clients />} />
-            <Route path="/spoilage" element={<Spoilage />} />
-            <Route path="/cloture" element={<Cloture />} />
-            <Route path="/commander" element={<Commander />} />
             <Route path="/shifts" element={<Shifts />} />
+            {/* Write-only routes: redirect boss to dashboard */}
+            <Route path="/commander" element={isReadOnly ? <Navigate to="/" replace /> : <Commander />} />
+            <Route path="/spoilage"  element={isReadOnly ? <Navigate to="/" replace /> : <Spoilage />} />
+            <Route path="/cloture"   element={isReadOnly ? <Navigate to="/" replace /> : <Cloture />} />
             <Route path="/portal" element={<ClientPortal />} />
             <Route path="/portal/:clientName/:phone?" element={<ClientPortal />} />
             <Route path="*" element={<Navigate to="/" replace />} />

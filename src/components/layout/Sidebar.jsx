@@ -17,16 +17,21 @@ export default function Sidebar({ className }) {
 
   const navItems = [
     { to: '/',          icon: LayoutDashboard, label: t('dashboard') },
-    { to: '/commander', icon: Cpu,             label: t('commanderInterface') },
+    { to: '/commander', icon: Cpu,             label: t('commanderInterface'), writeOnly: true },
     { to: '/stock',     icon: Package,         label: t('stock') },
     { to: '/sales',     icon: ShoppingCart,    label: t('sales') },
     { to: '/wait',      icon: BookOpen,        label: t('ledger') },
     { to: '/reports',   icon: BarChart2,       label: t('intelligence') },
     { to: '/clients',   icon: Users,           label: t('clientsDatabase') },
     { to: '/shifts',    icon: Clock,           label: t('currentShift') },
-    { to: '/spoilage',  icon: AlertTriangle,   label: t('spoilage') },
-    { to: '/cloture',   icon: Calculator,      label: t('closeRegister') },
+    { to: '/spoilage',  icon: AlertTriangle,   label: t('spoilage'), writeOnly: true },
+    { to: '/cloture',   icon: Calculator,      label: t('closeRegister'), writeOnly: true },
   ];
+
+  // Filter out write-only pages for the boss (read-only) view
+  const visibleNavItems = store.isReadOnly
+    ? navItems.filter(item => !item.writeOnly)
+    : navItems;
 
   return (
     <aside className={`app-sidebar no-print ${className ?? ''}`}>
@@ -68,7 +73,7 @@ export default function Sidebar({ className }) {
       <div className="app-sidebar__nav scroll-panel flex-1 min-h-0">
         <p className="text-label text-white/25 mb-2 px-2 tracking-widest">MENU</p>
         <nav className="app-sidebar__nav-list">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -108,22 +113,24 @@ export default function Sidebar({ className }) {
         </div>
 
         {/* End shift */}
-        <div
-          onClick={() => {
-            if (store.isReadOnly) {
-              localStorage.removeItem('biztrack_user');
-              localStorage.removeItem('biztrack_operator');
-              localStorage.removeItem('biztrack_shift_start');
-              window.location.href = '/';
-            } else {
-              store.setIsShiftEndModalOpen(true);
-            }
-          }}
-          className="flex items-center gap-2.5 px-3 py-2.5 bg-rose-500/8 border border-rose-500/20 rounded-xl text-rose-400 cursor-pointer hover:bg-rose-500/15 hover:border-rose-500/35 transition-all group min-h-[40px] active:scale-95"
-        >
-          <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform flex-shrink-0" />
-          <span className="text-body font-bold">{t('logOut')}</span>
-        </div>
+        {/* Boss view indicator OR End shift */}
+        {store.isReadOnly ? (
+          <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+            <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0" />
+            <div className="overflow-hidden min-w-0">
+              <p className="text-[0.6rem] font-black text-amber-400 uppercase tracking-widest leading-none mb-0.5">BOSS VIEW</p>
+              <p className="text-[0.6rem] font-bold text-amber-400/60 uppercase leading-none">Read-Only Mode</p>
+            </div>
+          </div>
+        ) : (
+          <div
+            onClick={() => store.setIsShiftEndModalOpen(true)}
+            className="flex items-center gap-2.5 px-3 py-2.5 bg-rose-500/8 border border-rose-500/20 rounded-xl text-rose-400 cursor-pointer hover:bg-rose-500/15 hover:border-rose-500/35 transition-all group min-h-[40px] active:scale-95"
+          >
+            <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform flex-shrink-0" />
+            <span className="text-body font-bold">{t('logOut')}</span>
+          </div>
+        )}
       </div>
     </aside>
   );

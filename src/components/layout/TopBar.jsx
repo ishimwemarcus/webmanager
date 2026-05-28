@@ -101,35 +101,15 @@ export default function TopBar({ onToggleSidebar, onToggleCalculator, isCalculat
         {/* ── RIGHT ── */}
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-          {/* Operator + End Shift */}
+          {/* Operator chip — shown in both modes */}
           {currentOperator && (
-            <div className="flex items-center gap-1 sm:gap-1.5">
-              <div className="hidden xs:flex items-center gap-1.5 px-2 py-1 bg-white/8 border border-white/10 rounded-lg">
-                <div className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs shadow-[0_0_8px_rgba(16,185,129,0.4)] flex-shrink-0">
-                  {currentOperator.charAt(0).toUpperCase()}
-                </div>
-                <span className="hidden sm:block font-black uppercase text-white" style={{ fontSize: '0.7rem', letterSpacing: '0.08em', maxWidth: 72 }} title={currentOperator}>
-                  {currentOperator.length > 8 ? currentOperator.slice(0, 7) + '…' : currentOperator}
-                </span>
+            <div className="hidden xs:flex items-center gap-1.5 px-2 py-1 bg-white/8 border border-white/10 rounded-lg">
+              <div className="w-5 h-5 rounded-full bg-emerald-500 text-black flex items-center justify-center font-black text-xs shadow-[0_0_8px_rgba(16,185,129,0.4)] flex-shrink-0">
+                {currentOperator.charAt(0).toUpperCase()}
               </div>
-              <button
-                onClick={() => {
-                  if (store.isReadOnly) {
-                    localStorage.removeItem('biztrack_user');
-                    localStorage.removeItem('biztrack_operator');
-                    localStorage.removeItem('biztrack_shift_start');
-                    window.location.href = '/';
-                  } else {
-                    store.setIsShiftEndModalOpen(true);
-                  }
-                }}
-                title={L('End shift', 'Fin de poste')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500/50 rounded-lg text-white font-black uppercase transition-all shadow-lg shadow-rose-600/25"
-                style={{ fontSize: '0.75rem', letterSpacing: '0.06em' }}
-              >
-                <LogOut className="w-4 h-4 flex-shrink-0" />
-                <span className="hidden xs:inline">{L('End', 'Fin')}</span>
-              </button>
+              <span className="hidden sm:block font-black uppercase text-white" style={{ fontSize: '0.7rem', letterSpacing: '0.08em', maxWidth: 72 }} title={currentOperator}>
+                {currentOperator.length > 8 ? currentOperator.slice(0, 7) + '…' : currentOperator}
+              </span>
             </div>
           )}
 
@@ -145,60 +125,76 @@ export default function TopBar({ onToggleSidebar, onToggleCalculator, isCalculat
             <span className="font-black text-white hidden xs:inline" style={{ fontSize: '0.65rem' }}>{lang.toUpperCase()}</span>
           </button>
 
-          {/* QR / Grid */}
-          <button
-            onClick={() => setShowQR(true)}
-            title={L('Boss Sync QR', 'QR Sync Boss')}
-            className="p-1.5 bg-white/5 border border-white/10 rounded-lg transition-all active:scale-90 hover:bg-white/12 text-white/50 hover:text-white"
-          >
-            <LayoutGrid className="w-3.5 h-3.5" />
-          </button>
+          {/* Controls only shown to staff, not the boss */}
+          {!store.isReadOnly && (
+            <>
+              {/* QR / Grid */}
+              <button
+                onClick={() => setShowQR(true)}
+                title={L('Boss Sync QR', 'QR Sync Boss')}
+                className="p-1.5 bg-white/5 border border-white/10 rounded-lg transition-all active:scale-90 hover:bg-white/12 text-white/50 hover:text-white"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+              </button>
 
-          {/* Calculator */}
-          <button
-            onClick={onToggleCalculator}
-            title={L('Calculator', 'Calculatrice')}
-            className={`p-1.5 border border-white/10 rounded-lg transition-all active:scale-90 ${
-              isCalculatorOpen
-                ? 'bg-emerald-500/20 text-emerald-300'
-                : 'bg-white/5 text-white/50 hover:bg-white/12 hover:text-white'
-            }`}
-          >
-            <Calculator className="w-3.5 h-3.5" />
-          </button>
+              {/* Calculator */}
+              <button
+                onClick={onToggleCalculator}
+                title={L('Calculator', 'Calculatrice')}
+                className={`p-1.5 border border-white/10 rounded-lg transition-all active:scale-90 ${
+                  isCalculatorOpen
+                    ? 'bg-emerald-500/20 text-emerald-300'
+                    : 'bg-white/5 text-white/50 hover:bg-white/12 hover:text-white'
+                }`}
+              >
+                <Calculator className="w-3.5 h-3.5" />
+              </button>
 
-          {/* UI Zoom */}
-          <div className="flex items-center gap-1 px-1 py-1 bg-white/5 border border-white/10 rounded-lg">
-            <button
-              onClick={decreaseZoom}
-              title={L('Zoom out', 'Zoom arrière')}
-              className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-            >
-              <ZoomOut className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={resetZoom}
-              title={L('Reset zoom', 'Réinitialiser zoom')}
-              className="min-w-[3rem] px-1 text-center text-[0.62rem] font-black text-emerald-300"
-            >
-              {Math.round(zoomLevel * 100)}%
-            </button>
-            <button
-              onClick={increaseZoom}
-              title={L('Zoom in', 'Zoom avant')}
-              className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
-            >
-              <ZoomIn className="w-3.5 h-3.5" />
-            </button>
-          </div>
+              {/* UI Zoom */}
+              <div className="flex items-center gap-1 px-1 py-1 bg-white/5 border border-white/10 rounded-lg">
+                <button
+                  onClick={decreaseZoom}
+                  title={L('Zoom out', 'Zoom arrière')}
+                  className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+                >
+                  <ZoomOut className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={resetZoom}
+                  title={L('Reset zoom', 'Réinitialiser zoom')}
+                  className="min-w-[3rem] px-1 text-center text-[0.62rem] font-black text-emerald-300"
+                >
+                  {Math.round(zoomLevel * 100)}%
+                </button>
+                <button
+                  onClick={increaseZoom}
+                  title={L('Zoom in', 'Zoom avant')}
+                  className="p-1.5 rounded-md text-white/60 hover:text-white hover:bg-white/10 transition-all active:scale-90"
+                >
+                  <ZoomIn className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
-          {/* Currency chip */}
-          <button
-            className="flex items-center justify-center w-7 h-7 bg-emerald-500 text-black rounded-lg font-black text-sm shadow-lg shadow-emerald-500/25 transition-all hover:bg-emerald-400 active:scale-90"
-            title={`Currency: ${currency}`}
-          >
-            {String(currency?.val || currency || '€')}
-          </button>
+              {/* Currency chip */}
+              <button
+                className="flex items-center justify-center w-7 h-7 bg-emerald-500 text-black rounded-lg font-black text-sm shadow-lg shadow-emerald-500/25 transition-all hover:bg-emerald-400 active:scale-90"
+                title={`Currency: ${currency}`}
+              >
+                {String(currency?.val || currency || '€')}
+              </button>
+
+              {/* End Shift */}
+              <button
+                onClick={() => store.setIsShiftEndModalOpen(true)}
+                title={L('End shift', 'Fin de poste')}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 active:scale-95 border border-rose-500/50 rounded-lg text-white font-black uppercase transition-all shadow-lg shadow-rose-600/25"
+                style={{ fontSize: '0.75rem', letterSpacing: '0.06em' }}
+              >
+                <LogOut className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden xs:inline">{L('End', 'Fin')}</span>
+              </button>
+            </>
+          )}
         </div>
       </header>
 
