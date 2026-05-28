@@ -220,13 +220,21 @@ export default function TopBar({ onToggleSidebar, onToggleCalculator, isCalculat
             </p>
             <div className="bg-slate-50 p-5 rounded-2xl mb-3 border-2 border-dashed border-slate-200 relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-t from-emerald-500/0 via-emerald-500/8 to-emerald-500/0 h-2 top-0 animate-scan z-10" />
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(
-                  window.location.origin + window.location.pathname + '#/?pass=MARCUS&sync=' + encodeURIComponent(store.syncUrl)
-                )}`}
-                alt="QR Code"
-                className="w-full h-auto rounded-xl relative z-0"
-              />
+              {(() => {
+                const customSyncUrl = localStorage.getItem('biztrack_sync_url') || '';
+                const activeSyncTarget = customSyncUrl || store.syncUrl;
+                const cleanSyncTarget = activeSyncTarget.startsWith('/')
+                  ? `${window.location.protocol}//${window.location.hostname}/manager web/api.php`
+                  : activeSyncTarget;
+                const qrTarget = `https://ishimwemarcus.github.io/webmanager/?pass=MARCUS&sync=${encodeURIComponent(cleanSyncTarget)}`;
+                return (
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrTarget)}`}
+                    alt="QR Code"
+                    className="w-full h-auto rounded-xl relative z-0"
+                  />
+                );
+              })()}
             </div>
             <p className="text-xs font-black uppercase text-emerald-600 tracking-widest">MARC Protocol v4.0</p>
           </div>

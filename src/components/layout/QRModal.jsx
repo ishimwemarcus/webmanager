@@ -4,9 +4,25 @@ import { useStore } from '../../context/StoreContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export default function QRModal() {
-  const { showQRModal, setShowQRModal, currency, showAlert, API_URL } = useStore();
+  const { showQRModal, setShowQRModal, currency, showAlert, API_URL, syncUrl } = useStore();
   const { L } = useLanguage();
   const [isSyncing, setIsSyncing] = React.useState(false);
+
+  // Read custom sync URL from localStorage if any, or construct from local state
+  const customSyncUrl = localStorage.getItem('biztrack_sync_url') || '';
+  const [tunnelInput, setTunnelInput] = React.useState(customSyncUrl);
+
+  const activeSyncTarget = React.useMemo(() => {
+    if (tunnelInput) return tunnelInput.trim();
+    // Default fallback
+    return window.location.hostname === 'localhost' && window.location.port !== ''
+      ? `${window.location.protocol}//${window.location.hostname}/manager web/api.php`
+      : `${window.location.origin}/manager web/api.php`;
+  }, [tunnelInput]);
+
+  const qrDataUrl = React.useMemo(() => {
+    return `https://ishimwemarcus.github.io/webmanager/?pass=MARCUS&sync=${encodeURIComponent(activeSyncTarget)}`;
+  }, [activeSyncTarget]);
 
   if (!showQRModal) return null;
 
@@ -34,7 +50,7 @@ export default function QRModal() {
         <div className="relative bg-white p-4 rounded-[32px] shadow-[0_0_60px_rgba(59,130,246,0.4)] border-8 border-white/10 hover:scale-105 transition-transform duration-500 group">
           <div className="absolute inset-0 bg-gradient-to-t from-accent-500/0 via-accent-500/20 to-accent-500/0 h-1 sm:h-2 top-0 animate-scan z-10"></div>
           <img 
-            src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} 
+            src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(qrDataUrl)}`} 
             alt="MARC Boss Sync QR Code"
             className="w-56 h-56 md:w-64 md:h-64 rounded-xl object-contain bg-white relative z-0"
           />
@@ -42,13 +58,38 @@ export default function QRModal() {
 
         
         <a 
-          href="https://ishimwemarcus.github.io/webmanager/?pass=MARCUS" 
+          href={qrDataUrl} 
           target="_blank" 
           rel="noreferrer"
           className="mt-6 text-xs md:text-sm md:text-xs text-accent-500 font-bold tracking-widest hover:text-white hover:underline uppercase text-center break-all px-4"
         >
-          ishimwemarcus.github.io/webmanager/?pass=MARCUS
+          {qrDataUrl.replace('https://', '')}
         </a>
+
+        {/* Public Tunnel Configuration Input */}
+        <div className="w-full mt-4 bg-white/5 border border-white/10 rounded-2xl p-4 text-left">
+          <label className="text-[10px] font-black uppercase tracking-widest text-accent-500 block mb-1">
+            {L('Public Tunnel / Sync Server URL', 'Serveur Sync Tunnel Public')}
+          </label>
+          <input 
+            type="text"
+            value={tunnelInput}
+            onChange={(e) => {
+              const val = e.target.value;
+              setTunnelInput(val);
+              if (val.trim()) {
+                localStorage.setItem('biztrack_sync_url', val.trim());
+              } else {
+                localStorage.removeItem('biztrack_sync_url');
+              }
+            }}
+            placeholder="e.g., https://5fd1967f5a518c.lhr.life/manager web/api.php"
+            className="w-full bg-[#030711] border border-white/10 rounded-xl px-3 py-2 text-xs font-bold text-white placeholder-white/20 outline-none focus:border-accent-500/50 transition-all"
+          />
+          <p className="text-[9px] font-semibold text-navy-400 mt-1 uppercase tracking-wider leading-normal">
+            {L("Required for HTTPS connection on boss's mobile phone.", "Requis pour la connexion HTTPS sur le téléphone du boss.")}
+          </p>
+        </div>
 
         {/* Manual Master Override Sync Button */}
         <button

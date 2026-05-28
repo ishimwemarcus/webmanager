@@ -6,6 +6,17 @@ export default function BootScreen({ onComplete }) {
   const [phase, setPhase] = useState(0);
   const { L } = useLanguage();
 
+  // Dynamic QR Code link builder
+  const qrDataUrl = React.useMemo(() => {
+    const customSyncUrl = localStorage.getItem('biztrack_sync_url') || '';
+    const activeSyncTarget = customSyncUrl || (
+      window.location.hostname === 'localhost' && window.location.port !== ''
+        ? `${window.location.protocol}//${window.location.hostname}/manager web/api.php`
+        : `${window.location.origin}/manager web/api.php`
+    );
+    return `https://ishimwemarcus.github.io/webmanager/?pass=MARCUS&sync=${encodeURIComponent(activeSyncTarget)}`;
+  }, []);
+
   useEffect(() => {
     const sequence = [
       setTimeout(() => setPhase(1), 500),
@@ -36,7 +47,7 @@ export default function BootScreen({ onComplete }) {
             <div className="absolute inset-0 bg-emerald-500/10 animate-pulse"></div>
             <div className={`absolute top-0 bottom-0 left-0 w-1 bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] transition-all duration-[2000ms] ease-out ${phase >= 1 ? 'h-full' : 'h-0'} z-20`}></div>
             
-            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('https://ishimwemarcus.github.io/webmanager/?pass=MARCUS')}`} alt="MARC Boss Sync QR" className="absolute inset-0 w-full h-full object-contain p-4 z-10" />
+            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrDataUrl)}`} alt="MARC Boss Sync QR" className="absolute inset-0 w-full h-full object-contain p-4 z-10" />
           </div>
         </div>
 
