@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
-import { hasBundleSupport, getBaseQuantity } from '../utils/ProductUtils';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { generateDailySummary, calculateTradingRatio, generateSystemHealthReport } from '../utils/Reporter';
 
 const load = (key, type, def) => {
@@ -705,16 +704,12 @@ export const StoreProvider = ({ children }) => {
       shiftId: shiftStart
     });
 
-    // 2. Decrement stock quantity — bundle-aware
+    // 2. Decrement stock quantity
     const product = products.find(p => p.id === product_id || p.product_id === product_id);
     if (product) {
-      // If this sale was in bundle units, deduct bundleSize × qty base units
-      const baseUnitsToDeduct = hasBundleSupport(product) && saleRecord.saleUnit === 'bundle'
-        ? (parseFloat(quantity) || 0) * (parseFloat(product.bundleSize) || 1)
-        : (parseFloat(quantity) || 0);
       updateRecord({
         ...product,
-        quantity: Math.max(0, (parseFloat(product.quantity) || 0) - baseUnitsToDeduct)
+        quantity: Math.max(0, (product.quantity || 0) - (parseInt(quantity) || 0))
       });
     }
 
