@@ -21,7 +21,7 @@ import {
   Filter,
   Wallet
 } from 'lucide-react';
-import { getFormattedQuantity } from '../utils/ProductUtils';
+import { getFormattedQuantity, getBundleInfo, hasBundleSupport } from '../utils/ProductUtils';
 import Pagination from '../components/common/Pagination';
 
 export default function Stock() {
@@ -41,7 +41,12 @@ export default function Stock() {
     packCount: '',
     quantity: 0,
     cost: 0,
-    price: 0
+    price: 0,
+    // Bundle decomposition (optional)
+    baseUnit: '',
+    bundleName: '',
+    bundleSize: '',
+    bundlePrice: '',
   });
 
   const [editProduct, setEditProduct] = useState(null);
@@ -107,10 +112,15 @@ export default function Stock() {
       quantity: parseFloat(newProduct.quantity) || 0,
       cost: parseFloat(newProduct.cost) || 0,
       price: parseFloat(newProduct.price) || 0,
+      // Bundle fields (only save if all are filled)
+      baseUnit: newProduct.baseUnit || '',
+      bundleName: newProduct.bundleName || '',
+      bundleSize: newProduct.bundleName && newProduct.bundleSize ? parseFloat(newProduct.bundleSize) : '',
+      bundlePrice: newProduct.bundlePrice ? parseFloat(newProduct.bundlePrice) : '',
       status: 'active',
       date: new Date().toISOString()
     });
-    setNewProduct({ name: '', category: '', packageType: 'U', quantity: 0, cost: 0, price: 0 });
+    setNewProduct({ name: '', category: '', packageType: 'U', quantity: 0, cost: 0, price: 0, baseUnit: '', bundleName: '', bundleSize: '', bundlePrice: '' });
     setShowModal(false);
   };
 
@@ -122,6 +132,10 @@ export default function Stock() {
       quantity: parseFloat(editProduct.quantity) || 0,
       cost: parseFloat(editProduct.cost) || 0,
       price: parseFloat(editProduct.price) || 0,
+      baseUnit: editProduct.baseUnit || '',
+      bundleName: editProduct.bundleName || '',
+      bundleSize: editProduct.bundleName && editProduct.bundleSize ? parseFloat(editProduct.bundleSize) : '',
+      bundlePrice: editProduct.bundlePrice ? parseFloat(editProduct.bundlePrice) : '',
     });
     setEditProduct(null);
   };
@@ -304,10 +318,16 @@ export default function Stock() {
                           <p className="text-[9px] font-black text-blue-gray uppercase tracking-wide mb-0.5 italic">{L('Available Stock', 'Stock Disponible')}</p>
                           <div className="flex items-center justify-start gap-1.5">
                              <span className="text-[10px] font-black text-navy-950">{getFormattedQuantity(p)}</span>
+                             {hasBundleSupport(p) && (
+                               <span className="text-[8px] font-bold text-blue-400">({p.quantity} {p.baseUnit || p.packageType})</span>
+                             )}
                              <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black uppercase ${p.quantity <= 5 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white shadow-sm'}`}>
                                 {p.quantity <= 5 ? L('Low', 'Bas') : L('Optimal', 'Optimal')}
                              </span>
                           </div>
+                          {hasBundleSupport(p) && (
+                            <p className="text-[8px] font-bold text-blue-400/70 mt-0.5">1 {p.bundleName} = {p.bundleSize} {p.baseUnit || p.packageType}</p>
+                          )}
                        </div>
                        <div>
                           <p className="text-[9px] font-black text-blue-gray uppercase tracking-wide mb-0.5 italic">{L('Unit Price', 'Prix Unitaire')}</p>
@@ -446,6 +466,71 @@ export default function Stock() {
                         className="w-full bg-navy-50 border border-transparent rounded-2xl px-5 py-4 text-sm font-black text-navy-950 outline-none focus:border-emerald-500 transition-all"
                       />
                     </div>
+                 </div>
+
+                 {/* Bundle Decomposition — Optional Section */}
+                 <div className="border-t border-navy-50 pt-6">
+                   <div className="flex items-center gap-2 mb-4">
+                     <Layers className="w-4 h-4 text-blue-500" />
+                     <p className="text-xs font-black uppercase tracking-widest text-blue-500">{L('Bundle Decomposition (Optional)', 'Décomposition Lot (Optionnel)')}</p>
+                   </div>
+                   <p className="text-[10px] font-medium text-blue-gray/60 mb-4 leading-relaxed">
+                     {L('Configure if this product is sold both as a full bundle (e.g. Box) and individually (e.g. Apple).', 'Configurez si ce produit se vend en lot (ex: Carton) et à l\'unité (ex: Pomme).')}
+                   </p>
+                   <div className="grid grid-cols-2 gap-4">
+                     <div>
+                       <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1 block">{L('Base Unit Name', 'Nom Unité de Base')}</label>
+                       <input
+                         type="text"
+                         placeholder={L('e.g. Apple, Bottle, Egg', 'ex: Pomme, Bouteille, Oeuf')}
+                         value={editProduct ? (editProduct.baseUnit || '') : (newProduct.baseUnit || '')}
+                         onChange={e => editProduct ? setEditProduct({...editProduct, baseUnit: e.target.value}) : setNewProduct({...newProduct, baseUnit: e.target.value})}
+                         className="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-blue-400 transition-all placeholder:text-blue-gray/30"
+                       />
+                     </div>
+                     <div>
+                       <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1 block">{L('Bundle Name', 'Nom du Lot')}</label>
+                       <input
+                         type="text"
+                         placeholder={L('e.g. Box, Carton, Tray', 'ex: Carton, Caisse, Plateau')}
+                         value={editProduct ? (editProduct.bundleName || '') : (newProduct.bundleName || '')}
+                         onChange={e => editProduct ? setEditProduct({...editProduct, bundleName: e.target.value}) : setNewProduct({...newProduct, bundleName: e.target.value})}
+                         className="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-blue-400 transition-all placeholder:text-blue-gray/30"
+                       />
+                     </div>
+                     <div>
+                       <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1 block">{L('Units per Bundle', 'Unités par Lot')}</label>
+                       <input
+                         type="number"
+                         min="2"
+                         step="1"
+                         placeholder={L('e.g. 12, 24, 30', 'ex: 12, 24, 30')}
+                         value={editProduct ? (editProduct.bundleSize || '') : (newProduct.bundleSize || '')}
+                         onChange={e => editProduct ? setEditProduct({...editProduct, bundleSize: e.target.value}) : setNewProduct({...newProduct, bundleSize: e.target.value})}
+                         className="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-blue-400 transition-all"
+                       />
+                     </div>
+                     <div>
+                       <label className="text-[10px] font-black uppercase tracking-widest text-blue-gray mb-1 block">{L('Bundle Sell Price', 'Prix Vente Lot')}</label>
+                       <input
+                         type="number"
+                         min="0"
+                         step="0.01"
+                         placeholder={L('Auto: unit price × size', 'Auto: prix × taille')}
+                         value={editProduct ? (editProduct.bundlePrice || '') : (newProduct.bundlePrice || '')}
+                         onChange={e => editProduct ? setEditProduct({...editProduct, bundlePrice: e.target.value}) : setNewProduct({...newProduct, bundlePrice: e.target.value})}
+                         className="w-full bg-blue-50/50 border border-blue-100 rounded-xl px-4 py-3 text-xs font-black text-navy-950 outline-none focus:border-blue-400 transition-all"
+                       />
+                     </div>
+                   </div>
+                   {/* Live preview */}
+                   {((editProduct?.bundleName && editProduct?.bundleSize) || (newProduct.bundleName && newProduct.bundleSize)) && (
+                     <div className="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                       <p className="text-[9px] font-black uppercase tracking-widest text-blue-500">
+                         ✓ {L('Bundle configured', 'Lot configuré')} — 1 {(editProduct || newProduct).bundleName} = {(editProduct || newProduct).bundleSize} {(editProduct || newProduct).baseUnit || (editProduct || newProduct).packageType || 'units'}
+                       </p>
+                     </div>
+                   )}
                  </div>
 
                  <button

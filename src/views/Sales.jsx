@@ -32,7 +32,7 @@ import {
   Banknote,
   Star
 } from 'lucide-react';
-import { getFormattedQuantity } from '../utils/ProductUtils';
+import { getFormattedQuantity, hasBundleSupport, getBundleInfo } from '../utils/ProductUtils';
 import Pagination from '../components/common/Pagination';
 import DesktopPageLayout from '../components/layout/DesktopPageLayout';
 
@@ -70,6 +70,8 @@ export default function Sales() {
     isAccepted: false,
     debtPaymentAmount: 0
   });
+  // 'base' = individual unit, 'bundle' = full box/carton
+  const [saleUnit, setSaleUnit] = useState('base');
 
   const [showSuccess, setShowSuccess] = useState(false);
   const [lastSaleRecord, setLastSaleRecord] = useState(null);
@@ -119,11 +121,16 @@ export default function Sales() {
     if (newSale.product_id) {
       const p = products.find(pr => pr.id === newSale.product_id || pr.product_id === newSale.product_id);
       if (p) {
-        const total = p.price * (newSale.quantity || 1);
+        let unitPrice = parseFloat(p.price) || 0;
+        if (hasBundleSupport(p) && saleUnit === 'bundle') {
+          const info = getBundleInfo(p);
+          unitPrice = info.bundlePrice;
+        }
+        const total = unitPrice * (parseFloat(newSale.quantity) || 1);
         setNewSale(prev => ({ ...prev, amount: total, paid: total }));
       }
     }
-  }, [newSale.product_id, newSale.quantity]);
+  }, [newSale.product_id, newSale.quantity, saleUnit]);
 
   const handleSalePreSubmit = (e) => {
     if (e) e.preventDefault();
@@ -166,6 +173,12 @@ export default function Sales() {
     const effectivePaid = overpayChoice ? amount : totalPayment;
     const debtPaymentAmt = parseFloat(newSale.debtPaymentAmount) || 0;
 
+    const selectedProduct = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
+    const bundleInfo = selectedProduct ? getBundleInfo(selectedProduct) : null;
+    const baseUnitsConsumed = bundleInfo && saleUnit === 'bundle'
+      ? (parseFloat(newSale.quantity) || 0) * bundleInfo.bundleSize
+      : parseFloat(newSale.quantity) || 0;
+
     const finalSale = {
       record_type: 'sale',
       name: product.name,
@@ -180,7 +193,13 @@ export default function Sales() {
       paymentMethod: newSale.paymentMethod,
       useCredit: newSale.useCredit,
       overpayChoice,
-      debtPaymentAmount: debtPaymentAmt
+      debtPaymentAmount: debtPaymentAmt,
+      // Bundle decomposition fields
+      saleUnit: hasBundleSupport(product) ? saleUnit : 'base',
+      bundleName: bundleInfo ? bundleInfo.bundleName : null,
+      baseUnit: bundleInfo ? bundleInfo.baseUnit : null,
+      baseUnitsConsumed,
+      unit: hasBundleSupport(product) && saleUnit === 'bundle' ? bundleInfo.bundleName : (product.baseUnit || product.packageType || 'U'),
     };
 
     store.processSmartTransaction(finalSale);
@@ -317,6 +336,7 @@ export default function Sales() {
     setShowConfirmPop(false);
     setEditingSale(null);
     setDebtPayment(0);
+    setSaleUnit('base');
     setNewSale({ product_id: '', client: '', phone: '', quantity: 1, amount: 0, paid: 0, paymentMethod: 'Cash', useCredit: true, overpayType: null, isAccepted: false, debtPaymentAmount: 0 });
   };
 
@@ -591,6 +611,53 @@ export default function Sales() {
                     ))}
                   </select>
                </div>
+
+               {/* Bundle Unit Toggle — shown only when product has bundle support */}
+               {(() => {
+                 const selProduct = products.find(p => p.id === newSale.product_id || p.product_id === newSale.product_id);
+                 const info = selProduct ? getBundleInfo(selProduct) : null;
+                 if (!info) return null;
+                 return (
+                   <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 animate-scale-in">
+                     <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 mb-3">
+                       {L('Selling Unit', 'Unité de Vente')} — 1 {info.bundleName} = {info.bundleSize} {info.baseUnit}
+                     </p>
+                     <div className="grid grid-cols-2 gap-2">
+                       <button
+                         type="button"
+                         disabled={newSale.isAccepted}
+                         onClick={() => { setSaleUnit('base'); }}
+                         className={`py-3 px-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                           saleUnit === 'base'
+                             ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                             : 'bg-white border border-blue-100 text-blue-400 hover:border-blue-300'
+                         }`}
+                       >
+                         {info.baseUnit} {L('(Single)', '(Unité)')}
+                         <span className="block text-[9px] opacity-70 mt-0.5 font-medium normal-case">{store.formatCurrency(info.basePrice)} {L('each', 'chacun')}</span>
+                       </button>
+                       <button
+                         type="button"
+                         disabled={newSale.isAccepted}
+                         onClick={() => { setSaleUnit('bundle'); }}
+                         className={`py-3 px-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                           saleUnit === 'bundle'
+                             ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/20'
+                             : 'bg-white border border-blue-100 text-blue-400 hover:border-blue-300'
+                         }`}
+                       >
+                         {info.bundleName} {L('(Full)', '(Lot)')}
+                         <span className="block text-[9px] opacity-70 mt-0.5 font-medium normal-case">{store.formatCurrency(info.bundlePrice)} {L('per', 'par')} {info.bundleName.toLowerCase()}</span>
+                       </button>
+                     </div>
+                     {saleUnit === 'bundle' && (
+                       <p className="text-[9px] font-bold text-blue-400 mt-2">
+                         ⚡ {L('Will deduct', 'Déduira')} {(parseFloat(newSale.quantity)||1) * info.bundleSize} {info.baseUnit} {L('from stock', 'du stock')}
+                       </p>
+                     )}
+                   </div>
+                 );
+               })()}
 
                <div className="grid grid-cols-2 gap-6">
                   <div>
